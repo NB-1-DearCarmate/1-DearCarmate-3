@@ -1,0 +1,109 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model USER {
+  id           String   @id @default(uuid())
+  name         String   @db.VarChar(50)
+  email        String   @unique @db.VarChar(320)
+  phone_number String   @unique @db.VarChar(20)
+  password     String   @db.VarChar(100)
+  createdAt    DateTime @default(now())
+  COMPANY      COMPANY  @relation(fields: [company_id], references: [id])
+  company_id   String
+  USERCODE     USERCODE @relation(fields: [usercode_id], references: [id])
+  usercode_id  String
+}
+
+model CUSTOMER {
+  id             String   @id @default(uuid())
+  name           String   @db.VarChar(50)
+  email          String   @unique @db.VarChar(320)
+  gender         String   @db.VarChar(50)
+  phone_number   String   @unique @db.VarChar(20)
+  age_group      Int      @db.Integer
+  region         String   @db.VarChar(50)
+  contract_count Int      @default(0) @db.Integer
+  memo           String?
+  created_at     DateTime @default(now())
+}
+
+model CAR {
+  id                 String   @id @default(uuid())
+  car_number         String   @unique @db.VarChar(50)
+  manufactuuing_year Int      @db.Integer
+  mileage            Int      @db.Integer
+  price              Int      @db.decimal(20, 2)
+  status             String   @db.VarChar(50)
+  accident_count     Int      @default(0) @db.Integer
+  content            String   @db.text
+  accident_detail    String   @db.text
+  Datetime           DateTime @default(now())
+  ?????
+  COMPANY            COMPANY  @relation(fields: [company_id], references: [id])
+  company_id         String
+}
+
+model CONTRACT {
+  id           String    @id @default(uuid())
+  status       String    @db.VarChar(50)
+  finalized_at DateTime?
+  created_at   DateTime  @default(now())
+  CUSTOMER     CUSTOMER  @relation(fields: [customer_id], references: [id])
+  customer_id  String
+  CAR          CAR       @relation(fields: [car_id], references: [id])
+  car_id       String
+  USERCODE     USERCODE  @relation(fields: [usercode_id], references: [id])
+  usercode_id  String
+}
+
+model CONTRACTDOCUMENT {
+  id          String   @id @default(uuid())
+  file_name   String   @db.VarChar(50)
+  file_path   String   @db.VarChar(50)
+  file_size   Int      @db.Integer
+  CONTRACT    CONTRACT @relation(fields: [contract_id], references: [id])
+  contract_id String
+}
+
+model CARCATEGORY {
+}
+
+model ALARM {
+  id         String   @id @default(uuid())
+  time       DateTime
+  MEETING    MEETING  @relation(fields: [meeting_id], references: [id])
+  meeting_id String
+}
+
+model MEETING {
+  id          String   @id @default(uuid())
+  time        DateTime
+  CONTRACT    CONTRACT @relation(fields: [contract_id], references: [id])
+  contract_id String
+}
+
+model COMPANY {
+  id       String @id @default(uuid())
+  name     String @db.VarChar(50)
+  code     String @db.VarChar(50)
+  passcode String @db.VarChar(50)
+}
+
+model USERCODE {
+  id         String  @id @default(uuid())
+  code       String  @unique @db.VarChar(50)
+  COMPANY    COMPANY @relation(fields: [company_id], references: [id])
+  company_id String
+}
