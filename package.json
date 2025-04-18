@@ -1,20 +1,36 @@
 {
-  "dependencies": {
-    "@prisma/client": "^5.4.2",
-    "dotenv": "^16.3.1",
-    "express": "^4.18.2",
-    "is-email": "^1.0.2",
-    "is-uuid": "^1.0.2",
-    "multer": "^1.4.5-lts.1",
-    "prisma": "^5.4.2",
-    "superstruct": "^1.0.3"
+  "scripts": {
+    "build": "tsc",
+    "start": "ts-node src/main.ts",
+    "dev": "nodemon --watch src src/main.ts"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1"
+    "@types/bcrypt": "^5.0.2",
+    "@types/cookie-parser": "^1.4.8",
+    "@types/cors": "^2.8.17",
+    "@types/dotenv": "^6.1.1",
+    "@types/multer": "^1.4.12",
+    "@types/passport": "^1.0.17",
+    "@types/passport-jwt": "^4.0.1",
+    "@types/passport-local": "^1.0.38",
+    "prettier": "^3.3.2",
+    "prisma": "^5.16.2",
+    "ts-node": "^10.9.2"
   },
-  "type": "module",
-  "scripts": {},
-  "prisma": {
-    "seed": "node prisma/seed.js"
+  "dependencies": {
+    "@prisma/client": "^5.16.2",
+    "bcrypt": "^5.1.1",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "file-type": "^20.4.1",
+    "multer": "^1.4.5-lts.1",
+    "nodemon": "^3.1.9",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
+    "passport-local": "^1.0.0",
+    "superstruct": "^2.0.2",
+    "typescript": "^5.8.2"
   }
 }
