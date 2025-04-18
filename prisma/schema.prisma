@@ -27,45 +27,52 @@ model USER {
 }
 
 model CUSTOMER {
-  id             String   @id @default(uuid())
-  name           String   @db.VarChar(50)
-  email          String   @unique @db.VarChar(320)
-  gender         String   @db.VarChar(50)
-  phone_number   String   @unique @db.VarChar(20)
-  age_group      Int      @db.Integer
-  region         String   @db.VarChar(50)
-  contract_count Int      @default(0) @db.Integer
+  id             String     @id @default(uuid())
+  name           String     @db.VarChar(50)
+  email          String     @unique @db.VarChar(320)
+  gender         String     @db.VarChar(50)
+  phone_number   String     @unique @db.VarChar(20)
+  age_group      Int        @db.Integer
+  region         String     @db.VarChar(50)
+  contract_count Int        @default(0) @db.Integer
   memo           String?
-  created_at     DateTime @default(now())
+  created_at     DateTime   @default(now())
+  COMPANY        COMPANY    @relation(fields: [company_id], references: [id])
+  company_id     String
+  CONTRACT       CONTRACT[]
 }
 
 model CAR {
-  id                 String   @id @default(uuid())
-  car_number         String   @unique @db.VarChar(50)
-  manufactuuing_year Int      @db.Integer
-  mileage            Int      @db.Integer
-  price              Int      @db.decimal(20, 2)
-  status             String   @db.VarChar(50)
-  accident_count     Int      @default(0) @db.Integer
-  content            String   @db.text
-  accident_detail    String   @db.text
-  Datetime           DateTime @default(now())
-  ?????
-  COMPANY            COMPANY  @relation(fields: [company_id], references: [id])
+  id                 String     @id @default(uuid())
+  car_number         String     @unique @db.VarChar(50)
+  manufactuuing_year Int        @db.Integer
+  mileage            Int        @db.Integer
+  price              Decimal    @db.Decimal(20, 2)
+  status             String     @default("AVAILABLE") @db.VarChar(50)
+  accident_count     Int        @default(0) @db.Integer
+  content            String?
+  accident_detail    String?
+  Datetime           DateTime   @default(now())
+  COMPANY            COMPANY    @relation(fields: [company_id], references: [id])
   company_id         String
+  CARMODEL           CARMODEL   @relation(fields: [car_model_id], references: [id])
+  car_model_id       String
+  CONTRACT           CONTRACT[]
 }
 
 model CONTRACT {
-  id           String    @id @default(uuid())
-  status       String    @db.VarChar(50)
-  finalized_at DateTime?
-  created_at   DateTime  @default(now())
-  CUSTOMER     CUSTOMER  @relation(fields: [customer_id], references: [id])
-  customer_id  String
-  CAR          CAR       @relation(fields: [car_id], references: [id])
-  car_id       String
-  USERCODE     USERCODE  @relation(fields: [usercode_id], references: [id])
-  usercode_id  String
+  id               String             @id @default(uuid())
+  status           String             @db.VarChar(50)
+  finalized_at     DateTime?
+  created_at       DateTime           @default(now())
+  CUSTOMER         CUSTOMER           @relation(fields: [customer_id], references: [id])
+  customer_id      String
+  CAR              CAR                @relation(fields: [car_id], references: [id])
+  car_id           String
+  USERCODE         USERCODE           @relation(fields: [usercode_id], references: [id])
+  usercode_id      String
+  CONTRACTDOCUMENT CONTRACTDOCUMENT[]
+  MEETING          MEETING[]
 }
 
 model CONTRACTDOCUMENT {
@@ -77,7 +84,26 @@ model CONTRACTDOCUMENT {
   contract_id String
 }
 
-model CARCATEGORY {
+model MANUFACTURER {
+  id       String     @id @default(uuid())
+  name     String     @db.VarChar(50)
+  CARMODEL CARMODEL[]
+}
+
+model CARTYPE {
+  id       String     @id @default(uuid())
+  name     String     @db.VarChar(50)
+  CARMODEL CARMODEL[]
+}
+
+model CARMODEL {
+  id              String       @id @default(uuid())
+  name            String       @db.VarChar(50)
+  MANUFACTURER    MANUFACTURER @relation(fields: [manufacturer_id], references: [id])
+  manufacturer_id String
+  CARTYPE         CARTYPE      @relation(fields: [car_type_id], references: [id])
+  car_type_id     String
+  CAR             CAR[]
 }
 
 model ALARM {
@@ -92,18 +118,25 @@ model MEETING {
   time        DateTime
   CONTRACT    CONTRACT @relation(fields: [contract_id], references: [id])
   contract_id String
+  ALARM       ALARM[]
 }
 
 model COMPANY {
-  id       String @id @default(uuid())
-  name     String @db.VarChar(50)
-  code     String @db.VarChar(50)
-  passcode String @db.VarChar(50)
+  id       String     @id @default(uuid())
+  name     String     @db.VarChar(50)
+  code     String     @db.VarChar(50)
+  passcode String     @db.VarChar(50)
+  USER     USER[]
+  CAR      CAR[]
+  USERCODE USERCODE[]
+  CUSTOMER CUSTOMER[]
 }
 
 model USERCODE {
-  id         String  @id @default(uuid())
-  code       String  @unique @db.VarChar(50)
-  COMPANY    COMPANY @relation(fields: [company_id], references: [id])
+  id         String     @id @default(uuid())
+  code       String     @unique @db.VarChar(50)
+  COMPANY    COMPANY    @relation(fields: [company_id], references: [id])
   company_id String
+  USER       USER[]
+  CONTRACT   CONTRACT[]
 }
