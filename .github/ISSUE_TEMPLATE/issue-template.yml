@@ -1,7 +1,7 @@
 ---
 name: New features
-about: ADD New features.
 title: '[이름 | 날짜] 제목'
-type: ['Feature']
+type: 'Feature'
+body:
 ---
 
