@@ -3,5 +3,8 @@ name: New features
 title: '[이름 | 날짜] 제목'
 type: 'Feature'
 body:
+  - type: textarea
+    attributes:
+      label: Name
 ---
 
