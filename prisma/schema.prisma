@@ -19,11 +19,11 @@ model USER {
   email        String     @unique @db.VarChar(320)
   phone_number String     @unique @db.VarChar(20)
   password     String     @db.VarChar(100)
+  role         USER_ROLE
+  user_code    String     @db.VarChar(50)
   createdAt    DateTime   @default(now())
   COMPANY      COMPANY    @relation(fields: [company_id], references: [id], onDelete: Cascade)
   company_id   String
-  USERCODE     USERCODE   @relation(fields: [usercode_id], references: [id], onDelete: Restrict)
-  usercode_id  String     @unique
   CONTRACT     CONTRACT[]
 }
 
@@ -120,17 +120,7 @@ model COMPANY {
   code     String     @unique @db.VarChar(50)
   USER     USER[]
   CAR      CAR[]
-  USERCODE USERCODE[]
   CUSTOMER CUSTOMER[]
-}
-
-model USERCODE {
-  id         String  @id @default(uuid())
-  code       String  @unique @db.VarChar(50)
-  COMPANY    COMPANY @relation(fields: [company_id], references: [id], onDelete: Cascade)
-  company_id String
-
-  USER USER? @relation
 }
 
 enum CONTRACT_STATUS {
@@ -145,4 +135,10 @@ enum CAR_STATUS {
   AVAILABLE
   PENDING
   SOLD
+}
+
+enum USER_ROLE {
+  ADMIN
+  OWNER
+  EMPLOYEE
 }
