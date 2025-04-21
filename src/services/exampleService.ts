@@ -6,7 +6,7 @@ import {
   PERIOD_REFRESH_TOKEN,
   REFRESH_STRING,
 } from '../config/constants';
-import userRepository from '../repositories/exampleRepository';
+import userRepository from '../repositories/userRepository';
 import NotFoundError from '../lib/errors/Example3Error';
 import UnauthError from '../lib/errors/UnauthError';
 import { User, Prisma } from '@prisma/client';

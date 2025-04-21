@@ -1,8 +1,8 @@
 import { Prisma } from '@prisma/client';
 import prisma from '../config/prismaClient';
 
-async function findById(id: number) {
-  return await prisma.user.findUnique({
+async function findById(id: string) {
+  return await prisma.uSER.findUnique({
     where: {
       id,
     },

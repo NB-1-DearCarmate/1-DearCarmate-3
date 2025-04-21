@@ -1,32 +1,45 @@
 import passport from 'passport';
 import localStrategy from './localStrategy';
 import jwtStrategy from './jwtStrategy';
-import userRepository from '../../repositories/exampleRepository';
+import userRepository from '../../repositories/userRepository';
 import UnauthError from '../../lib/errors/UnauthError';
-import { UserWithId } from '../../../types/AuthedUser';
+import { AuthedUser } from '../../../types/AuthedUser';
 
 passport.use('local', localStrategy);
 passport.use('access-token', jwtStrategy.accessTokenStrategy);
 passport.use('refresh-token', jwtStrategy.refreshTokenStrategy);
 
-const NUMBER_TYPE = typeof 0;
-function isUserWithId(user: unknown): user is UserWithId {
+function isUserWithId(user: unknown): user is AuthedUser {
   return (
-    user instanceof Object && 'id' in user && typeof (user as { id: unknown }).id === NUMBER_TYPE
+    user instanceof Object &&
+    'id' in user &&
+    typeof (user as { id: unknown }).id === 'string' &&
+    'type' in user &&
+    typeof (user as { type: unknown }).type === 'string'
   );
 }
 passport.serializeUser((user: unknown, done) => {
   if (isUserWithId(user)) {
-    done(null, user.id);
+    done(null, { id: user.id, type: user.type });
   } else {
     done(new UnauthError());
   }
 });
 
-passport.deserializeUser(async (id: number, done) => {
+passport.deserializeUser(async (serializedUser: { id: string; type: string }, done) => {
   try {
-    const user = await userRepository.findById(id);
-    done(null, user);
+    if (serializedUser.type === 'admin') {
+      // adminRepository.findById(serializedUser.id)
+    } else if (serializedUser.type === 'owner') {
+      // userRepository.findById(serializedUser.id)
+    } else {
+      const employee = await userRepository.findById(serializedUser.id);
+      if (employee === null) {
+        throw new UnauthError();
+      }
+    }
+
+    done(null, serializedUser);
   } catch (error) {
     done(error);
   }

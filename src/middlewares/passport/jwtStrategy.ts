@@ -5,6 +5,7 @@ import { Request } from 'express';
 
 interface JwtPayload {
   userId: string;
+  type: string;
   iat?: number;
   exp?: number;
 }
@@ -19,7 +20,7 @@ const refreshTokenOptions = {
 };
 async function jwtVerify(payload: JwtPayload, done: VerifiedCallback) {
   try {
-    const { userId } = payload;
+    const { userId, type } = payload;
     const user = await userService.getUserById(parseInt(userId));
     if (!user) {
       return done(null, false);
