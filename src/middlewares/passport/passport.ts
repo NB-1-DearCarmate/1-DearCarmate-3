@@ -14,26 +14,26 @@ function isUserWithId(user: unknown): user is AuthedUser {
     user instanceof Object &&
     'id' in user &&
     typeof (user as { id: unknown }).id === 'string' &&
-    'type' in user &&
-    typeof (user as { type: unknown }).type === 'string'
+    'role' in user &&
+    typeof (user as { role: unknown }).role === 'string'
   );
 }
 passport.serializeUser((user: unknown, done) => {
   if (isUserWithId(user)) {
-    done(null, { id: user.id, type: user.type });
+    done(null, { id: user.id, role: user.role });
   } else {
     done(new UnauthError());
   }
 });
 
-passport.deserializeUser(async (serializedUser: { id: string; type: string }, done) => {
+passport.deserializeUser(async (serializedUser: { id: string; role: string }, done) => {
   try {
-    if (serializedUser.type === 'admin') {
+    const employee = await userRepository.findById(serializedUser.id);
+    if (serializedUser.role === 'admin' && employee) {
       // adminRepository.findById(serializedUser.id)
-    } else if (serializedUser.type === 'owner') {
+    } else if (serializedUser.role === 'owner') {
       // userRepository.findById(serializedUser.id)
     } else {
-      const employee = await userRepository.findById(serializedUser.id);
       if (employee === null) {
         throw new UnauthError();
       }
