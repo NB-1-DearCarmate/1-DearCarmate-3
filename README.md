@@ -6,10 +6,13 @@ USER {
   Varchar email
   Varchar phone_number
   Varchar password
+  Varchar user_code
+  USER_ROLE role
   Datetime created_at
   UUID company_id FK
-  UUID user_code FK
 }
+%% ENUM TYPE: USER_ROLE
+%% VALUES: ADMIN, OWNER, EMPLOYEE
 
 CUSTOMER{
   UUID id PK
@@ -91,14 +94,7 @@ COMPANY{
   Varchar code
 }
 
-USERCODE{
-  UUID id PK
-  Varchar code
-  UUID company_id FK
-}
-
-    USER ||--o{ COMPANY : "소속회사"
-    USERCODE ||--o| USER : "회사에서 발급된 사원코드"
+    COMPANY ||--o{ USER : "소속회사"
     COMPANY ||--o{ CUSTOMER  : "계약하려는 고객"
     COMPANY ||--o{ CAR : "회사에 소속된 차량"
     CARMODEL ||--o{ CAR : "차량관련 정보제공"
@@ -109,6 +105,5 @@ USERCODE{
     MANUFACTURER ||--o{ CARMODEL : "자동차 제조사"
     CARTYPE ||--o{ CARMODEL : "자동차 타입"
     CONTRACT ||--o{ MEETING : "계약관련 미팅"
-    COMPANY ||--o{ USERCODE : "회사에 소속된 사원들의 코드"
 
 ```
