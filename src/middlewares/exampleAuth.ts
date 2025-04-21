@@ -4,7 +4,7 @@ import articleService from '../services/articleService';
 import { IdParamsStruct } from '../structs/commonStructs';
 import { create } from 'superstruct';
 import { NextFunction, Request, Response } from 'express';
-import { UserWithId } from '../../types/example-type';
+import { UserWithId } from '../../types/AuthedUser';
 
 async function verifyAricleOwner(req: Request, res: Response, next: NextFunction) {
   const reqUser = req.user as UserWithId;

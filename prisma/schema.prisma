@@ -122,6 +122,7 @@ model COMPANY {
   CAR      CAR[]
   USERCODE USERCODE[]
   CUSTOMER CUSTOMER[]
+  OWNER    OWNER[]
 }
 
 model USERCODE {
@@ -131,6 +132,20 @@ model USERCODE {
   company_id String
 
   USER USER? @relation
+}
+
+model OWNER {
+  id         String  @id @default(uuid())
+  email      String  @unique @db.VarChar(320)
+  password   String  @db.VarChar(100)
+  COMPANY    COMPANY @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  company_id String
+}
+
+model ADMIN {
+  id       String @id @default(uuid())
+  email    String @unique @db.VarChar(320)
+  password String @db.VarChar(100)
 }
 
 enum CONTRACT_STATUS {

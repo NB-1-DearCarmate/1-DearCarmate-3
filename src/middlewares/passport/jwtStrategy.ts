@@ -1,5 +1,5 @@
 import { Strategy as JwtStrategy, ExtractJwt, VerifiedCallback } from 'passport-jwt';
-import { JWT_SECRET, REFRESH_tOKEN_STRING } from '../../config/constants';
+import { JWT_SECRET } from '../../config/constants';
 import userService from '../../services/exampleService';
 import { Request } from 'express';
 
@@ -14,7 +14,7 @@ const accessTokenOptions = {
   secretOrKey: JWT_SECRET,
 };
 const refreshTokenOptions = {
-  jwtFromRequest: (req: Request) => req.cookies[REFRESH_tOKEN_STRING],
+  jwtFromRequest: (req: Request) => req.cookies['refreshToken'],
   secretOrKey: JWT_SECRET,
 };
 async function jwtVerify(payload: JwtPayload, done: VerifiedCallback) {

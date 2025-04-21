@@ -7,7 +7,7 @@ import {
   UpdateUserBodyStruct,
 } from '../structs/exampleStructs';
 import { Request, Response } from 'express';
-import { UserWithId } from '../../types/example-type';
+import { UserWithId } from '../../types/AuthedUser';
 import { NONE_STRING, REFRESH_STRING, REFRESH_tOKEN_STRING } from '../config/constants';
 
 export async function createUser(req: Request, res: Response) {

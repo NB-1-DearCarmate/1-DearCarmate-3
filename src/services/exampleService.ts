@@ -10,7 +10,7 @@ import userRepository from '../repositories/exampleRepository';
 import NotFoundError from '../lib/errors/Example3Error';
 import UnauthError from '../lib/errors/UnauthError';
 import { User, Prisma } from '@prisma/client';
-import { UserWithId } from '../../types/example-type';
+import { UserWithId } from '../../types/AuthedUser';
 
 async function hashingPassword(password: string) {
   return await bcrypt.hash(password, 10);
