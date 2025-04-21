@@ -1,51 +1,51 @@
 export const COMPANY = [
   {
-    id: '1',
+    id: 1,
     name: '햇살카',
     code: 'sunshine',
   },
   {
-    id: '2',
+    id: 2,
     name: '케이카',
     code: 'kcar',
   },
   {
-    id: '3',
+    id: 3,
     name: '굿모닝카',
     code: 'goodmoring',
   },
   {
-    id: '4',
+    id: 4,
     name: '한빛오토',
     code: 'hanbit-auto',
   },
   {
-    id: '5',
+    id: 5,
     name: '미래모터스',
     code: 'mirae-motors',
   },
   {
-    id: '6',
+    id: 6,
     name: '하이카',
     code: 'hi-car',
   },
   {
-    id: '7',
+    id: 7,
     name: '퍼스트카',
     code: 'firstcar',
   },
   {
-    id: '8',
+    id: 8,
     name: '드림자동차',
     code: 'dreamauto',
   },
   {
-    id: '9',
+    id: 9,
     name: '스타모터스',
     code: 'starmotors',
   },
   {
-    id: '10',
+    id: 10,
     name: '스피드카',
     code: 'speedcar',
   },
@@ -53,7 +53,7 @@ export const COMPANY = [
 
 export const USER = [
   {
-    id: '11',
+    id: 11,
     name: '관리자',
     email: 'admin@dearcarmate.com',
     phone_number: '01011112222',
@@ -61,10 +61,10 @@ export const USER = [
     role: 'ADMIN',
     user_code: 'USR001',
     createdAt: new Date('2024-01-01T09:00:00Z'),
-    company_id: '1', // 햇살카
+    company_id: 1,
   },
   {
-    id: '12',
+    id: 12,
     name: '햇살 오너',
     email: 'admin@sunshine.com',
     phone_number: '01022223333',
@@ -72,10 +72,10 @@ export const USER = [
     role: 'OWNER',
     user_code: 'USR002',
     createdAt: new Date('2024-01-05T10:00:00Z'),
-    company_id: '1', // 햇살카
+    company_id: 1,
   },
   {
-    id: '13',
+    id: 13,
     name: '햇살 직원',
     email: 'user1@sunshine.com',
     phone_number: '01033334444',
@@ -83,10 +83,10 @@ export const USER = [
     role: 'EMPLOYEE',
     user_code: 'USR003',
     createdAt: new Date('2024-01-07T14:00:00Z'),
-    company_id: '1', // 햇살카
+    company_id: 1,
   },
   {
-    id: '14',
+    id: 14,
     name: '케이카 오너',
     email: 'owner@kcar.com',
     phone_number: '01044445555',
@@ -94,10 +94,10 @@ export const USER = [
     role: 'OWNER',
     user_code: 'USR004',
     createdAt: new Date('2024-01-10T11:00:00Z'),
-    company_id: '2',
+    company_id: 2,
   },
   {
-    id: '15',
+    id: 15,
     name: '케이카 직원',
     email: 'employee1@kcar.com',
     phone_number: '01055556666',
@@ -105,10 +105,10 @@ export const USER = [
     role: 'EMPLOYEE',
     user_code: 'USR005',
     createdAt: new Date('2024-01-12T15:30:00Z'),
-    company_id: '2',
+    company_id: 2,
   },
   {
-    id: '16',
+    id: 16,
     name: '굿모닝 오너',
     email: 'owner@goodmoring.com',
     phone_number: '01066667777',
@@ -116,10 +116,10 @@ export const USER = [
     role: 'OWNER',
     user_code: 'USR006',
     createdAt: new Date('2024-01-15T09:45:00Z'),
-    company_id: '3',
+    company_id: 3,
   },
   {
-    id: '17',
+    id: 17,
     name: '굿모닝 직원',
     email: 'employee@goodmoring.com',
     phone_number: '01077778888',
@@ -127,10 +127,10 @@ export const USER = [
     role: 'EMPLOYEE',
     user_code: 'USR007',
     createdAt: new Date('2024-01-16T13:20:00Z'),
-    company_id: '3',
+    company_id: 3,
   },
   {
-    id: '18',
+    id: 18,
     name: '미래모터스 대표',
     email: 'owner@mirae.com',
     phone_number: '01088889999',
@@ -138,10 +138,10 @@ export const USER = [
     role: 'OWNER',
     user_code: 'USR008',
     createdAt: new Date('2024-01-18T10:10:00Z'),
-    company_id: '5',
+    company_id: 5,
   },
   {
-    id: '19',
+    id: 19,
     name: '미래모터스 직원',
     email: 'staff@mirae.com',
     phone_number: '01099990000',
@@ -149,13 +149,13 @@ export const USER = [
     role: 'EMPLOYEE',
     user_code: 'USR009',
     createdAt: new Date('2024-01-19T08:55:00Z'),
-    company_id: '5',
+    company_id: 5,
   },
 ];
 
 export const CUSTOMER = [
   {
-    id: '20',
+    id: 20,
     name: '김철수',
     email: 'kimcs@example.com',
     gender: '남성',
@@ -165,10 +165,10 @@ export const CUSTOMER = [
     contract_count: 2,
     memo: '우수 고객',
     created_at: new Date('2024-01-10T10:00:00Z'),
-    company_id: '1', // 햇살카
+    company_id: 1,
   },
   {
-    id: '21',
+    id: 21,
     name: '이영희',
     email: 'leeyh@example.com',
     gender: '여성',
@@ -178,10 +178,10 @@ export const CUSTOMER = [
     contract_count: 1,
     memo: '',
     created_at: new Date('2024-01-11T09:30:00Z'),
-    company_id: '2', // 케이카
+    company_id: 2,
   },
   {
-    id: '22',
+    id: 22,
     name: '박지성',
     email: 'parkjs@example.com',
     gender: '남성',
@@ -191,10 +191,10 @@ export const CUSTOMER = [
     contract_count: 0,
     memo: '시승 예약 요청',
     created_at: new Date('2024-01-12T14:00:00Z'),
-    company_id: '3', // 굿모닝카
+    company_id: 3,
   },
   {
-    id: '23',
+    id: 23,
     name: '최미영',
     email: 'choimy@example.com',
     gender: '여성',
@@ -204,10 +204,10 @@ export const CUSTOMER = [
     contract_count: 3,
     memo: '리스를 선호함',
     created_at: new Date('2024-01-13T15:15:00Z'),
-    company_id: '1', //햇살카
+    company_id: 1,
   },
   {
-    id: '24',
+    id: 24,
     name: '정우성',
     email: 'jungws@example.com',
     gender: '남성',
@@ -217,10 +217,10 @@ export const CUSTOMER = [
     contract_count: 1,
     memo: '',
     created_at: new Date('2024-01-14T10:45:00Z'),
-    company_id: '2', //케이카
+    company_id: 2,
   },
   {
-    id: '25',
+    id: 25,
     name: '장미란',
     email: 'jangmr@example.com',
     gender: '여성',
@@ -230,10 +230,10 @@ export const CUSTOMER = [
     contract_count: 0,
     memo: '첫 방문',
     created_at: new Date('2024-01-15T11:00:00Z'),
-    company_id: '3', //굿모닝카
+    company_id: 3,
   },
   {
-    id: '26',
+    id: 26,
     name: '한예슬',
     email: 'hanys@example.com',
     gender: '여성',
@@ -243,10 +243,10 @@ export const CUSTOMER = [
     contract_count: 2,
     memo: '',
     created_at: new Date('2024-01-16T12:00:00Z'),
-    company_id: '5', // 미래모터스
+    company_id: 5,
   },
   {
-    id: '27',
+    id: 27,
     name: '오승훈',
     email: 'ohsh@example.com',
     gender: '남성',
@@ -256,10 +256,10 @@ export const CUSTOMER = [
     contract_count: 1,
     memo: '차량 문의 많음',
     created_at: new Date('2024-01-17T13:00:00Z'),
-    company_id: '5', // 미래 모터스
+    company_id: 5,
   },
   {
-    id: '28',
+    id: 28,
     name: '배수지',
     email: 'baesz@example.com',
     gender: '여성',
@@ -269,10 +269,10 @@ export const CUSTOMER = [
     contract_count: 0,
     memo: '',
     created_at: new Date('2024-01-18T14:30:00Z'),
-    company_id: '2', //케이카
+    company_id: 2,
   },
   {
-    id: '29',
+    id: 29,
     name: '서강준',
     email: 'seokj@example.com',
     gender: '남성',
@@ -282,13 +282,13 @@ export const CUSTOMER = [
     contract_count: 0,
     memo: '',
     created_at: new Date('2024-01-19T16:00:00Z'),
-    company_id: '1', //햇살카
+    company_id: 1,
   },
 ];
 
 export const CAR = [
   {
-    id: '30',
+    id: 30,
     car_number: '12가3456',
     manufactuuing_year: 2020,
     mileage: 15000,
@@ -298,11 +298,11 @@ export const CAR = [
     content: '전혀 사고 없는 차량',
     accident_detail: '',
     Datetime: new Date('2024-01-10T10:00:00Z'),
-    company_id: '1', // 햇살카
-    car_model_id: '33', // 모델 1
+    company_id: 1,
+    car_model_id: 33,
   },
   {
-    id: '31',
+    id: 31,
     car_number: '34나5678',
     manufactuuing_year: 2019,
     mileage: 20000,
@@ -312,11 +312,11 @@ export const CAR = [
     content: '사고 이력 있음, 수리 완료',
     accident_detail: '전면 충돌',
     Datetime: new Date('2024-01-11T11:00:00Z'),
-    company_id: '2', // 케이카
-    car_model_id: '34', // 모델 2
+    company_id: 2,
+    car_model_id: 34,
   },
   {
-    id: '32',
+    id: 32,
     car_number: '56다7890',
     manufactuuing_year: 2021,
     mileage: 5000,
@@ -326,11 +326,11 @@ export const CAR = [
     content: '새 차량처럼 깨끗',
     accident_detail: '',
     Datetime: new Date('2024-01-12T12:00:00Z'),
-    company_id: '3', // 굿모닝카
-    car_model_id: '35', // 모델 3
+    company_id: 3,
+    car_model_id: 35,
   },
   {
-    id: '36',
+    id: 36,
     car_number: '78라9012',
     manufactuuing_year: 2018,
     mileage: 35000,
@@ -340,11 +340,11 @@ export const CAR = [
     content: '사고 이력 있음, 재조정 완료',
     accident_detail: '후방 사고',
     Datetime: new Date('2024-01-13T13:00:00Z'),
-    company_id: '1', // 햇살카
-    car_model_id: '33', // 모델 1
+    company_id: 1,
+    car_model_id: 33,
   },
   {
-    id: '37',
+    id: 37,
     car_number: '90마2345',
     manufactuuing_year: 2022,
     mileage: 8000,
@@ -354,11 +354,11 @@ export const CAR = [
     content: '최신 모델, 컨디션 우수',
     accident_detail: '',
     Datetime: new Date('2024-01-14T14:30:00Z'),
-    company_id: '2', // 케이카
-    car_model_id: '34', // 모델 2
+    company_id: 2,
+    car_model_id: 34,
   },
   {
-    id: '38',
+    id: 38,
     car_number: '12바3456',
     manufactuuing_year: 2020,
     mileage: 12000,
@@ -368,11 +368,11 @@ export const CAR = [
     content: '사고 없는 깨끗한 차량',
     accident_detail: '',
     Datetime: new Date('2024-01-15T10:30:00Z'),
-    company_id: '3', // 굿모닝카
-    car_model_id: '35', // 모델 3
+    company_id: 3,
+    car_model_id: 35,
   },
   {
-    id: '39',
+    id: 39,
     car_number: '34사4567',
     manufactuuing_year: 2017,
     mileage: 50000,
@@ -382,11 +382,11 @@ export const CAR = [
     content: '사고 여러 건 있음, 매매가 어려움',
     accident_detail: '전면 및 후면 충돌',
     Datetime: new Date('2024-01-16T11:15:00Z'),
-    company_id: '1', // 햇살카
-    car_model_id: '33', // 모델 1
+    company_id: 1,
+    car_model_id: 33,
   },
   {
-    id: '40',
+    id: 40,
     car_number: '56아5678',
     manufactuuing_year: 2019,
     mileage: 25000,
@@ -396,11 +396,11 @@ export const CAR = [
     content: '좋은 상태의 차량',
     accident_detail: '',
     Datetime: new Date('2024-01-17T12:30:00Z'),
-    company_id: '3', // 굿모닝카
-    car_model_id: '35', // 모델 3
+    company_id: 3,
+    car_model_id: 35,
   },
   {
-    id: '41',
+    id: 41,
     car_number: '78자6789',
     manufactuuing_year: 2021,
     mileage: 9000,
@@ -410,235 +410,235 @@ export const CAR = [
     content: '완전 새 차량',
     accident_detail: '',
     Datetime: new Date('2024-01-18T13:45:00Z'),
-    company_id: '2', // 케이카
-    car_model_id: '34', // 모델 2
+    company_id: 2,
+    car_model_id: 34,
   },
 ];
 
 export const CONTRACT = [
   {
-    id: '42',
+    id: 42,
     status: 'CONTRACT_SUCCESS',
     finalized_at: new Date('2024-01-10T14:00:00Z'),
     created_at: new Date('2024-01-10T14:00:00Z'),
-    customer_id: '20', // 고객 1
-    car_id: '30', // 차량 1 (같은 회사에 속하는 차량)
-    user_id: '13', // 유저 1 (employee)
+    customer_id: 20,
+    car_id: 30,
+    user_id: 13,
   },
   {
-    id: '43',
+    id: 43,
     status: 'CONTRACT_PREPARING',
     finalized_at: null,
     created_at: new Date('2024-01-11T15:00:00Z'),
-    customer_id: '23', // 고객 2
-    car_id: '36', // 차량 2 (같은 회사에 속하는 차량)
-    user_id: '13',
+    customer_id: 23,
+    car_id: 36,
+    user_id: 13,
   },
   {
-    id: '44',
+    id: 44,
     status: 'VEHICLE_CHECKING',
     finalized_at: null,
     created_at: new Date('2024-01-12T16:30:00Z'),
-    customer_id: '21', // 고객 3
-    car_id: '31', // 차량 3 (같은 회사에 속하는 차량)
-    user_id: '15', // 유저 3 (employee)
+    customer_id: 21,
+    car_id: 31,
+    user_id: 15,
   },
   {
-    id: '45',
+    id: 45,
     status: 'PRICE_CHECKING',
     finalized_at: null,
     created_at: new Date('2024-01-13T17:00:00Z'),
-    customer_id: '24', // 고객 4
-    car_id: '37', // 차량 4 (같은 회사에 속하는 차량)
-    user_id: '15', // 유저 4 (employee)
+    customer_id: 24,
+    car_id: 37,
+    user_id: 15,
   },
   {
-    id: '46',
+    id: 46,
     status: 'CONTRACT_FAILED',
     finalized_at: new Date('2024-01-14T18:15:00Z'),
     created_at: new Date('2024-01-14T18:15:00Z'),
-    customer_id: '22', // 고객 5
-    car_id: '32', // 차량 5 (같은 회사에 속하는 차량)
-    user_id: '17', // 유저 5 (employee)
+    customer_id: 22,
+    car_id: 32,
+    user_id: 17,
   },
   {
-    id: '47',
+    id: 47,
     status: 'CONTRACT_SUCCESS',
     finalized_at: new Date('2024-01-15T19:30:00Z'),
     created_at: new Date('2024-01-15T19:30:00Z'),
-    customer_id: '25', // 고객 6
-    car_id: '38', // 차량 6 (같은 회사에 속하는 차량)
-    user_id: '17', // 유저 6 (employee)
+    customer_id: 25,
+    car_id: 38,
+    user_id: 17,
   },
 ];
 
 export const CONTRACTDOCUMENT = [
   {
-    id: '48',
+    id: 48,
     file_name: 'contract_001.pdf',
     file_path: '/documents/contracts/contract_001.pdf',
     file_size: 2048,
-    contract_id: '42', // 계약 1
+    contract_id: 42,
   },
   {
-    id: '49',
+    id: 49,
     file_name: 'contract_002.pdf',
     file_path: '/documents/contracts/contract_002.pdf',
     file_size: 3072,
-    contract_id: '43', // 계약 2
+    contract_id: 43,
   },
   {
-    id: 'd3d3d3d3-3333-3333-3333-333333333333',
+    id: 100,
     file_name: 'contract_003.pdf',
     file_path: '/documents/contracts/contract_003.pdf',
     file_size: 4096,
-    contract_id: '44', // 계약 3
+    contract_id: 44,
   },
   {
-    id: '23',
+    id: 23,
     file_name: 'contract_004.pdf',
     file_path: '/documents/contracts/contract_004.pdf',
     file_size: 5120,
-    contract_id: '45', // 계약 4
+    contract_id: 45,
   },
   {
-    id: '50',
+    id: 50,
     file_name: 'contract_005.pdf',
     file_path: '/documents/contracts/contract_005.pdf',
     file_size: 6144,
-    contract_id: '46', // 계약 5
+    contract_id: 46,
   },
   {
-    id: '51',
+    id: 51,
     file_name: 'contract_006.pdf',
     file_path: '/documents/contracts/contract_006.pdf',
     file_size: 7168,
-    contract_id: '47', // 계약 6
+    contract_id: 47,
   },
 ];
 
 export const CARMODEL = [
   {
-    id: '33',
+    id: 33,
     name: 'Sonata 2023',
-    manufacturer_id: '52', // 현대
-    car_type_id: '53', // 세단
+    manufacturer_id: 52, // 현대
+    car_type_id: 53, // 세단
   },
   {
-    id: '34',
+    id: 34,
     name: 'K7 2023',
-    manufacturer_id: '54', // 기아
-    car_type_id: '55', // SUV
+    manufacturer_id: 54, // 기아
+    car_type_id: 55, // SUV
   },
   {
-    id: '35',
+    id: 35,
     name: 'Tucson 2023',
-    manufacturer_id: '56', //
-    car_type_id: '55', // SUV
+    manufacturer_id: 56,
+    car_type_id: 55, // SUV
   },
   {
-    id: '57',
+    id: 57,
     name: 'Carnival 2023',
-    manufacturer_id: '54', // 기아
-    car_type_id: '58', // 미니밴
+    manufacturer_id: 54, // 기아
+    car_type_id: 58, // 미니밴
   },
   {
-    id: '59',
+    id: 59,
     name: 'S-Class 2023',
-    manufacturer_id: '60', // 벤츠
-    car_type_id: '53', // 세단
+    manufacturer_id: 60, // 벤츠
+    car_type_id: 53, // 세단
   },
   {
-    id: '61',
+    id: 61,
     name: 'C-Class 2023',
-    manufacturer_id: '60', // 벤츠
-    car_type_id: '53', // 세단
+    manufacturer_id: 60, // 벤츠
+    car_type_id: 53, // 세단
   },
 ];
 
 export const MEETING = [
   {
-    id: '62',
+    id: 62,
     time: new Date('2024-05-10T10:00:00Z'),
-    contract_id: '42', // 계약 1
+    contract_id: 42, // 계약 1
   },
   {
-    id: '63',
+    id: 63,
     time: new Date('2024-05-11T14:00:00Z'),
-    contract_id: '43', // 계약 2
+    contract_id: 43, // 계약 2
   },
   {
-    id: '64',
+    id: 64,
     time: new Date('2024-05-12T16:00:00Z'),
-    contract_id: '44', // 계약 3
+    contract_id: 44, // 계약 3
   },
   {
-    id: '65',
+    id: 65,
     time: new Date('2024-05-13T09:00:00Z'),
-    contract_id: '45', // 계약 4
+    contract_id: 45, // 계약 4
   },
   {
-    id: '66',
+    id: 66,
     time: new Date('2024-05-14T11:00:00Z'),
-    contract_id: '46', // 계약 5
+    contract_id: 46, // 계약 5
   },
   {
-    id: '67',
+    id: 67,
     time: new Date('2024-05-15T13:00:00Z'),
-    contract_id: '47', // 계약 6
+    contract_id: 47, // 계약 6
   },
 ];
 
 export const MANUFACTURER = [
   {
-    id: '52',
+    id: 52,
     name: 'Hyundai',
   },
   {
-    id: '54',
+    id: 54,
     name: 'Kia',
   },
   {
-    id: '56',
+    id: 56,
     name: 'Mercedes-Benz',
   },
   {
-    id: '60',
+    id: 60,
     name: 'BMW',
   },
   {
-    id: '68',
+    id: 68,
     name: 'Audi',
   },
   {
-    id: '69',
+    id: 69,
     name: 'Toyota',
   },
 ];
 
 export const CARTYPE = [
   {
-    id: '53',
+    id: 53,
     name: 'Sedan', // 세단
   },
   {
-    id: '55',
+    id: 55,
     name: 'SUV', // SUV
   },
   {
-    id: '58',
+    id: 58,
     name: 'Minivan', // 미니밴
   },
   {
-    id: '70',
+    id: 70,
     name: 'Coupe', // 쿠페
   },
   {
-    id: '71',
+    id: 71,
     name: 'Convertible', // 컨버터블
   },
   {
-    id: '72',
+    id: 72,
     name: 'Hatchback', // 해치백
   },
 ];
