@@ -99,6 +99,7 @@ COMPANY{
     COMPANY ||--o{ CAR : "회사에 소속된 차량"
     CARMODEL ||--o{ CAR : "차량관련 정보제공"
     CAR ||--o{ CONTRACT : "계약될 차량"
+    USER ||--o{ CONTRACT : "계약 담당직원"
     CUSTOMER ||--o{ CONTRACT : "계약할 사람"
     COMPANY ||--o{ CONTRACT : "회사에 소속된 계약"
     CONTRACT ||--o{ CONTRACTDOCUMENT : "계약서류 디렉토리경로"
