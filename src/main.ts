@@ -4,7 +4,7 @@ import path from 'path';
 import cookieParser from 'cookie-parser';
 import passport from './middlewares/passport/passport';
 import { PORT, UPLOAD_FOLDER, STATIC_PATH } from './config/constants';
-import exampleRouter from './routers/exampleRouter';
+import authRouter from './routers/authRouter';
 import { defaultNotFoundHandler, globalErrorHandler } from './controllers/errorController';
 
 const app = express();
@@ -17,7 +17,7 @@ app.use(passport.initialize());
 
 app.use(STATIC_PATH, express.static(path.resolve(process.cwd(), UPLOAD_FOLDER)));
 
-app.use('/users', exampleRouter);
+app.use('/auth', authRouter);
 
 app.use(defaultNotFoundHandler);
 app.use(globalErrorHandler);

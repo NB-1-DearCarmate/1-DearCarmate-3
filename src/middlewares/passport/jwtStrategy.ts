@@ -1,11 +1,12 @@
 import { Strategy as JwtStrategy, ExtractJwt, VerifiedCallback } from 'passport-jwt';
-import { JWT_SECRET } from '../../config/constants';
-import userService from '../../services/exampleService';
+import { JWT_SECRET, REFRESH_tOKEN_STRING } from '../../config/constants';
+import userService from '../../services/userService';
 import { Request } from 'express';
+import { USER_ROLE } from '@prisma/client';
 
 interface JwtPayload {
   userId: string;
-  type: string;
+  role: USER_ROLE;
   iat?: number;
   exp?: number;
 }
@@ -15,16 +16,20 @@ const accessTokenOptions = {
   secretOrKey: JWT_SECRET,
 };
 const refreshTokenOptions = {
-  jwtFromRequest: (req: Request) => req.cookies['refreshToken'],
+  jwtFromRequest: (req: Request) => req.cookies[REFRESH_tOKEN_STRING],
   secretOrKey: JWT_SECRET,
 };
 async function jwtVerify(payload: JwtPayload, done: VerifiedCallback) {
   try {
-    const { userId, type } = payload;
-    const user = await userService.getUserById(parseInt(userId));
-    if (!user) {
+    const { userId, role } = payload;
+
+    const user = await userService.getUserById(userId);
+
+    const validRoles = [USER_ROLE.ADMIN, USER_ROLE.OWNER, USER_ROLE.EMPLOYEE];
+    if (!user || !validRoles.includes(role) || role !== user.role) {
       return done(null, false);
     }
+
     return done(null, user);
   } catch (error) {
     return done(error);
