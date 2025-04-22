@@ -1,6 +1,6 @@
 import express from 'express';
 import { withAsync } from '../lib/withAsync';
-import { postCompany } from '../controllers/company';
+import { postCompany } from '../controllers/companyController';
 
 const companyRouter = express.Router();
 

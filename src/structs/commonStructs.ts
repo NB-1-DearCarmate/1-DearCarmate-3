@@ -9,16 +9,8 @@ import {
   nonempty,
   define,
 } from 'superstruct';
-import isUuid from 'is-uuid';
-const uuid = define('uuid', (value): boolean => {
-  return typeof value === 'string' && isUuid.v4(value);
-});
 
 const integerString = coerce(integer(), string(), (value) => parseInt(value));
-
-export const IdParamsStruct = object({
-  id: uuid,
-});
 
 export const PageParamsStruct = object({
   page: defaulted(integerString, 1),

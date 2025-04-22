@@ -1,6 +1,6 @@
 import express from 'express';
 import { withAsync } from '../lib/withAsync';
-import { createUser, deleteUser, editInfo, getInfo, signOut } from '../controllers/userController';
+import { createUser, deleteUser, editInfo, getInfo, withDraw } from '../controllers/userController';
 import passport from '../middlewares/passport/passport';
 
 const usersRouter = express.Router();
@@ -20,7 +20,7 @@ usersRouter.patch(
 usersRouter.delete(
   '/users/me',
   passport.authenticate('access-token', { session: false }),
-  withAsync(signOut),
+  withAsync(withDraw),
 );
 usersRouter.delete(
   '/users/:userId',

@@ -1,9 +1,9 @@
 import dotenv from 'dotenv';
-import EnvVarError from '../lib/errors/EnvVarError';
+import CommonError from '../lib/errors/CommonError';
 dotenv.config();
 
 if (!process.env.JWT_SECRET || !process.env.DATABASE_URL) {
-  throw new EnvVarError();
+  throw new CommonError('Missing Environment Variable', 500);
 }
 
 export const DATABASE_URL = process.env.DATABASE_URL;

@@ -1,47 +1,58 @@
 import { create } from 'superstruct';
-import userService from '../services/exampleService';
-import { IdParamsStruct } from '../structs/commonStructs';
+import userService from '../services/userService';
 import {
-  CreatePasswordStruct,
   CreateUserBodyStruct,
+  DeleteUserBodyType,
   UpdateUserBodyStruct,
-} from '../structs/exampleStructs';
-import { Request, Response } from 'express';
-import { UserWithId } from '../../types/example-type';
+} from '../structs/userStructs';
+import { RequestHandler } from 'express';
+import { CreateUserDTO, ResponseUserDTO } from '../lib/dtos/userDTO';
+import companyService from '../services/companyService';
+import CommonError from '../lib/errors/CommonError';
+import NotFoundError from '../lib/errors/NotFoundError';
+import { OmittedUser } from '../../types/OmittedUser';
+import { USER_ROLE } from '@prisma/client';
+import UnauthError from '../lib/errors/UnauthError';
 
-export async function createUser(req: Request, res: Response) {
+export const createUser: RequestHandler = async (req, res) => {
   const data = create(req.body, CreateUserBodyStruct);
-  const user = await userService.createUser(data);
-  res.status(201).send(user);
-}
+  const company = await companyService.getByName(data.company);
+  if (!company) {
+    throw new NotFoundError(companyService.getEntityName(), data.company);
+  }
+  if (company.companyCode !== data.companyCode) {
+    throw new CommonError('Company code is wrong', 404);
+  }
 
-export async function getInfo(req: Request, res: Response) {
-  const reqUser = req.user as UserWithId;
-  const { id: userId } = create({ id: reqUser.id }, IdParamsStruct);
-  const user = await userService.getUserById(userId);
-  res.send(user);
-}
+  const user = await userService.createUser(new CreateUserDTO(data, company.id));
+  res.status(201).send(new ResponseUserDTO(user));
+};
 
-export async function editInfo(req: Request, res: Response) {
-  const reqUser = req.user as UserWithId;
-  const { id: userId } = create({ id: reqUser.id }, IdParamsStruct);
+export const getInfo: RequestHandler = async (req, res) => {
+  const reqUser = req.user as OmittedUser;
+  const user = await userService.getUserById(reqUser.id);
+  res.send(new ResponseUserDTO(user));
+};
+
+export const editInfo: RequestHandler = async (req, res) => {
+  const reqUser = req.user as OmittedUser;
   const data = create(req.body, UpdateUserBodyStruct);
-  const user = await userService.updateUser(userId, data);
-  res.status(201).send(user);
-}
+  const user = await userService.updateUser(reqUser.id, data);
+  res.status(201).send(new ResponseUserDTO(user));
+};
 
-export async function signOut(req: Request, res: Response) {
-  const reqUser = req.user as UserWithId;
-  const { id: userId } = create({ id: reqUser.id }, IdParamsStruct);
-  const { password: password } = create(req.body, CreatePasswordStruct);
-  const user = await userService.updatePassword(userId, password);
-  res.status(201).send(user);
-}
+export const withDraw: RequestHandler = async (req, res) => {
+  const reqUser = req.user as OmittedUser;
+  await userService.deleteUser(reqUser.id);
+  res.status(204).send('유저 삭제 성공');
+};
 
-export async function deleteUser(req: Request, res: Response) {
-  const reqUser = req.user as UserWithId;
-  const { id: userId } = create({ id: reqUser.id }, IdParamsStruct);
-  const { password: password } = create(req.body, CreatePasswordStruct);
-  const user = await userService.updatePassword(userId, password);
-  res.status(201).send(user);
-}
+export const deleteUser: RequestHandler = async (req, res) => {
+  const reqUser = req.user as OmittedUser;
+  if (reqUser.role !== USER_ROLE.ADMIN) {
+    throw new UnauthError();
+  }
+  const data = create(req.body, DeleteUserBodyType);
+  await userService.deleteUser(data.userId);
+  res.status(204).send('유저 삭제 성공');
+};
