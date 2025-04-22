@@ -16,7 +16,7 @@ async function getUser(email: string, password: string) {
   return filterSensitiveUserData(user);
 }
 
-async function getUserById(id: string) {
+async function getUserById(id: number) {
   const user = await userRepository.findById(id);
 
   if (!user) {
@@ -26,7 +26,7 @@ async function getUserById(id: string) {
   return filterSensitiveUserData(user);
 }
 
-async function refreshToken(userId: string) {
+async function refreshToken(userId: number) {
   const user = await userRepository.findById(userId);
   if (!user) {
     throw new UnauthError();
@@ -51,7 +51,7 @@ function filterSensitiveUserData(user: Partial<USER> = {}) {
 function createToken(authedUser: AuthedUser, type?: String) {
   const payload = { userId: authedUser.id, role: authedUser.role };
   const options: SignOptions = {
-    expiresIn: type === 'refresh' ? '6h' : '2d',
+    expiresIn: type === 'refresh' ? '5m' : '2d',
   };
   const token = jwt.sign(payload, JWT_SECRET, options);
   return token;

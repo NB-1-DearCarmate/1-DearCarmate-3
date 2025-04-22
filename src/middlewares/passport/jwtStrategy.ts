@@ -5,7 +5,7 @@ import { Request } from 'express';
 import { USER_ROLE } from '@prisma/client';
 
 interface JwtPayload {
-  userId: string;
+  userId: number;
   role: USER_ROLE;
   iat?: number;
   exp?: number;
