@@ -10,7 +10,7 @@ import {
   CARTYPE,
   CARMODEL,
   CONTRACTDOCUMENT,
-} from './mock.js';
+} from './mock.mjs';
 
 const prisma = new PrismaClient();
 
