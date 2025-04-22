@@ -52,7 +52,7 @@ function filterSensitiveUserData(user: User) {
 function createToken(authedUser: OmittedUser, type?: String) {
   const payload = { userId: authedUser.id, role: authedUser.role };
   const options: SignOptions = {
-    expiresIn: type === 'refresh' ? '2d' : '1h',
+    expiresIn: type === 'refresh' ? '7d' : '1h',
   };
   const token = jwt.sign(payload, JWT_SECRET, options);
   return token;
