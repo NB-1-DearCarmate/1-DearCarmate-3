@@ -10,7 +10,7 @@ import {
   CARTYPE,
   CARMODEL,
   CONTRACTDOCUMENT,
-} from './mock.js';
+} from './mock.mjs';
 
 const prisma = new PrismaClient();
 
@@ -85,6 +85,33 @@ async function main() {
     data: CONTRACTDOCUMENT,
     skipDuplicates: true,
   });
+
+  await prisma.$executeRawUnsafe(
+    `SELECT setVal('"Company_id_seq"', (SELECT MAX(id) FROM "Company"));`,
+  );
+  await prisma.$executeRawUnsafe(`SELECT setVal('"User_id_seq"', (SELECT MAX(id) FROM "User"));`);
+  await prisma.$executeRawUnsafe(
+    `SELECT setVal('"Customer_id_seq"', (SELECT MAX(id) FROM "Customer"));`,
+  );
+  await prisma.$executeRawUnsafe(`SELECT setVal('"Car_id_seq"', (SELECT MAX(id) FROM "Car"));`);
+  await prisma.$executeRawUnsafe(
+    `SELECT setVal('"Contract_id_seq"', (SELECT MAX(id) FROM "Contract"));`,
+  );
+  await prisma.$executeRawUnsafe(
+    `SELECT setVal('"Meeting_id_seq"', (SELECT MAX(id) FROM "Meeting"));`,
+  );
+  await prisma.$executeRawUnsafe(
+    `SELECT setVal('"CarModel_id_seq"', (SELECT MAX(id) FROM "CarModel"));`,
+  );
+  await prisma.$executeRawUnsafe(
+    `SELECT setVal('"Manufacturer_id_seq"', (SELECT MAX(id) FROM "Manufacturer"));`,
+  );
+  await prisma.$executeRawUnsafe(
+    `SELECT setVal('"CarType_id_seq"', (SELECT MAX(id) FROM "CarType"));`,
+  );
+  await prisma.$executeRawUnsafe(
+    `SELECT setVal('"ContractDocument_id_seq"', (SELECT MAX(id) FROM "ContractDocument"));`,
+  );
 }
 
 main()
