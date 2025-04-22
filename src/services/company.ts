@@ -1,9 +1,9 @@
 import { create } from '../repositories/company';
 
 export async function createCompany(company: { companyName: string; companyCode: string }) {
-  const { companyName: name, companyCode: code } = company;
+  const { companyName, companyCode } = company;
 
-  const createdCompany = await create({ name, code });
+  const createdCompany = await create({ companyName, companyCode });
 
   return createdCompany;
 }
