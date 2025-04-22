@@ -79,7 +79,7 @@ export const USER = [
     name: '햇살 직원',
     email: 'user1@sunshine.com',
     phone_number: '01033334444',
-    password: 'password',
+    password: '$2a$10$016asn6GSAyr0YlncfupOe133YbX15yUwbUa/eXitodZof0sFnryq',
     role: 'EMPLOYEE',
     user_code: 'USR003',
     createdAt: new Date('2024-01-07T14:00:00Z'),

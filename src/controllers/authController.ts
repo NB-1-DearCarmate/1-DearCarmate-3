@@ -7,6 +7,7 @@ import { REFRESH_tOKEN_STRING } from '../config/constants';
 
 export async function login(req: Request, res: Response) {
   const reqUser = req.user as AuthedUser;
+  console.log(reqUser);
   const accessToken = userService.createToken(reqUser);
   const refreshToken = userService.createToken(reqUser, 'refresh');
   res.cookie(REFRESH_tOKEN_STRING, refreshToken, {
@@ -28,5 +29,5 @@ export async function refreshToken(req: Request, res: Response) {
     sameSite: 'none',
     secure: false,
   });
-  res.json({ accessToken });
+  res.json({ accessToken, refreshToken: newRefreshToken });
 }

@@ -5,7 +5,6 @@ import userRepository from '../repositories/userRepository';
 import NotFoundError from '../lib/errors/NotFoundError';
 import UnauthError from '../lib/errors/UnauthError';
 import { USER } from '@prisma/client';
-import { AuthedUser } from '../../types/AuthedUser';
 
 async function getUser(email: string, password: string) {
   const user = await userRepository.findByEmail(email);
@@ -48,7 +47,7 @@ function filterSensitiveUserData(user: Partial<USER> = {}) {
   return rest;
 }
 
-function createToken(authedUser: AuthedUser, type?: String) {
+function createToken(authedUser: USER, type?: String) {
   const payload = { userId: authedUser.id, role: authedUser.role };
   const options: SignOptions = {
     expiresIn: type === 'refresh' ? '5m' : '2d',
