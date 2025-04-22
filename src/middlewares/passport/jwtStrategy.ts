@@ -16,13 +16,13 @@ const accessTokenOptions = {
   secretOrKey: JWT_SECRET,
 };
 const refreshTokenOptions = {
-  jwtFromRequest: (req: Request) => req.cookies[REFRESH_tOKEN_STRING],
+  // jwtFromRequest: (req: Request) => req.cookies[REFRESH_tOKEN_STRING],
+  jwtFromRequest: ExtractJwt.fromBodyField('refreshToken'),
   secretOrKey: JWT_SECRET,
 };
 async function jwtVerify(payload: JwtPayload, done: VerifiedCallback) {
   try {
     const { userId, role } = payload;
-
     const user = await userService.getUserById(userId);
 
     const validRoles = [USER_ROLE.ADMIN, USER_ROLE.OWNER, USER_ROLE.EMPLOYEE];
