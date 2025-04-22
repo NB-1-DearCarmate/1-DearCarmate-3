@@ -13,124 +13,127 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model USER {
-  id           String     @id @default(uuid())
-  name         String     @db.VarChar(50)
-  email        String     @unique @db.VarChar(320)
-  phone_number String     @unique @db.VarChar(20)
-  password     String     @db.VarChar(100)
-  createdAt    DateTime   @default(now())
-  COMPANY      COMPANY    @relation(fields: [company_id], references: [id], onDelete: Cascade)
-  company_id   String
-  USERCODE     USERCODE   @relation(fields: [usercode_id], references: [id], onDelete: Restrict)
-  usercode_id  String     @unique
-  CONTRACT     CONTRACT[]
+model User {
+  id                Int       @id @default(autoincrement())
+  companyId         Int
+  name              String    @db.VarChar(50)
+  email             String    @unique @db.VarChar(320)
+  phoneNumber       String    @unique @db.VarChar(20)
+  encryptedPassword String    @db.VarChar(100)
+  role              USER_ROLE
+  employeeNumber    String    @db.VarChar(50)
+  imageUrl          String?   @db.VarChar(255)
+  createdAt         DateTime  @default(now())
+
+  company   Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  contracts Contract[]
 }
 
-model CUSTOMER {
-  id             String     @id @default(uuid())
-  name           String     @db.VarChar(50)
-  email          String     @unique @db.VarChar(320)
-  gender         String     @db.VarChar(50)
-  phone_number   String     @unique @db.VarChar(20)
-  age_group      Int?       @db.Integer
-  region         String?    @db.VarChar(50)
-  contract_count Int        @default(0) @db.Integer
-  memo           String?
-  created_at     DateTime   @default(now())
-  COMPANY        COMPANY    @relation(fields: [company_id], references: [id], onDelete: Cascade)
-  company_id     String
-  CONTRACT       CONTRACT[]
+model Customer {
+  id            Int      @id @default(autoincrement())
+  companyId     Int
+  name          String   @db.VarChar(50)
+  email         String   @unique @db.VarChar(320)
+  gender        String   @db.VarChar(50)
+  phoneNumber   String   @unique @db.VarChar(20)
+  ageGroup      Int?     @db.Integer
+  region        String?  @db.VarChar(50)
+  contractCount Int      @default(0) @db.Integer
+  memo          String?
+  createdAt     DateTime @default(now())
+
+  company   Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  contracts Contract[]
 }
 
-model CAR {
-  id                 String     @id @default(uuid())
-  car_number         String     @unique @db.VarChar(50)
-  manufactuuing_year Int        @db.Integer
-  mileage            Int        @db.Integer
-  price              Decimal    @db.Decimal(20, 2)
-  status             CAR_STATUS @default(AVAILABLE)
-  accident_count     Int        @default(0) @db.Integer
-  content            String?
-  accident_detail    String?
-  Datetime           DateTime   @default(now())
-  COMPANY            COMPANY    @relation(fields: [company_id], references: [id], onDelete: Cascade)
-  company_id         String
-  CARMODEL           CARMODEL   @relation(fields: [car_model_id], references: [id], onDelete: Restrict)
-  car_model_id       String
-  CONTRACT           CONTRACT[]
+model Car {
+  id                Int        @id @default(autoincrement())
+  companyId         Int
+  modelId           Int
+  carNumber         String     @unique @db.VarChar(50)
+  manufacturingYear Int        @db.Integer
+  mileage           Int        @db.Integer
+  price             Decimal    @db.Decimal(20, 2)
+  status            CAR_STATUS @default(AVAILABLE)
+  accidentCount     Int        @default(0) @db.Integer
+  explanation       String?
+  accidentDetails   String?
+  Datetime          DateTime   @default(now())
+
+  company   Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  carModel  CarModel   @relation(fields: [modelId], references: [id], onDelete: Restrict)
+  contracts Contract[]
 }
 
-model CONTRACT {
-  id               String             @id @default(uuid())
-  status           CONTRACT_STATUS
-  finalized_at     DateTime?
-  created_at       DateTime           @default(now())
-  CUSTOMER         CUSTOMER           @relation(fields: [customer_id], references: [id], onDelete: Cascade)
-  customer_id      String
-  CAR              CAR                @relation(fields: [car_id], references: [id], onDelete: Cascade)
-  car_id           String
-  USER             USER               @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  user_id          String
-  CONTRACTDOCUMENT CONTRACTDOCUMENT[]
-  MEETING          MEETING[]
+model Contract {
+  id             Int             @id @default(autoincrement())
+  customerId     Int
+  carId          Int
+  userId         Int
+  companyId      Int
+  status         CONTRACT_STATUS
+  contractPrice  Decimal         @db.Decimal(20, 2)
+  resolutionDate DateTime?
+  createdAt      DateTime        @default(now())
+
+  customer          Customer           @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  car               Car                @relation(fields: [carId], references: [id], onDelete: Cascade)
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contractDocuments ContractDocument[]
+  meetings          Meeting[]
+  Company           Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
-model CONTRACTDOCUMENT {
-  id          String   @id @default(uuid())
-  file_name   String   @db.VarChar(50)
-  file_path   String   @db.VarChar(255)
-  file_size   Int?     @db.Integer
-  CONTRACT    CONTRACT @relation(fields: [contract_id], references: [id], onDelete: Cascade)
-  contract_id String
+model ContractDocument {
+  id         Int    @id @default(autoincrement())
+  fileName   String @db.VarChar(50)
+  filePath   String @db.VarChar(255)
+  fileSize   Int?   @db.Integer
+  contractId Int
+
+  contract Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
 }
 
-model MANUFACTURER {
-  id       String     @id @default(uuid())
-  name     String     @unique @db.VarChar(50)
-  CARMODEL CARMODEL[]
+model Manufacturer {
+  id   Int    @id @default(autoincrement())
+  name String @unique @db.VarChar(50)
+
+  carModels CarModel[]
 }
 
-model CARTYPE {
-  id       String     @id @default(uuid())
-  name     String     @unique @db.VarChar(50)
-  CARMODEL CARMODEL[]
+model CarType {
+  id   Int    @id @default(autoincrement())
+  type String @unique @db.VarChar(50)
+
+  carModels CarModel[]
 }
 
-model CARMODEL {
-  id              String       @id @default(uuid())
-  name            String       @db.VarChar(50)
-  MANUFACTURER    MANUFACTURER @relation(fields: [manufacturer_id], references: [id], onDelete: Restrict)
-  manufacturer_id String
-  CARTYPE         CARTYPE      @relation(fields: [car_type_id], references: [id], onDelete: Restrict)
-  car_type_id     String
-  CAR             CAR[]
+model CarModel {
+  id             Int    @id @default(autoincrement())
+  model          String @db.VarChar(50)
+  manufacturerId Int
+  typeId         Int
+
+  manufacturer Manufacturer @relation(fields: [manufacturerId], references: [id], onDelete: Restrict)
+  carType      CarType      @relation(fields: [typeId], references: [id], onDelete: Restrict)
+  cars         Car[]
 }
 
-model MEETING {
-  id          String   @id @default(uuid())
-  time        DateTime
-  CONTRACT    CONTRACT @relation(fields: [contract_id], references: [id], onDelete: Cascade)
-  contract_id String
+model Meeting {
+  id         Int      @id @default(autoincrement())
+  time       DateTime
+  contract   Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  contractId Int
 }
 
-model COMPANY {
-  id       String     @id @default(uuid())
-  name     String     @db.VarChar(50)
-  code     String     @unique @db.VarChar(50)
-  USER     USER[]
-  CAR      CAR[]
-  USERCODE USERCODE[]
-  CUSTOMER CUSTOMER[]
-}
-
-model USERCODE {
-  id         String  @id @default(uuid())
-  code       String  @unique @db.VarChar(50)
-  COMPANY    COMPANY @relation(fields: [company_id], references: [id], onDelete: Cascade)
-  company_id String
-
-  USER USER? @relation
+model Company {
+  id          Int        @id @default(autoincrement())
+  companyName String     @db.VarChar(50)
+  companyCode String     @unique @db.VarChar(50)
+  users       User[]
+  cars        Car[]
+  customers   Customer[]
+  contracts   Contract[]
 }
 
 enum CONTRACT_STATUS {
@@ -145,4 +148,10 @@ enum CAR_STATUS {
   AVAILABLE
   PENDING
   SOLD
+}
+
+enum USER_ROLE {
+  ADMIN
+  OWNER
+  EMPLOYEE
 }

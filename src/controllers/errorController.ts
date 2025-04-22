@@ -6,6 +6,7 @@ import ForbiddenError from '../lib/errors/ForbiddenError';
 import FileExtError from '../lib/errors/FileExtError';
 import EmptyUploadError from '../lib/errors/EmptyUploadError';
 import multer from 'multer';
+import UnauthError from '../lib/errors/UnauthError';
 import { Prisma } from '@prisma/client';
 import { NextFunction, Request, Response } from 'express';
 import EnvVarError from '../lib/errors/EnvVarError';

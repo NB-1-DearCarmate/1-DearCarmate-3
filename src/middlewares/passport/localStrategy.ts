@@ -1,10 +1,9 @@
 import { Strategy as LocalStrategy } from 'passport-local';
-import userService from '../../services/exampleService';
-import { EMAIL_STRING } from '../../config/constants';
+import userService from '../../services/userService';
 
 const localStrategy = new LocalStrategy(
   {
-    usernameField: EMAIL_STRING,
+    usernameField: 'email',
   },
   async (email, password, done) => {
     try {
