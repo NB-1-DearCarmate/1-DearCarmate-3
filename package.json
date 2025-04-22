@@ -15,6 +15,7 @@
     "@types/passport": "^1.0.17",
     "@types/passport-jwt": "^4.0.1",
     "@types/passport-local": "^1.0.38",
+    "@types/uuid": "^10.0.0",
     "prettier": "^3.3.2",
     "prisma": "^5.16.2",
     "ts-node": "^10.9.2"
@@ -34,7 +35,8 @@
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
     "superstruct": "^2.0.2",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.2",
+    "uuid": "^11.1.0"
   },
   "prisma": {
     "seed": "node prisma/seed.js"

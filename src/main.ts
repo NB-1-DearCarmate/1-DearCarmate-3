@@ -7,6 +7,7 @@ import passport from './middlewares/passport/passport';
 import { PORT, UPLOAD_FOLDER, STATIC_PATH } from './config/constants';
 import authRouter from './routers/authRouter';
 import { defaultNotFoundHandler, globalErrorHandler } from './controllers/errorController';
+import imageRouter from "./routers/imageRouter";
 
 const app = express();
 
@@ -24,6 +25,10 @@ app.use('/companies', companyRouter);
 
 app.use(defaultNotFoundHandler);
 app.use(globalErrorHandler);
+
+app.use("/uploads", express.static(path.join(__dirname, "../public/uploads")));
+app.use("/images", imageRouter);
+
 
 app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
