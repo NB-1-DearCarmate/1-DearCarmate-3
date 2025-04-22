@@ -2,11 +2,14 @@ import { create } from 'superstruct';
 import userService from '../services/userService';
 import { IdParamsStruct } from '../structs/commonStructs';
 import { Request, Response } from 'express';
-import { AuthedUser } from '../../types/AuthedUser';
+import { OmittedUser } from '../../types/OmittedUser';
 import { REFRESH_tOKEN_STRING } from '../config/constants';
+import { LoginResponseDTO } from '../lib/dtos/authDTO';
+import { PrismaClient } from '@prisma/client';
+import prisma from '../config/prismaClient';
 
 export async function login(req: Request, res: Response) {
-  const reqUser = req.user as AuthedUser;
+  const reqUser = req.user as OmittedUser;
   console.log(reqUser);
   const accessToken = userService.createToken(reqUser);
   const refreshToken = userService.createToken(reqUser, 'refresh');
@@ -16,12 +19,12 @@ export async function login(req: Request, res: Response) {
     sameSite: 'none',
     secure: false,
   });
-  res.json({ accessToken });
+  const resultDTO = new LoginResponseDTO(reqUser, accessToken, refreshToken);
+  res.json({ resultDTO });
 }
 
 export async function refreshToken(req: Request, res: Response) {
-  const reqUser = req.user as AuthedUser;
-  // const { id: userId } = create({ id: reqUser.id }, IdParamsStruct);
+  const reqUser = req.user as OmittedUser;
   const { accessToken, newRefreshToken } = await userService.refreshToken(reqUser.id);
   res.cookie(REFRESH_tOKEN_STRING, newRefreshToken, {
     path: '/auth/refresh',

@@ -1,38 +1,32 @@
-import { USER } from '@prisma/client';
-import { AuthedUser } from '../../../types/AuthedUser';
-import { UserDTO } from './userDTO';
+import { User, USER_ROLE } from '@prisma/client';
+import { OmittedUser } from '../../../types/OmittedUser';
 
-export class ArticleWithLikeDTO {
-  id!: number;
-  image!: string | null;
-  createdAt!: Date;
-  updatedAt!: Date;
-  title!: string;
-  content!: string;
-  userId!: number;
-  isLiked: boolean;
+class UserDTO {
+  id: number;
+  name: string;
+  email: string;
+  employeeNumber: string;
+  phoneNumber: string;
+  imageUrl: string;
+  isAdmin: boolean;
+  company: CompanyDTO;
+  constructor(user: OmittedUser) {
+    this.id = user.id;
+    this.name = user.name;
+    this.email = user.email;
+    this.employeeNumber = user.employeeNumber;
+    this.phoneNumber = user.phoneNumber;
+    this.imageUrl = user.imageUrl ?? '';
+    this.isAdmin = user.role === USER_ROLE.ADMIN;
 
-  constructor(
-    article: {
-      id: number;
-      image: string | null;
-      createdAt: Date;
-      updatedAt: Date;
-      title: string;
-      content: string;
-      userId: number;
-    },
-    isLiked: Object | null,
-  ) {
-    Object.assign(this, { ...article });
-    this.isLiked = !!isLiked;
+    this.company = new CompanyDTO(user.companyId);
   }
 }
 
-export class CompanyDTO {
+class CompanyDTO {
   companyCode: string;
-  constructor(companyCode: string) {
-    this.companyCode = companyCode;
+  constructor(companyCode: number) {
+    this.companyCode = companyCode.toString();
   }
 }
 
@@ -40,39 +34,9 @@ export class LoginResponseDTO {
   user: UserDTO;
   accessToken: string;
   refreshToken: string;
-  constructor(user: USER, accessToken: string, refreshToken: string) {
-    const company = new CompanyDTO(user.user_code);
-    this.user.id = user.id;
+  constructor(user: OmittedUser, accessToken: string, refreshToken: string) {
+    this.user = new UserDTO(user);
     this.accessToken = accessToken;
     this.refreshToken = refreshToken;
-  }
-}
-
-export class ArticleListWithCountDTO {
-  list!: {
-    id: number;
-    image: string | null;
-    createdAt: Date;
-    updatedAt: Date;
-    title: string;
-    content: string;
-    userId: number;
-  }[];
-  totalCount!: number;
-
-  constructor(
-    articles: {
-      id: number;
-      image: string | null;
-      createdAt: Date;
-      updatedAt: Date;
-      title: string;
-      content: string;
-      userId: number;
-    }[],
-    totalCount: number,
-  ) {
-    this.list = articles;
-    this.totalCount = totalCount;
   }
 }

@@ -4,14 +4,15 @@ import { JWT_SECRET } from '../config/constants';
 import userRepository from '../repositories/userRepository';
 import NotFoundError from '../lib/errors/NotFoundError';
 import UnauthError from '../lib/errors/UnauthError';
-import { USER } from '@prisma/client';
+import { User } from '@prisma/client';
+import { OmittedUser } from '../../types/OmittedUser';
 
 async function getUser(email: string, password: string) {
   const user = await userRepository.findByEmail(email);
   if (!user) {
     throw new UnauthError();
   }
-  await verifyPassword(password, user.password);
+  await verifyPassword(password, user.encryptedPassword);
   return filterSensitiveUserData(user);
 }
 
@@ -42,12 +43,13 @@ async function verifyPassword(inputPassword: string, savedPassword: string) {
   }
 }
 
-function filterSensitiveUserData(user: Partial<USER> = {}) {
-  const { password, ...rest } = user;
-  return rest;
+function filterSensitiveUserData(user: User) {
+  const { encryptedPassword, ...rest } = user;
+  const omitedUser: OmittedUser = rest;
+  return omitedUser;
 }
 
-function createToken(authedUser: USER, type?: String) {
+function createToken(authedUser: OmittedUser, type?: String) {
   const payload = { userId: authedUser.id, role: authedUser.role };
   const options: SignOptions = {
     expiresIn: type === 'refresh' ? '5m' : '2d',
