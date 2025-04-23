@@ -8,6 +8,7 @@ import { PORT, UPLOAD_FOLDER, STATIC_PATH } from './config/constants';
 import authRouter from './routers/authRouter';
 import { defaultNotFoundHandler, globalErrorHandler } from './controllers/errorController';
 import imageRouter from "./routers/imageRouter";
+import dotenv from "dotenv";
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use(globalErrorHandler);
 app.use("/uploads", express.static(path.join(__dirname, "../public/uploads")));
 app.use("/images", imageRouter);
 
+dotenv.config();
 
 app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
