@@ -21,7 +21,7 @@ export const login: RequestHandler = async (req: Request, res: Response) => {
 export const logout: RequestHandler = async (req: Request, res: Response) => {
   res.clearCookie(ACCESS_tOKEN_STRING, { path: '/' });
   res.clearCookie(REFRESH_tOKEN_STRING, { path: '/' });
-  res.send(204).send('로그아웃');
+  res.status(204).send('로그아웃');
 };
 
 export const refreshToken = async (req: Request, res: Response) => {
