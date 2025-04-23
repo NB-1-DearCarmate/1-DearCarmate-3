@@ -2,9 +2,10 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import cookieParser from 'cookie-parser';
-import companyRouter from './routers/company';
+import companyRouter from './routers/companyRouter';
 import passport from './middlewares/passport/passport';
 import { PORT, UPLOAD_FOLDER, STATIC_PATH } from './config/constants';
+import userRouter from './routers/userRouter';
 import authRouter from './routers/authRouter';
 import { defaultNotFoundHandler, globalErrorHandler } from './controllers/errorController';
 
@@ -18,8 +19,8 @@ app.use(passport.initialize());
 
 app.use(STATIC_PATH, express.static(path.resolve(process.cwd(), UPLOAD_FOLDER)));
 
+app.use('/users', userRouter);
 app.use('/auth', authRouter);
-//app.use('/users', exampleRouter);
 app.use('/companies', companyRouter);
 
 app.use(defaultNotFoundHandler);

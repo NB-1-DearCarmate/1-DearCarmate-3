@@ -1,15 +1,24 @@
+import companyRepository from '../repositories/companyRepository';
 import { CompanySearchField } from '../../types/company';
-import { create, getList, getCount } from '../repositories/company';
 
-export async function createCompany(company: { companyName: string; companyCode: string }) {
+async function createCompany(company: { companyName: string; companyCode: string }) {
   const { companyName, companyCode } = company;
 
-  const createdCompany = await create({ companyName, companyCode });
+  const createdCompany = await companyRepository.create({ companyName, companyCode });
 
   return createdCompany;
 }
 
-export async function getCompanies({
+async function getByName(companyName: string) {
+  const company = await companyRepository.findByName(companyName);
+  return company;
+}
+
+function getEntityName() {
+  return companyRepository.getEntityName();
+}
+
+async function getCompanies({
   page,
   pageSize,
   searchBy,
@@ -53,8 +62,8 @@ export async function getCompanies({
     }
   }
 
-  const companies = await getList(prismaParams);
-  const totalItemCount = await getCount({
+  const companies = await companyRepository.getList(prismaParams);
+  const totalItemCount = await companyRepository.getCount({
     where: searchBy && keyword ? { [searchBy]: { contains: keyword } } : {},
   });
   // 처음엔 prismaParams.where 변수로 getCount에 넣어주려고했으나
@@ -74,3 +83,10 @@ export async function getCompanies({
     data: formatted,
   };
 }
+
+export default {
+  createCompany,
+  getByName,
+  getEntityName,
+  getCompanies,
+};

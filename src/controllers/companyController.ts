@@ -1,10 +1,10 @@
 import { RequestHandler } from 'express';
-import { createCompany, getCompanies } from '../services/company';
+import companyService from '../services/companyService';
 
 export const postCompany: RequestHandler = async (req, res, next) => {
   const { companyName, companyCode } = req.body;
 
-  const company = await createCompany({ companyName, companyCode });
+  const company = await companyService.createCompany({ companyName, companyCode });
 
   res.status(201).json(company);
 };
@@ -15,7 +15,7 @@ export const getCompanyList: RequestHandler = async (req, res, next) => {
   const searchBy = (req.query.searchBy as string) || '';
   const keyword = (req.query.keyword as string) || '';
 
-  const companies = await getCompanies({ page, pageSize, searchBy, keyword });
+  const companies = await companyService.getCompanies({ page, pageSize, searchBy, keyword });
 
   res.status(200).json(companies);
 };
