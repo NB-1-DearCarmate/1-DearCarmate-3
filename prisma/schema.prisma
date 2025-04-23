@@ -128,7 +128,7 @@ model Meeting {
 
 model Company {
   id          Int        @id @default(autoincrement())
-  companyName String     @db.VarChar(50)
+  companyName String     @unique @db.VarChar(50)
   companyCode String     @unique @db.VarChar(50)
   users       User[]
   cars        Car[]
