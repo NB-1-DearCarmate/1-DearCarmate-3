@@ -46,8 +46,7 @@ async function getUserById(id: number) {
 async function updateUser(id: number, data: UpdateUserBodyType) {
   const user = await userRepository.findById(id);
   const { currentPassword, password, passwordConfirmation, ...rest } = data;
-  const currentPasswordHashed = await hashingPassword(currentPassword);
-  await verifyPassword(currentPasswordHashed, user!.encryptedPassword);
+  await verifyPassword(currentPassword, user!.encryptedPassword);
 
   let hashedPassword: string | null = null;
   if (password) {

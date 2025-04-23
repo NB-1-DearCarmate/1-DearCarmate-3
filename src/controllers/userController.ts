@@ -2,7 +2,7 @@ import { create } from 'superstruct';
 import userService from '../services/userService';
 import {
   CreateUserBodyStruct,
-  DeleteUserBodyType,
+  DeleteUserParamStruct,
   UpdateUserBodyStruct,
 } from '../structs/userStructs';
 import { RequestHandler } from 'express';
@@ -44,7 +44,7 @@ export const editInfo: RequestHandler = async (req, res) => {
 export const withDraw: RequestHandler = async (req, res) => {
   const reqUser = req.user as OmittedUser;
   await userService.deleteUser(reqUser.id);
-  res.status(204).send('유저 삭제 성공');
+  res.status(204).send(); //.send('유저 삭제 성공');
 };
 
 export const deleteUser: RequestHandler = async (req, res) => {
@@ -52,7 +52,7 @@ export const deleteUser: RequestHandler = async (req, res) => {
   if (reqUser.role !== USER_ROLE.ADMIN) {
     throw new UnauthError();
   }
-  const data = create(req.body, DeleteUserBodyType);
-  await userService.deleteUser(data.userId);
-  res.status(204).send('유저 삭제 성공');
+  const { userId } = create(req.params, DeleteUserParamStruct);
+  await userService.deleteUser(userId);
+  res.status(204).send(); //.send('유저 삭제 성공');
 };

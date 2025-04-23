@@ -10,7 +10,9 @@ import {
   define,
 } from 'superstruct';
 
-const integerString = coerce(integer(), string(), (value) => parseInt(value));
+export const integerString = coerce(integer(), string(), (value) => parseInt(value));
+
+const urlRegExp = /^(https?:\/\/)/;
 
 export const PageParamsStruct = object({
   page: defaulted(integerString, 1),

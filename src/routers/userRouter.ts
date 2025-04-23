@@ -5,27 +5,27 @@ import passport from '../middlewares/passport/passport';
 
 const usersRouter = express.Router();
 
-usersRouter.post('/users', withAsync(createUser));
-
 usersRouter.get(
-  '/users/me',
+  '/me',
   passport.authenticate('access-token', { session: false }),
   withAsync(getInfo),
 );
 usersRouter.patch(
-  '/users/me',
+  '/me',
   passport.authenticate('access-token', { session: false }),
   withAsync(editInfo),
 );
 usersRouter.delete(
-  '/users/me',
+  '/me',
   passport.authenticate('access-token', { session: false }),
   withAsync(withDraw),
 );
 usersRouter.delete(
-  '/users/:userId',
+  '/:userId',
   passport.authenticate('access-token', { session: false }),
   withAsync(deleteUser),
 );
+
+usersRouter.post('/', withAsync(createUser));
 
 export default usersRouter;
