@@ -14,4 +14,5 @@ export const JWT_SECRET = process.env.JWT_SECRET;
 export const ACCESS_TOKEN_STRATEGY = 'access-token';
 export const REFRESH_TOKEN_STRATEGY = 'refresh-token';
 export const LOCAL_STRATEGY = 'local';
+export const ACCESS_tOKEN_STRING = 'accessToken';
 export const REFRESH_tOKEN_STRING = 'refreshToken';

@@ -15,6 +15,23 @@ async function findByName(companyName: string) {
   });
 }
 
+async function getList(params: Prisma.CompanyFindManyArgs) {
+  return await prisma.company.findMany({
+    ...params,
+    include: {
+      _count: {
+        select: { users: true },
+      },
+    },
+  });
+}
+
+async function getCount(params: Prisma.CompanyCountArgs) {
+  return await prisma.company.count({
+    ...params,
+  });
+}
+
 function getEntityName() {
   return prisma.company.getEntityName();
 }
@@ -22,5 +39,7 @@ function getEntityName() {
 export default {
   create,
   findByName,
+  getList,
+  getCount,
   getEntityName,
 };
