@@ -15,7 +15,7 @@ import { integerString } from './commonStructs';
 const emailRegExp = pattern(
   string(),
   // /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i,
-  /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g,
+  /^[\w.-]+@([\w.-]+\.)+[\w]{2,4}$/g,
 );
 
 const phoneNumberRegExp = pattern(string(), /^\d{2,3}-\d{3,4}-\d{4}$/);
@@ -36,7 +36,7 @@ export const CreateUserBodyStruct = matchPasswords(
     phoneNumber: phoneNumberRegExp,
     password: pwRegExp,
     passwordConfirmation: string(),
-    company: nonempty(string()),
+    companyName: nonempty(string()),
     companyCode: nonempty(string()),
   }),
 );

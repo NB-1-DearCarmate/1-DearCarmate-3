@@ -69,9 +69,9 @@ import UnauthError from '../lib/errors/UnauthError';
  */
 export const createUser: RequestHandler = async (req, res) => {
   const data = create(req.body, CreateUserBodyStruct);
-  const company = await companyService.getByName(data.company);
+  const company = await companyService.getByName(data.companyName);
   if (!company) {
-    throw new NotFoundError(companyService.getEntityName(), data.company);
+    throw new NotFoundError(companyService.getEntityName(), data.companyName);
   }
   if (company.companyCode !== data.companyCode) {
     throw new CommonError('Company code is wrong', 404);
