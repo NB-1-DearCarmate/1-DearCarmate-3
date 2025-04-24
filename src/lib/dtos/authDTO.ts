@@ -1,4 +1,3 @@
-import { User, USER_ROLE } from '@prisma/client';
 import { OmittedUser } from '../../../types/OmittedUser';
 import { ResponseUserDTO } from './userDTO';
 
