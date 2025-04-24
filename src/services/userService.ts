@@ -9,6 +9,7 @@ import { OmittedUser } from '../../types/OmittedUser';
 import { CreateUserDTO } from '../lib/dtos/userDTO';
 import CommonError from '../lib/errors/CommonError';
 import { UpdateUserBodyType } from '../structs/userStructs';
+import { PageParamsType } from '../structs/commonStructs';
 
 async function hashingPassword(password: string) {
   return await bcrypt.hash(password, 10);
@@ -43,17 +44,7 @@ async function getUserById(id: number) {
   return filterSensitiveUserData(user);
 }
 
-async function getUsers({
-  page,
-  pageSize,
-  searchBy,
-  keyword,
-}: {
-  page: number;
-  pageSize: number;
-  searchBy?: string;
-  keyword?: string;
-}) {
+async function getUsers({ page, pageSize, searchBy, keyword }: PageParamsType) {
   let prismaParams: {
     skip: number;
     take: number;
