@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createContractService, updateContractService, getAllContractsService, getContractByIdService } from "../services/contractService";
+import { createContractService, updateContractService, getAllContractsService, getContractByIdService, deleteContractService } from "../services/contractService";
 
 export const createContract = async (req: Request, res: Response) => {
   try {
@@ -47,4 +47,16 @@ export const getAllContracts = async (req: Request, res: Response) => {
       res.status(500).json({ message: "계약 조회 실패" });
     }
   };
+
+  export const deleteContract = async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      await deleteContractService(id);
+      res.status(200).json({ message: "계약이 삭제되었습니다." });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "계약 삭제 실패" });
+    }
+  };
+  
   
