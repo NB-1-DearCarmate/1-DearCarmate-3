@@ -7,9 +7,7 @@ import userService from '../services/userService';
 
 export const postCompany: RequestHandler = async (req, res, next) => {
   const { companyName, companyCode } = req.body;
-
   const company = await companyService.createCompany({ companyName, companyCode });
-
   res.status(201).json(company);
 };
 
@@ -18,9 +16,7 @@ export const getCompanyList: RequestHandler = async (req, res, next) => {
   const pageSize = parseInt(req.query.pageSize as string, 10) || 10;
   const searchBy = (req.query.searchBy as string) || '';
   const keyword = (req.query.keyword as string) || '';
-
   const companies = await companyService.getCompanies({ page, pageSize, searchBy, keyword });
-
   res.status(200).json(companies);
 };
 
@@ -41,6 +37,12 @@ export const getCompanyUsers: RequestHandler = async (req, res, next) => {
     searchBy,
     keyword,
   });
-
   res.status(200).json(users);
+};
+
+export const patchCompany: RequestHandler = async (req, res, next) => {
+  const companyId = parseInt(req.params.companyId as string, 10);
+  const { companyName, companyCode } = req.body;
+  const company = await companyService.updateCompany(companyId, { companyName, companyCode });
+  res.status(200).json(company);
 };
