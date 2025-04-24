@@ -46,3 +46,9 @@ export const patchCompany: RequestHandler = async (req, res, next) => {
   const company = await companyService.updateCompany(companyId, { companyName, companyCode });
   res.status(200).json(company);
 };
+
+export const deleteCompany: RequestHandler = async (req, res, next) => {
+  const companyId = parseInt(req.params.companyId as string, 10);
+  await companyService.deleteCompany(companyId);
+  res.status(200).send({ message: '회사 삭제 성공' });
+};

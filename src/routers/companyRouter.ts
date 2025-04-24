@@ -5,6 +5,7 @@ import {
   getCompanyList,
   getCompanyUsers,
   patchCompany,
+  deleteCompany,
 } from '../controllers/companyController';
 import passport from 'passport';
 
@@ -29,6 +30,12 @@ companyRouter.patch(
   '/:companyId',
   passport.authenticate('access-token', { session: false }),
   withAsync(patchCompany),
+);
+
+companyRouter.delete(
+  '/:companyId',
+  passport.authenticate('access-token', { session: false }),
+  withAsync(deleteCompany),
 );
 
 export default companyRouter;

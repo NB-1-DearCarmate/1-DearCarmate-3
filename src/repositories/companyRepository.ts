@@ -50,6 +50,14 @@ function getEntityName() {
   return prisma.company.getEntityName();
 }
 
+async function deleteById(companyId: number) {
+  return await prisma.company.delete({
+    where: {
+      id: companyId,
+    },
+  });
+}
+
 export default {
   create,
   update,
@@ -57,4 +65,5 @@ export default {
   getList,
   getCount,
   getEntityName,
+  deleteById,
 };
