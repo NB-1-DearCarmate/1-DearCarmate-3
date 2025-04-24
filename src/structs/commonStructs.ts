@@ -8,6 +8,7 @@ import {
   enums,
   nonempty,
   define,
+  Infer,
 } from 'superstruct';
 
 export const integerString = coerce(integer(), string(), (value) => parseInt(value));
@@ -17,9 +18,10 @@ const urlRegExp = /^(https?:\/\/)/;
 export const PageParamsStruct = object({
   page: defaulted(integerString, 1),
   pageSize: defaulted(integerString, 10),
-  orderBy: optional(enums(['recent'])),
-  keyword: optional(nonempty(string())),
+  searchBy: optional(string()),
+  keyword: optional(string()),
 });
+export type PageParamsType = Infer<typeof PageParamsStruct>;
 
 export const CursorParamsStruct = object({
   cursor: defaulted(integerString, 0),

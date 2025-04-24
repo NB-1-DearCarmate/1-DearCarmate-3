@@ -44,7 +44,7 @@ export const editInfo: RequestHandler = async (req, res) => {
 export const withDraw: RequestHandler = async (req, res) => {
   const reqUser = req.user as OmittedUser;
   await userService.deleteUser(reqUser.id);
-  res.status(204).send(); //.send('유저 삭제 성공');
+  res.status(204).send();
 };
 
 export const deleteUser: RequestHandler = async (req, res) => {
@@ -54,5 +54,5 @@ export const deleteUser: RequestHandler = async (req, res) => {
   }
   const { userId } = create(req.params, DeleteUserParamStruct);
   await userService.deleteUser(userId);
-  res.status(204).send(); //.send('유저 삭제 성공');
+  res.status(204).send();
 };

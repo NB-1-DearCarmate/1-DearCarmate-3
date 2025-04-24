@@ -14,8 +14,7 @@ export const login: RequestHandler = async (req: Request, res: Response) => {
     sameSite: 'none',
     secure: false,
   });
-  const resultDTO = new LoginResponseDTO(reqUser, accessToken, refreshToken);
-  res.send({ resultDTO });
+  res.send(new LoginResponseDTO(reqUser, accessToken, refreshToken));
 };
 
 export const logout: RequestHandler = async (req: Request, res: Response) => {
