@@ -4,7 +4,7 @@ import { JWT_SECRET } from '../config/constants';
 import userRepository from '../repositories/userRepository';
 import NotFoundError from '../lib/errors/NotFoundError';
 import UnauthError from '../lib/errors/UnauthError';
-import { User } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import { OmittedUser } from '../../types/OmittedUser';
 import { CreateUserDTO } from '../lib/dtos/userDTO';
 import CommonError from '../lib/errors/CommonError';
@@ -41,6 +41,84 @@ async function getUserById(id: number) {
   }
 
   return filterSensitiveUserData(user);
+}
+
+async function getUsers({
+  page,
+  pageSize,
+  searchBy,
+  keyword,
+}: {
+  page: number;
+  pageSize: number;
+  searchBy?: string;
+  keyword?: string;
+}) {
+  let prismaParams: {
+    skip: number;
+    take: number;
+    include: {
+      company: {
+        select: { companyName: true };
+      };
+    };
+    where?: Prisma.UserWhereInput;
+  } = {
+    skip: (page - 1) * pageSize,
+    take: pageSize,
+    include: {
+      company: {
+        select: { companyName: true },
+      },
+    },
+  };
+  let prismaWhereCondition: Prisma.UserWhereInput = {};
+
+  if (searchBy && keyword) {
+    switch (searchBy) {
+      case 'companyName':
+        prismaWhereCondition = {
+          company: {
+            companyName: {
+              contains: keyword,
+            },
+          },
+        };
+        break;
+      case 'email':
+        prismaWhereCondition = {
+          email: {
+            contains: keyword,
+          },
+        };
+        break;
+      case 'name':
+        prismaWhereCondition = {
+          name: {
+            contains: keyword,
+          },
+        };
+        break;
+    }
+  }
+  prismaParams = {
+    ...prismaParams,
+    where: prismaWhereCondition,
+  };
+
+  const users = await userRepository.findMany(prismaParams);
+  const totalItemCount = await userRepository.getCount({ where: prismaWhereCondition });
+  const omitedUsers = users.map((user) => {
+    const { encryptedPassword, ...rest } = user;
+    const omitedUser: OmittedUser = rest;
+    return omitedUser;
+  });
+  return {
+    currentPage: page,
+    totalPages: Math.ceil(totalItemCount / pageSize),
+    totalItemCount: totalItemCount,
+    data: omitedUsers,
+  };
 }
 
 async function updateUser(id: number, data: UpdateUserBodyType) {
@@ -102,6 +180,7 @@ export default {
   getUserById,
   updateUser,
   deleteUser,
+  getUsers,
   createToken,
   refreshToken,
 };
