@@ -61,6 +61,14 @@ async function getCompanies({
   const totalItemCount = await companyRepository.getCount({
     where: prismaWhereCondition,
   });
+<<<<<<< HEAD
+=======
+
+  const formatted = companies.map(({ _count, ...company }) => ({
+    ...company,
+    userCount: _count.users,
+  }));
+>>>>>>> 570f63891206dd46c86e2ca621deb1da95d5f0e9
 
   return {
     currentPage: page,
