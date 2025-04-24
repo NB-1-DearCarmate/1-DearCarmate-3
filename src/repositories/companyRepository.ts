@@ -7,6 +7,20 @@ async function create(company: Prisma.CompanyCreateInput) {
   });
 }
 
+async function update(companyId: number, data: Prisma.CompanyUpdateInput) {
+  return await prisma.company.update({
+    data,
+    where: {
+      id: companyId,
+    },
+    include: {
+      _count: {
+        select: { users: true },
+      },
+    },
+  });
+}
+
 async function findByName(companyName: string) {
   return await prisma.company.findUnique({
     where: {
@@ -38,6 +52,7 @@ function getEntityName() {
 
 export default {
   create,
+  update,
   findByName,
   getList,
   getCount,

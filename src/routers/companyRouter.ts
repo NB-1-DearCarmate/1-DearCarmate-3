@@ -1,6 +1,11 @@
 import express from 'express';
 import { withAsync } from '../lib/withAsync';
-import { postCompany, getCompanyList, getCompanyUsers } from '../controllers/companyController';
+import {
+  postCompany,
+  getCompanyList,
+  getCompanyUsers,
+  patchCompany,
+} from '../controllers/companyController';
 import passport from 'passport';
 
 const companyRouter = express.Router();
@@ -20,4 +25,10 @@ companyRouter.get(
   passport.authenticate('access-token', { session: false }),
   withAsync(getCompanyUsers),
 );
+companyRouter.patch(
+  '/:companyId',
+  passport.authenticate('access-token', { session: false }),
+  withAsync(patchCompany),
+);
+
 export default companyRouter;

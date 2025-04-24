@@ -1,8 +1,7 @@
 import { USER_ROLE } from '@prisma/client';
 import { OmittedUser } from '../../../types/OmittedUser';
 import { CompanyDTO } from './authDTO';
-import { CreateUserBodyType, UpdateUserBodyType } from '../../structs/userStructs';
-import { partial } from 'superstruct';
+import { CreateUserBodyType } from '../../structs/userStructs';
 
 export class ResponseUserDTO {
   id: number;

@@ -1,20 +1,20 @@
+import { ResponseCompanyDTO } from '../lib/dtos/companyDTO';
 import companyRepository from '../repositories/companyRepository';
 import { Prisma } from '@prisma/client';
 
 async function createCompany(company: { companyName: string; companyCode: string }) {
   const { companyName, companyCode } = company;
-
   const createdCompany = await companyRepository.create({ companyName, companyCode });
+  return new ResponseCompanyDTO(createdCompany);
+}
 
-  return {
-    ...createdCompany,
-    userCount: 0,
-  };
+async function updateCompany(companyId: number, body: Prisma.CompanyUpdateInput) {
+  const updatedCompany = await companyRepository.update(companyId, body);
+  return new ResponseCompanyDTO(updatedCompany);
 }
 
 async function getByName(companyName: string) {
-  const company = await companyRepository.findByName(companyName);
-  return company;
+  return await companyRepository.findByName(companyName);
 }
 
 function getEntityName() {
@@ -62,21 +62,17 @@ async function getCompanies({
     where: prismaWhereCondition,
   });
 
-  const formatted = companies.map(({ _count, ...company }) => ({
-    ...company,
-    userCount: _count.users,
-  }));
-
   return {
     currentPage: page,
     totalPages: Math.ceil(totalItemCount / pageSize),
     totalItemCount,
-    data: formatted,
+    data: companies.map((company) => new ResponseCompanyDTO(company)),
   };
 }
 
 export default {
   createCompany,
+  updateCompany,
   getByName,
   getEntityName,
   getCompanies,
