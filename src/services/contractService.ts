@@ -1,6 +1,7 @@
 import prisma from "../config/prismaClient";
 import { assert } from "superstruct";
 import { ContractCreateStruct } from "../structs/contractStructs";
+import { CONTRACT_STATUS } from "@prisma/client";
 
 type CreateContractData = {
   customerId: number;
@@ -56,9 +57,45 @@ export const updateContractService = async (id: number, data: any) => {
         meetings: true,
       },
       orderBy: {
-        createdAt: "desc", // 최신순
+        createdAt: "desc",
       },
     });
   
     return contracts;
   };
+
+  export const getContractByIdService = async (id: number) => {
+    const contract = await prisma.contract.findUnique({
+      where: { id },
+      include: {
+        customer: true,
+        car: true,
+        user: true,
+        meetings: true,
+        contractDocuments: true,
+      },
+    });
+  
+    return contract;
+  };
+  
+  export const deleteContractService = async (id: number) => {
+    return await prisma.contract.delete({
+      where: { id },
+    });
+  };
+  
+  export const updateContractStatusService = async (
+    id: number,
+    status: CONTRACT_STATUS,
+    resolutionDate?: Date | null
+  ) => {
+    return await prisma.contract.update({
+      where: { id },
+      data: {
+        status,
+        resolutionDate: resolutionDate ?? null,
+      },
+    });
+  };
+  

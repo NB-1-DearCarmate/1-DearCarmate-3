@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createContractService, updateContractService, getAllContractsService, getContractByIdService, deleteContractService } from "../services/contractService";
+import { createContractService, updateContractService, getAllContractsService, getContractByIdService, deleteContractService, updateContractStatusService } from "../services/contractService";
 
 export const createContract = async (req: Request, res: Response) => {
   try {
@@ -59,4 +59,15 @@ export const getAllContracts = async (req: Request, res: Response) => {
     }
   };
   
+  export const updateContractStatus = async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { status, resolutionDate } = req.body;
+      const updated = await updateContractStatusService(id, status, resolutionDate);
+      res.status(200).json(updated);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "계약 상태 변경 실패" });
+    }
+  };
   
