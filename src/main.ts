@@ -1,4 +1,6 @@
 import express from 'express';
+import swaggerUi from 'swagger-ui-express';
+import swaggerSpec from './swagger';
 import cors from 'cors';
 import path from 'path';
 import cookieParser from 'cookie-parser';
@@ -12,6 +14,7 @@ import imageRouter from './routers/imageRouter';
 import dotenv from 'dotenv';
 
 const app = express();
+dotenv.config();
 
 app.use(cors());
 app.use(express.json());
@@ -23,13 +26,13 @@ app.use('/users', userRouter);
 app.use('/auth', authRouter);
 app.use('/companies', companyRouter);
 
-app.use(defaultNotFoundHandler);
-app.use(globalErrorHandler);
-
 app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
 app.use('/images', imageRouter);
 
-dotenv.config();
+app.use('/', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+app.use(defaultNotFoundHandler);
+app.use(globalErrorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
