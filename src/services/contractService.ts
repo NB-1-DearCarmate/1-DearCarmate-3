@@ -46,3 +46,19 @@ export const updateContractService = async (id: number, data: any) => {
   
     return updatedContract;
   };
+
+  export const getAllContractsService = async () => {
+    const contracts = await prisma.contract.findMany({
+      include: {
+        customer: true,
+        car: true,
+        user: true,
+        meetings: true,
+      },
+      orderBy: {
+        createdAt: "desc", // 최신순
+      },
+    });
+  
+    return contracts;
+  };
