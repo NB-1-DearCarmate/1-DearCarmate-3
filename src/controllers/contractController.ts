@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
-import { createContractService, updateContractService, getAllContractsService, getContractByIdService, deleteContractService, updateContractStatusService } from "../services/contractService";
+import { createContractService, updateContractService, getAllContractsService, getContractByIdService, deleteContractService, updateContractStatusService, getCustomerDropdownService } from "../services/contractService";
+import { RequestHandler } from "express";
 
 export const createContract = async (req: Request, res: Response) => {
   try {
@@ -69,5 +70,17 @@ export const getAllContracts = async (req: Request, res: Response) => {
       console.error(error);
       res.status(500).json({ message: "계약 상태 변경 실패" });
     }
+  };
+
+  export const getCustomerDropdown: RequestHandler = async (req: Request, res: Response) => {
+    const companyId =  (req.user as { companyId: number }).companyId;
+
+  
+    if (!companyId) {
+    res.status(400).json({ message: "회사 정보가 없습니다." });
+    }
+  
+    const customers = await getCustomerDropdownService(companyId);
+    res.status(200).json(customers);
   };
   

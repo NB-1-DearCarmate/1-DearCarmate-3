@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createContract, updateContract, getAllContracts, getContractById } from "../controllers/contractController";
+import { createContract, updateContract, getAllContracts, getContractById, deleteContract, updateContractStatus, getCustomersForContract, } from "../controllers/contractController";
 import passport from "passport";
 
 const router = Router();
@@ -10,5 +10,15 @@ router.patch("/:id", passport.authenticate("jwt", { session: false }), updateCon
 
 router.get("/", passport.authenticate("jwt", { session: false }), getAllContracts);
 router.get("/:id", passport.authenticate("jwt", { session: false }), getContractById);
+
+router.delete("/:id", passport.authenticate("jwt", { session: false }), deleteContract);
+
+router.patch("/:id/status", passport.authenticate("jwt", { session: false }), updateContractStatus);
+
+router.get(
+    "/customers",
+    passport.authenticate("jwt", { session: false }),
+    getCustomersForContract
+  );  
 
 export default router;
