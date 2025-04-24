@@ -61,10 +61,15 @@ async function getCompanies({ page, pageSize, searchBy, keyword }: PageParamsTyp
   };
 }
 
+async function deleteCompany(companyId: number) {
+  return await companyRepository.deleteById(companyId);
+}
+
 export default {
   createCompany,
   updateCompany,
   getByName,
   getEntityName,
   getCompanies,
+  deleteCompany,
 };

@@ -5,6 +5,7 @@ import {
   getCompanyList,
   getCompanyUsers,
   patchCompany,
+  deleteCompany,
 } from '../controllers/companyController';
 import passport from 'passport';
 import { ACCESS_TOKEN_STRATEGY } from '../config/constants';
@@ -30,6 +31,12 @@ companyRouter.patch(
   '/:companyId',
   passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
   withAsync(patchCompany),
+);
+
+companyRouter.delete(
+  '/:companyId',
+  passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
+  withAsync(deleteCompany),
 );
 
 export default companyRouter;

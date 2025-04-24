@@ -55,7 +55,6 @@ export const postCompany: RequestHandler = async (req, res) => {
   if (reqUser.role !== USER_ROLE.ADMIN) {
     throw new UnauthError();
   }
-
   const data = create(req.body, CreateCompanyBodyStruct);
   const company = await companyService.createCompany(data);
   res.status(201).send(company);
@@ -158,7 +157,6 @@ export const getCompanyUsers: RequestHandler = async (req, res) => {
   if (reqUser.role !== USER_ROLE.ADMIN) {
     throw new UnauthError();
   }
-
   const data = create(req.query, PageParamsStruct);
   const users = await userService.getUsers(data);
   res.send(users);
@@ -211,4 +209,13 @@ export const patchCompany: RequestHandler = async (req, res) => {
   const data = create(req.query, PatchCompanyBodyStruct);
   const company = await companyService.updateCompany(companyId, data);
   res.status(200).json(company);
+};
+export const deleteCompany: RequestHandler = async (req, res, next) => {
+  const reqUser = req.user as OmittedUser;
+  if (reqUser.role !== USER_ROLE.ADMIN) {
+    throw new UnauthError();
+  }
+  const companyId = parseInt(req.params.companyId as string, 10);
+  await companyService.deleteCompany(companyId);
+  res.status(200).send({ message: '회사 삭제 성공' });
 };
