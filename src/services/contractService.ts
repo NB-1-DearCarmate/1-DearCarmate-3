@@ -1,4 +1,6 @@
 import prisma from "../config/prismaClient";
+import { assert } from "superstruct";
+import { ContractCreateStruct } from "../structs/contractStructs";
 
 type CreateContractData = {
   customerId: number;
@@ -10,6 +12,7 @@ type CreateContractData = {
 };
 
 export const createContractService = async (data: CreateContractData) => {
+  assert(data, ContractCreateStruct);
   const { customerId, carId, userId, companyId, contractPrice, meetings } = data;
 
   const contract = await prisma.contract.create({
@@ -31,3 +34,15 @@ export const createContractService = async (data: CreateContractData) => {
 
   return contract;
 };
+
+export const updateContractService = async (id: number, data: any) => {
+    const updatedContract = await prisma.contract.update({
+      where: { id },
+      data,
+      include: {
+        meetings: true,
+      },
+    });
+  
+    return updatedContract;
+  };
