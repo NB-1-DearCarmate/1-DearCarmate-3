@@ -40,6 +40,17 @@ async function findByEmail(email: string) {
   });
 }
 
+async function findMany(params: Prisma.UserFindManyArgs) {
+  return await prisma.user.findMany({
+    ...params,
+  });
+}
+
+async function getCount(params: Prisma.UserCountArgs) {
+  return await prisma.user.count({
+    ...params,
+  });
+}
 function getEntityName() {
   return prisma.user.getEntityName();
 }
@@ -50,5 +61,7 @@ export default {
   remove,
   findById,
   findByEmail,
+  findMany,
+  getCount,
   getEntityName,
 };
