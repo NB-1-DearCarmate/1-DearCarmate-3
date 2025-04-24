@@ -16,7 +16,6 @@ const accessTokenOptions = {
   secretOrKey: JWT_SECRET,
 };
 const refreshTokenOptions = {
-  // jwtFromRequest: (req: Request) => req.cookies[REFRESH_tOKEN_STRING],
   jwtFromRequest: ExtractJwt.fromBodyField('refreshToken'),
   secretOrKey: JWT_SECRET,
 };

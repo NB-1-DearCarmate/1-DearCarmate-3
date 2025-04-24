@@ -1,14 +1,15 @@
 import { ResponseCompanyDTO } from '../lib/dtos/companyDTO';
 import companyRepository from '../repositories/companyRepository';
 import { Prisma } from '@prisma/client';
+import { PageParamsType } from '../structs/commonStructs';
+import { CreateCompanyBodyType, PatchCompanyBodyType } from '../structs/companyStructs';
 
-async function createCompany(company: { companyName: string; companyCode: string }) {
-  const { companyName, companyCode } = company;
-  const createdCompany = await companyRepository.create({ companyName, companyCode });
+async function createCompany(company: CreateCompanyBodyType) {
+  const createdCompany = await companyRepository.create(company);
   return new ResponseCompanyDTO(createdCompany);
 }
 
-async function updateCompany(companyId: number, body: Prisma.CompanyUpdateInput) {
+async function updateCompany(companyId: number, body: PatchCompanyBodyType) {
   const updatedCompany = await companyRepository.update(companyId, body);
   return new ResponseCompanyDTO(updatedCompany);
 }
@@ -21,17 +22,7 @@ function getEntityName() {
   return companyRepository.getEntityName();
 }
 
-async function getCompanies({
-  page,
-  pageSize,
-  searchBy,
-  keyword,
-}: {
-  page: number;
-  pageSize: number;
-  searchBy?: string;
-  keyword?: string;
-}) {
+async function getCompanies({ page, pageSize, searchBy, keyword }: PageParamsType) {
   let prismaParams: {
     skip: number;
     take: number;
