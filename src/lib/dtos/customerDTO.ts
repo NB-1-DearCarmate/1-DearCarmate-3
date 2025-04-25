@@ -94,7 +94,7 @@ export class ResponseCustomerDTO {
   memo: string;
   contractCount: number;
 
-  constructor(customer: Customer) {
+  constructor(customer: Customer & { _count?: { contracts: number } }) {
     this.id = customer.id;
     this.name = customer.name;
     this.gender = customer.gender;
@@ -103,6 +103,6 @@ export class ResponseCustomerDTO {
     this.region = reverseRegionMap[customer.region];
     this.email = customer.email;
     this.memo = customer.memo ?? '';
-    this.contractCount = customer.contractCount ?? 0;
+    this.contractCount = customer._count?.contracts ?? 0;
   }
 }

@@ -25,8 +25,9 @@ export const getCustomerList: RequestHandler = async (req, res) => {
     throw new UnauthError();
   }
   const page = create(req.query, PageParamsStruct);
-  //const customers = await customerService.getCustomers(page);
-  // res.status(200).send(customers);
+  const userCompanyId = await userService.getCompanyIdById(reqUser.id);
+  const customers = await customerService.getCustomers(userCompanyId, page);
+  res.status(200).send(customers);
 };
 
 /**
