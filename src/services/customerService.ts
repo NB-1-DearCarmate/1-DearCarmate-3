@@ -1,8 +1,7 @@
-import { Prisma } from '@prisma/client';
-import { ResponseCustomerDTO } from '../lib/dtos/customerDTO';
+import { RequestCustomerDTO, ResponseCustomerDTO } from '../lib/dtos/customerDTO';
 import customerRepository from '../repositories/customerRepositry';
 
-async function createCustomer(companyId: number, customer: Prisma.CustomerCreateInput) {
+async function createCustomer(companyId: number, customer: RequestCustomerDTO) {
   const data = {
     ...customer,
     company: {
@@ -11,8 +10,7 @@ async function createCustomer(companyId: number, customer: Prisma.CustomerCreate
       },
     },
   };
-  const createdCustomer = await customerRepository.create(data);
-  return new ResponseCustomerDTO(createdCustomer);
+  return await customerRepository.create(data);
 }
 
 export default {

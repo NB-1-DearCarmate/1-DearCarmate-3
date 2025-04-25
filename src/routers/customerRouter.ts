@@ -3,6 +3,7 @@ import { withAsync } from '../lib/withAsync';
 import {
   deleteCustomer,
   getCustomer,
+  getCustomerList,
   patchCustomer,
   postCustomer,
   postCustomers,
@@ -11,11 +12,21 @@ import passport from 'passport';
 import { ACCESS_TOKEN_STRATEGY } from '../config/constants';
 
 const customerRouter = express.Router();
+customerRouter.get(
+  '/',
+  passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
+  withAsync(getCustomerList),
+);
 
 customerRouter.post(
   '/',
   passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
   withAsync(postCustomer),
+);
+customerRouter.get(
+  '/upload',
+  passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
+  withAsync(postCustomers),
 );
 customerRouter.get(
   '/:customersId',
@@ -32,11 +43,6 @@ customerRouter.delete(
   '/:customersId',
   passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
   withAsync(deleteCustomer),
-);
-customerRouter.get(
-  '/upload',
-  passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
-  withAsync(postCustomers),
 );
 
 export default customerRouter;
