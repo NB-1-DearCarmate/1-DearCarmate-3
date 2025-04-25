@@ -1,5 +1,7 @@
+import { Prisma } from '@prisma/client';
 import { RequestCustomerDTO, ResponseCustomerDTO } from '../lib/dtos/customerDTO';
 import customerRepository from '../repositories/customerRepositry';
+import { PageParamsType } from '../structs/commonStructs';
 
 async function createCustomer(companyId: number, customer: RequestCustomerDTO) {
   const data = {
@@ -13,6 +15,56 @@ async function createCustomer(companyId: number, customer: RequestCustomerDTO) {
   return await customerRepository.create(data);
 }
 
+async function getCustomers(
+  companyId: number,
+  { page, pageSize, searchBy, keyword }: PageParamsType,
+) {
+  let prismaParams: {
+    skip: number;
+    take: number;
+    where?: Prisma.CustomerWhereInput;
+  } = {
+    skip: (page - 1) * pageSize,
+    take: pageSize,
+  };
+  let prismaWhereCondition: Prisma.CustomerWhereInput = { companyId: companyId };
+  if (searchBy && keyword) {
+    switch (searchBy) {
+      case 'name':
+        prismaWhereCondition = {
+          ...prismaWhereCondition,
+          name: {
+            contains: keyword,
+          },
+        };
+        break;
+      case 'email':
+        prismaWhereCondition = {
+          ...prismaWhereCondition,
+          email: {
+            contains: keyword,
+          },
+        };
+    }
+  }
+  prismaParams = {
+    ...prismaParams,
+    where: prismaWhereCondition,
+  };
+
+  const customers = await customerRepository.getList(prismaParams);
+  const totalItemCount = await customerRepository.getCount({
+    where: prismaWhereCondition,
+  });
+  return {
+    currentPage: page,
+    totalPages: Math.ceil(totalItemCount / pageSize),
+    totalItemCount,
+    data: customers.map((customer) => new ResponseCustomerDTO(customer)),
+  };
+}
+
 export default {
   createCustomer,
+  getCustomers,
 };
