@@ -3,11 +3,11 @@ import CommonError from '../lib/errors/CommonError';
 
 /**
  * @openapi
- * /upload:
+ * /images/uploads:
  *   post:
  *     summary: 이미지 업로드
  *     tags:
- *       - File
+ *       - Image
  *     requestBody:
  *       required: true
  *       content:
