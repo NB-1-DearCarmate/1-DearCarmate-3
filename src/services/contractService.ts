@@ -37,9 +37,25 @@ export const createContractService = async (data: CreateContractData) => {
 };
 
 export const updateContractService = async (id: number, data: any) => {
+    const { meetings, ...contractData } = data;
+  
     const updatedContract = await prisma.contract.update({
       where: { id },
-      data,
+      data: {
+        customerId: contractData.customerId,
+        carId: contractData.carId,
+        userId: contractData.userId,
+        companyId: contractData.companyId,
+        contractPrice: contractData.contractPrice,
+        status: contractData.status,
+        resolutionDate: contractData.resolutionDate,
+        ...(meetings && {
+          meetings: {
+            deleteMany: {},
+            create: meetings,
+          },
+        }),
+      },
       include: {
         meetings: true,
       },
@@ -47,7 +63,6 @@ export const updateContractService = async (id: number, data: any) => {
   
     return updatedContract;
   };
-
   export const getAllContractsService = async () => {
     const contracts = await prisma.contract.findMany({
       include: {
