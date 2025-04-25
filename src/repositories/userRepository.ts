@@ -46,6 +46,17 @@ async function findMany(params: Prisma.UserFindManyArgs) {
   });
 }
 
+async function findCompanyIdbyUserId(userId: number) {
+  return await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+    select: {
+      companyId: true,
+    },
+  });
+}
+
 async function getCount(params: Prisma.UserCountArgs) {
   return await prisma.user.count({
     ...params,
@@ -62,6 +73,7 @@ export default {
   findById,
   findByEmail,
   findMany,
+  findCompanyIdbyUserId,
   getCount,
   getEntityName,
 };
