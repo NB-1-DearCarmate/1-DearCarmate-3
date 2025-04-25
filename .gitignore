@@ -9,3 +9,5 @@ http/
 # Uploaded files
 /public/uploads/*
 !public/.gitkeep
+!public/uploads/
+!public/uploads/.gitkeep

@@ -1,37 +1,28 @@
+import { ResponseCompanyDTO } from '../lib/dtos/companyDTO';
 import companyRepository from '../repositories/companyRepository';
 import { Prisma } from '@prisma/client';
+import { PageParamsType } from '../structs/commonStructs';
+import { CreateCompanyBodyType, PatchCompanyBodyType } from '../structs/companyStructs';
 
-async function createCompany(company: { companyName: string; companyCode: string }) {
-  const { companyName, companyCode } = company;
+async function createCompany(company: CreateCompanyBodyType) {
+  const createdCompany = await companyRepository.create(company);
+  return new ResponseCompanyDTO(createdCompany);
+}
 
-  const createdCompany = await companyRepository.create({ companyName, companyCode });
-
-  return {
-    ...createdCompany,
-    userCount: 0,
-  };
+async function updateCompany(companyId: number, body: PatchCompanyBodyType) {
+  const updatedCompany = await companyRepository.update(companyId, body);
+  return new ResponseCompanyDTO(updatedCompany);
 }
 
 async function getByName(companyName: string) {
-  const company = await companyRepository.findByName(companyName);
-  return company;
+  return await companyRepository.findByName(companyName);
 }
 
 function getEntityName() {
   return companyRepository.getEntityName();
 }
 
-async function getCompanies({
-  page,
-  pageSize,
-  searchBy,
-  keyword,
-}: {
-  page: number;
-  pageSize: number;
-  searchBy?: string;
-  keyword?: string;
-}) {
+async function getCompanies({ page, pageSize, searchBy, keyword }: PageParamsType) {
   let prismaParams: {
     skip: number;
     take: number;
@@ -62,22 +53,23 @@ async function getCompanies({
     where: prismaWhereCondition,
   });
 
-  const formatted = companies.map(({ _count, ...company }) => ({
-    ...company,
-    userCount: _count.users,
-  }));
-
   return {
     currentPage: page,
     totalPages: Math.ceil(totalItemCount / pageSize),
     totalItemCount,
-    data: formatted,
+    data: companies.map((company) => new ResponseCompanyDTO(company)),
   };
+}
+
+async function deleteCompany(companyId: number) {
+  return await companyRepository.deleteById(companyId);
 }
 
 export default {
   createCompany,
+  updateCompany,
   getByName,
   getEntityName,
   getCompanies,
+  deleteCompany,
 };
