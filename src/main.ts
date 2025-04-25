@@ -12,6 +12,7 @@ import authRouter from './routers/authRouter';
 import { defaultNotFoundHandler, globalErrorHandler } from './controllers/errorController';
 import imageRouter from './routers/imageRouter';
 import dotenv from 'dotenv';
+import customerRouter from './routers/customerRouter';
 
 const app = express();
 dotenv.config();
@@ -24,6 +25,7 @@ app.use(passport.initialize());
 
 app.use('/users', userRouter);
 app.use('/auth', authRouter);
+app.use('/customers', customerRouter);
 app.use('/companies', companyRouter);
 
 app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));

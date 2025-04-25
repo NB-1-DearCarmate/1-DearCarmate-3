@@ -112,6 +112,14 @@ async function getUsers({ page, pageSize, searchBy, keyword }: PageParamsType) {
   };
 }
 
+async function getCompanyIdById(userId: number) {
+  const user = await userRepository.findCompanyIdbyUserId(userId);
+  if (!user) {
+    throw new NotFoundError(userRepository.getEntityName(), userId);
+  }
+  return user.companyId;
+}
+
 async function updateUser(id: number, data: UpdateUserBodyType) {
   const user = await userRepository.findById(id);
   const { currentPassword, password, passwordConfirmation, ...rest } = data;
@@ -169,6 +177,7 @@ export default {
   createUser,
   getUser,
   getUserById,
+  getCompanyIdById,
   updateUser,
   deleteUser,
   getUsers,
