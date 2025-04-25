@@ -98,4 +98,34 @@ export const updateContractService = async (id: number, data: any) => {
       },
     });
   };
+
+  export const getCustomerDropdownService = async (companyId: number) => {
+    return await prisma.customer.findMany({
+      where: { companyId },
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+  };
+
+  export const getUserDropdownService = async (companyId: number) => {
+    return await prisma.user.findMany({
+      where: { companyId },
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+  };
+
+  export const getCarDropdownService = async (companyId: number) => {
+    return await prisma.car.findMany({
+      where: { companyId },
+      select: {
+        id: true,
+        carNumber: true,
+      },
+    });
+  };
   
