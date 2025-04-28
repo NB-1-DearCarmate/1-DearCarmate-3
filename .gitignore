@@ -7,7 +7,6 @@ dist/
 http/
 
 # Uploaded files
-public/*
-!public/.gitkeep
+/public/uploads/*
 !public/uploads/
 !public/uploads/.gitkeep
