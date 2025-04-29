@@ -127,9 +127,14 @@ export const deleteCustomer: RequestHandler = async (req, res) => {
   if (reqUser.role !== USER_ROLE.EMPLOYEE) {
     throw new UnauthError();
   }
-  const customerId = parseInt(req.params.customerId, 10);
-  //await customerService.deleteCustomer(customerId);
-  res.status(204).send();
+  const userCompanyId = await userService.getCompanyIdById(reqUser.id);
+  const { customerId } = create(req.params, CustomerIdParamStruct);
+  const customerCompanyId = await customerService.getCompanyIdById(customerId);
+  if (userCompanyId !== customerCompanyId) {
+    throw new UnauthError();
+  }
+  await customerService.deleteCustomer(customerId);
+  res.status(200).send({ message: '고객 삭제 성공' });
 };
 
 export const postCustomers: RequestHandler = async (req, res) => {

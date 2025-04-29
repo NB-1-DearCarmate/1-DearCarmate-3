@@ -84,10 +84,15 @@ async function getCompanyIdById(customerId: number) {
   return customer.companyId;
 }
 
+async function deleteCustomer(customerId: number) {
+  return await customerRepository.deleteById(customerId);
+}
+
 export default {
   createCustomer,
   getCustomer,
   getCustomers,
   updateCustomer,
   getCompanyIdById,
+  deleteCustomer,
 };
