@@ -42,10 +42,17 @@ export async function update(id: number, data: Prisma.CustomerUpdateInput) {
   });
 }
 
+export async function deleteById(id: number) {
+  return await prisma.customer.delete({
+    where: { id },
+  });
+}
+
 export default {
   create,
   getList,
   getById,
   getCount,
   update,
+  deleteById,
 };
