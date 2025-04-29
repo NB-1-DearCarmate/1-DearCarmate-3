@@ -1,5 +1,9 @@
 import { Prisma } from '@prisma/client';
-import { RequestCustomerDTO, ResponseCustomerDTO } from '../lib/dtos/customerDTO';
+import {
+  RequestCustomerDTO,
+  RequestUpdateCustomerDTO,
+  ResponseCustomerDTO,
+} from '../lib/dtos/customerDTO';
 import customerRepository from '../repositories/customerRepositry';
 import { PageParamsType } from '../structs/commonStructs';
 
@@ -64,7 +68,21 @@ async function getCustomers(
   };
 }
 
+async function updateCustomer(customerId: number, customer: RequestUpdateCustomerDTO) {
+  return await customerRepository.update(customerId, customer);
+}
+
+async function getCompanyIdById(customerId: number) {
+  const customer = await customerRepository.getById(customerId);
+  if (!customer) {
+    throw new Error('Customer not found');
+  }
+  return customer.companyId;
+}
+
 export default {
   createCustomer,
   getCustomers,
+  updateCustomer,
+  getCompanyIdById,
 };

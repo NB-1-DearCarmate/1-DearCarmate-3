@@ -29,18 +29,18 @@ customerRouter.get(
   withAsync(postCustomers),
 );
 customerRouter.get(
-  '/:customersId',
+  '/:customerId',
   passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
   withAsync(getCustomer),
 );
 customerRouter.patch(
-  '/:customersId',
+  '/:customerId',
   passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
   withAsync(patchCustomer),
 );
 
 customerRouter.delete(
-  '/:customersId',
+  '/:customerId',
   passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
   withAsync(deleteCustomer),
 );

@@ -3,11 +3,19 @@ import { OmittedUser } from '../../types/OmittedUser';
 import { RequestHandler } from 'express';
 import UnauthError from '../lib/errors/UnauthError';
 import customerService from '../services/customerService';
-import { CreateCustomerBodyStruct } from '../structs/customerStructs';
+import {
+  CreateCustomerBodyStruct,
+  CustomerIdParamStruct,
+  PatchCustomerBodyStruct,
+} from '../structs/customerStructs';
 import { create } from 'superstruct';
 import userService from '../services/userService';
 import { PageParamsStruct } from '../structs/commonStructs';
-import { RequestCustomerDTO, ResponseCustomerDTO } from '../lib/dtos/customerDTO';
+import {
+  RequestCustomerDTO,
+  RequestUpdateCustomerDTO,
+  ResponseCustomerDTO,
+} from '../lib/dtos/customerDTO';
 
 export const getCustomer: RequestHandler = async (req, res) => {
   const reqUser = req.user as OmittedUser;
@@ -97,10 +105,17 @@ export const patchCustomer: RequestHandler = async (req, res) => {
   if (reqUser.role !== USER_ROLE.EMPLOYEE) {
     throw new UnauthError();
   }
-  const customerId = parseInt(req.params.customerId, 10);
-  //const data = create(req.body, PatchCustomerBodyStruct);
-  //const customer = await customerService.patchCustomer(customerId, data);
-  //res.status(200).send(customer);
+  const userCompanyId = await userService.getCompanyIdById(reqUser.id);
+  const { customerId } = create(req.params, CustomerIdParamStruct);
+  const customerCompanyId = await customerService.getCompanyIdById(customerId);
+  if (userCompanyId !== customerCompanyId) {
+    throw new UnauthError();
+  }
+  const rawData = create(req.body, PatchCustomerBodyStruct);
+  const transformedData = new RequestUpdateCustomerDTO(rawData);
+  const customer = await customerService.updateCustomer(customerId, transformedData);
+  const reverseTransformedData = new ResponseCustomerDTO(customer);
+  res.status(200).send(reverseTransformedData);
 };
 
 export const deleteCustomer: RequestHandler = async (req, res) => {

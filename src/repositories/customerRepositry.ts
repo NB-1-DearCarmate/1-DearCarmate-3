@@ -18,14 +18,34 @@ async function getList(params: Prisma.CustomerFindManyArgs) {
   });
 }
 
+export async function getById(id: number) {
+  return await prisma.customer.findUniqueOrThrow({
+    where: { id },
+    include: {
+      _count: {
+        select: { contracts: true },
+      },
+    },
+  });
+}
+
 async function getCount(params: Prisma.CustomerCountArgs) {
   return await prisma.customer.count({
     ...params,
   });
 }
 
+export async function update(id: number, data: Prisma.CustomerUpdateInput) {
+  return await prisma.customer.update({
+    where: { id },
+    data,
+  });
+}
+
 export default {
   create,
   getList,
+  getById,
   getCount,
+  update,
 };
