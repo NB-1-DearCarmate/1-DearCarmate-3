@@ -297,9 +297,10 @@ export const CAR = [
     accidentCount: 0,
     explanation: '전혀 사고 없는 차량',
     accidentDetails: '',
-    Datetime: new Date('2024-01-10T10:00:00Z'),
     companyId: 1,
-    modelId: 33,
+    manufacturer: '기아',
+    model: 'K3',
+    type: 'SEDAN',
   },
   {
     id: 31,
@@ -311,9 +312,10 @@ export const CAR = [
     accidentCount: 1,
     explanation: '사고 이력 있음, 수리 완료',
     accidentDetails: '전면 충돌',
-    Datetime: new Date('2024-01-11T11:00:00Z'),
     companyId: 2,
-    modelId: 34,
+    manufacturer: '기아',
+    model: 'K5',
+    type: 'SEDAN',
   },
   {
     id: 32,
@@ -325,9 +327,10 @@ export const CAR = [
     accidentCount: 0,
     explanation: '새 차량처럼 깨끗',
     accidentDetails: '',
-    Datetime: new Date('2024-01-12T12:00:00Z'),
     companyId: 3,
-    modelId: 35,
+    manufacturer: '기아',
+    model: 'K7',
+    type: 'SEDAN',
   },
   {
     id: 36,
@@ -339,9 +342,10 @@ export const CAR = [
     accidentCount: 2,
     explanation: '사고 이력 있음, 재조정 완료',
     accidentDetails: '후방 사고',
-    Datetime: new Date('2024-01-13T13:00:00Z'),
     companyId: 1,
-    modelId: 33,
+    manufacturer: '기아',
+    model: 'K9',
+    type: 'SEDAN',
   },
   {
     id: 37,
@@ -353,9 +357,10 @@ export const CAR = [
     accidentCount: 0,
     explanation: '최신 모델, 컨디션 우수',
     accidentDetails: '',
-    Datetime: new Date('2024-01-14T14:30:00Z'),
     companyId: 2,
-    modelId: 34,
+    manufacturer: '기아',
+    model: 'K8',
+    type: 'SEDAN',
   },
   {
     id: 38,
@@ -367,9 +372,10 @@ export const CAR = [
     accidentCount: 0,
     explanation: '사고 없는 깨끗한 차량',
     accidentDetails: '',
-    Datetime: new Date('2024-01-15T10:30:00Z'),
     companyId: 3,
-    modelId: 35,
+    manufacturer: '현대',
+    model: '그랜저',
+    type: 'SEDAN',
   },
   {
     id: 39,
@@ -381,9 +387,10 @@ export const CAR = [
     accidentCount: 3,
     explanation: '사고 여러 건 있음, 매매가 어려움',
     accidentDetails: '전면 및 후면 충돌',
-    Datetime: new Date('2024-01-16T11:15:00Z'),
     companyId: 1,
-    modelId: 33,
+    manufacturer: '현대',
+    model: '아반떼',
+    type: 'SEDAN',
   },
   {
     id: 40,
@@ -395,9 +402,10 @@ export const CAR = [
     accidentCount: 0,
     explanation: '좋은 상태의 차량',
     accidentDetails: '',
-    Datetime: new Date('2024-01-17T12:30:00Z'),
     companyId: 3,
-    modelId: 35,
+    manufacturer: '현대',
+    model: '소나타',
+    type: 'SEDAN',
   },
   {
     id: 41,
@@ -409,9 +417,10 @@ export const CAR = [
     accidentCount: 0,
     explanation: '완전 새 차량',
     accidentDetails: '',
-    Datetime: new Date('2024-01-18T13:45:00Z'),
     companyId: 2,
-    modelId: 34,
+    manufacturer: '현대',
+    model: '투싼',
+    type: 'SEDAN',
   },
 ];
 
@@ -529,45 +538,6 @@ export const CONTRACTDOCUMENT = [
   },
 ];
 
-export const CARMODEL = [
-  {
-    id: 33,
-    model: 'Sonata 2023',
-    manufacturerId: 52, // 현대
-    typeId: 53, // 세단
-  },
-  {
-    id: 34,
-    model: 'K7 2023',
-    manufacturerId: 54, // 기아
-    typeId: 55, // SUV
-  },
-  {
-    id: 35,
-    model: 'Tucson 2023',
-    manufacturerId: 56,
-    typeId: 55, // SUV
-  },
-  {
-    id: 57,
-    model: 'Carnival 2023',
-    manufacturerId: 54, // 기아
-    typeId: 58, // 미니밴
-  },
-  {
-    id: 59,
-    model: 'S-Class 2023',
-    manufacturerId: 60, // 벤츠
-    typeId: 53, // 세단
-  },
-  {
-    id: 61,
-    model: 'C-Class 2023',
-    manufacturerId: 60, // 벤츠
-    typeId: 53, // 세단
-  },
-];
-
 export const MEETING = [
   {
     id: 62,
@@ -598,59 +568,5 @@ export const MEETING = [
     id: 67,
     time: new Date('2024-05-15T13:00:00Z'),
     contractId: 47, // 계약 6
-  },
-];
-
-export const MANUFACTURER = [
-  {
-    id: 52,
-    name: 'Hyundai',
-  },
-  {
-    id: 54,
-    name: 'Kia',
-  },
-  {
-    id: 56,
-    name: 'Mercedes-Benz',
-  },
-  {
-    id: 60,
-    name: 'BMW',
-  },
-  {
-    id: 68,
-    name: 'Audi',
-  },
-  {
-    id: 69,
-    name: 'Toyota',
-  },
-];
-
-export const CARTYPE = [
-  {
-    id: 53,
-    type: 'Sedan', // 세단
-  },
-  {
-    id: 55,
-    type: 'SUV', // SUV
-  },
-  {
-    id: 58,
-    type: 'Minivan', // 미니밴
-  },
-  {
-    id: 70,
-    type: 'Coupe', // 쿠페
-  },
-  {
-    id: 71,
-    type: 'Convertible', // 컨버터블
-  },
-  {
-    id: 72,
-    type: 'Hatchback', // 해치백
   },
 ];

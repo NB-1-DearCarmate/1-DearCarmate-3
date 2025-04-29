@@ -1,16 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import {
-  COMPANY,
-  USER,
-  CUSTOMER,
-  CAR,
-  CONTRACT,
-  MEETING,
-  MANUFACTURER,
-  CARTYPE,
-  CARMODEL,
-  CONTRACTDOCUMENT,
-} from './mock.mjs';
+import { COMPANY, USER, CUSTOMER, CAR, CONTRACT, MEETING, CONTRACTDOCUMENT } from './mock.mjs';
 
 const prisma = new PrismaClient();
 
@@ -22,28 +11,7 @@ async function main() {
   await prisma.car.deleteMany();
   await prisma.contract.deleteMany();
   await prisma.meeting.deleteMany();
-  await prisma.carModel.deleteMany();
-  await prisma.manufacturer.deleteMany();
-  await prisma.carType.deleteMany();
   await prisma.contractDocument.deleteMany();
-
-  // MANUFACTURER 데이터 생성
-  await prisma.manufacturer.createMany({
-    data: MANUFACTURER,
-    skipDuplicates: true,
-  });
-
-  // CARTYPE 데이터 생성
-  await prisma.carType.createMany({
-    data: CARTYPE,
-    skipDuplicates: true,
-  });
-
-  // CARMODEL 데이터 생성
-  await prisma.carModel.createMany({
-    data: CARMODEL,
-    skipDuplicates: true,
-  });
 
   // COMPANY 데이터 생성
   await prisma.company.createMany({
@@ -99,15 +67,6 @@ async function main() {
   );
   await prisma.$executeRawUnsafe(
     `SELECT setVal('"Meeting_id_seq"', (SELECT MAX(id) FROM "Meeting"));`,
-  );
-  await prisma.$executeRawUnsafe(
-    `SELECT setVal('"CarModel_id_seq"', (SELECT MAX(id) FROM "CarModel"));`,
-  );
-  await prisma.$executeRawUnsafe(
-    `SELECT setVal('"Manufacturer_id_seq"', (SELECT MAX(id) FROM "Manufacturer"));`,
-  );
-  await prisma.$executeRawUnsafe(
-    `SELECT setVal('"CarType_id_seq"', (SELECT MAX(id) FROM "CarType"));`,
   );
   await prisma.$executeRawUnsafe(
     `SELECT setVal('"ContractDocument_id_seq"', (SELECT MAX(id) FROM "ContractDocument"));`,

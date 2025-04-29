@@ -47,22 +47,24 @@ model Customer {
 }
 
 model Car {
-  id                Int        @id @default(autoincrement())
+  id                Int    @id @default(autoincrement())
   companyId         Int
-  modelId           Int
-  carNumber         String     @unique @db.VarChar(50)
-  manufacturingYear Int        @db.Integer
-  mileage           Int        @db.Integer
-  price             Decimal    @db.Decimal(20, 2)
-  status            CAR_STATUS @default(AVAILABLE)
-  accidentCount     Int        @default(0) @db.Integer
-  explanation       String?
-  accidentDetails   String?
-  Datetime          DateTime   @default(now())
+  carNumber         String @unique
+  manufacturer      String
+  model             String
+  type              String
+  manufacturingYear Int
+  mileage           Int
+  price             Int
+  accidentCount     Int
+  explanation       String
+  accidentDetails   String
+  status            String
 
-  company   Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  carModel  CarModel   @relation(fields: [modelId], references: [id], onDelete: Restrict)
+  company   Company    @relation(fields: [companyId], references: [id])
   contracts Contract[]
+
+  @@map("Car")
 }
 
 model Contract {
@@ -92,31 +94,6 @@ model ContractDocument {
   contractId Int
 
   contract Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
-}
-
-model Manufacturer {
-  id   Int    @id @default(autoincrement())
-  name String @unique @db.VarChar(50)
-
-  carModels CarModel[]
-}
-
-model CarType {
-  id   Int    @id @default(autoincrement())
-  type String @unique @db.VarChar(50)
-
-  carModels CarModel[]
-}
-
-model CarModel {
-  id             Int    @id @default(autoincrement())
-  model          String @db.VarChar(50)
-  manufacturerId Int
-  typeId         Int
-
-  manufacturer Manufacturer @relation(fields: [manufacturerId], references: [id], onDelete: Restrict)
-  carType      CarType      @relation(fields: [typeId], references: [id], onDelete: Restrict)
-  cars         Car[]
 }
 
 model Meeting {
