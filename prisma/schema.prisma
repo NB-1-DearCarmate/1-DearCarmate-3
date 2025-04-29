@@ -47,6 +47,7 @@ model Customer {
 }
 
 model Car {
+<<<<<<< HEAD
   id                Int    @id @default(autoincrement())
   companyId         Int
   carNumber         String @unique
@@ -65,6 +66,24 @@ model Car {
   contracts Contract[]
 
   @@map("Car")
+=======
+  id                Int        @id @default(autoincrement())
+  companyId         Int
+  modelId           Int
+  carNumber         String     @unique @db.VarChar(50)
+  manufacturingYear Int        @db.Integer
+  mileage           Int        @db.Integer
+  price             Decimal    @db.Decimal(20, 2)
+  status            CAR_STATUS @default(AVAILABLE)
+  accidentCount     Int        @default(0) @db.Integer
+  explanation       String?
+  accidentDetails   String?
+  Datetime          DateTime   @default(now())
+
+  company   Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  carModel  CarModel   @relation(fields: [modelId], references: [id], onDelete: Restrict)
+  contracts Contract[]
+>>>>>>> 96a8d3c5885b743b4ab3439251462527fd6988f6
 }
 
 model Contract {
@@ -96,6 +115,7 @@ model ContractDocument {
   contract Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
 }
 
+<<<<<<< HEAD
 model Meeting {
   id         Int      @id @default(autoincrement())
   time       DateTime
@@ -103,6 +123,40 @@ model Meeting {
   contractId Int
 }
 
+=======
+model Manufacturer {
+  id   Int    @id @default(autoincrement())
+  name String @unique @db.VarChar(50)
+
+  carModels CarModel[]
+}
+
+model CarType {
+  id   Int    @id @default(autoincrement())
+  type String @unique @db.VarChar(50)
+
+  carModels CarModel[]
+}
+
+model CarModel {
+  id             Int    @id @default(autoincrement())
+  model          String @db.VarChar(50)
+  manufacturerId Int
+  typeId         Int
+
+  manufacturer Manufacturer @relation(fields: [manufacturerId], references: [id], onDelete: Restrict)
+  carType      CarType      @relation(fields: [typeId], references: [id], onDelete: Restrict)
+  cars         Car[]
+}
+
+model Meeting {
+  id         Int      @id @default(autoincrement())
+  time       DateTime
+  contract   Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  contractId Int
+}
+
+>>>>>>> 96a8d3c5885b743b4ab3439251462527fd6988f6
 model Company {
   id          Int        @id @default(autoincrement())
   companyName String     @unique @db.VarChar(50)

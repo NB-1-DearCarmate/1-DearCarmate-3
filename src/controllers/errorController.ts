@@ -6,7 +6,10 @@ import UnauthError from '../lib/errors/UnauthError';
 import { Prisma } from '@prisma/client';
 import { NextFunction, Request, Response } from 'express';
 import CommonError from '../lib/errors/CommonError';
+<<<<<<< HEAD
 import NoFoundError from '../lib/errors/NoFoundError';
+=======
+>>>>>>> 96a8d3c5885b743b4ab3439251462527fd6988f6
 
 export function defaultNotFoundHandler(_req: Request, res: Response, next: NextFunction) {
   res.status(404).send({ message: 'Not found' });
@@ -58,11 +61,14 @@ export function globalErrorHandler(err: unknown, _req: Request, res: Response, n
     /** Prisma error codes */
     console.error(err);
     res.status(500).send({ message: 'Failed to process data' });
+<<<<<<< HEAD
   } else if (
     /** anothoer NotFoundError */
     err instanceof NoFoundError
   ) {
     res.status(410).send({ message: err.message });
+=======
+>>>>>>> 96a8d3c5885b743b4ab3439251462527fd6988f6
   } else {
     console.error(err);
     res.status(500).send({ message: 'Internal server error' });

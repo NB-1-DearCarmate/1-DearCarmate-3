@@ -106,3 +106,26 @@ export class ResponseCustomerDTO {
     this.contractCount = customer._count?.contracts ?? 0;
   }
 }
+<<<<<<< HEAD
+=======
+
+export class RequestUpdateCustomerDTO {
+  name?: string;
+  gender?: string;
+  phoneNumber?: string;
+  ageGroup?: AGE_GROUP;
+  region?: REGION;
+  email?: string;
+  memo?: string;
+
+  constructor(customer: Partial<CreateCustomerBodyType>) {
+    if (customer.name !== undefined) this.name = customer.name;
+    if (customer.gender !== undefined) this.gender = customer.gender;
+    if (customer.phoneNumber !== undefined) this.phoneNumber = customer.phoneNumber;
+    if (customer.ageGroup !== undefined) this.ageGroup = ageGroupMap[customer.ageGroup];
+    if (customer.region !== undefined) this.region = regionMap[customer.region];
+    if (customer.email !== undefined) this.email = customer.email;
+    if (customer.memo !== undefined) this.memo = customer.memo;
+  }
+}
+>>>>>>> 96a8d3c5885b743b4ab3439251462527fd6988f6

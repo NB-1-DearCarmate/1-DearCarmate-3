@@ -3,20 +3,46 @@ import { OmittedUser } from '../../types/OmittedUser';
 import { RequestHandler } from 'express';
 import UnauthError from '../lib/errors/UnauthError';
 import customerService from '../services/customerService';
+<<<<<<< HEAD
 import { CreateCustomerBodyStruct } from '../structs/customerStructs';
 import { create } from 'superstruct';
 import userService from '../services/userService';
 import { PageParamsStruct } from '../structs/commonStructs';
 import { RequestCustomerDTO, ResponseCustomerDTO } from '../lib/dtos/customerDTO';
+=======
+import {
+  CreateCustomerBodyStruct,
+  CustomerIdParamStruct,
+  PatchCustomerBodyStruct,
+} from '../structs/customerStructs';
+import { create } from 'superstruct';
+import userService from '../services/userService';
+import { PageParamsStruct } from '../structs/commonStructs';
+import {
+  RequestCustomerDTO,
+  RequestUpdateCustomerDTO,
+  ResponseCustomerDTO,
+} from '../lib/dtos/customerDTO';
+>>>>>>> 96a8d3c5885b743b4ab3439251462527fd6988f6
 
 export const getCustomer: RequestHandler = async (req, res) => {
   const reqUser = req.user as OmittedUser;
   if (reqUser.role !== USER_ROLE.EMPLOYEE) {
     throw new UnauthError();
   }
+<<<<<<< HEAD
   const customerId = parseInt(req.params.customerId, 10);
   //const customer = await customerService.getCustomer(customerId);
   //res.status(200).send(customer);
+=======
+  const userCompanyId = await userService.getCompanyIdById(reqUser.id);
+  const { customerId } = create(req.params, CustomerIdParamStruct);
+  const customer = await customerService.getCustomer(customerId);
+  if (userCompanyId !== customer.companyId) {
+    throw new UnauthError();
+  }
+  res.status(200).send(new ResponseCustomerDTO(customer));
+>>>>>>> 96a8d3c5885b743b4ab3439251462527fd6988f6
 };
 
 export const getCustomerList: RequestHandler = async (req, res) => {
@@ -97,10 +123,24 @@ export const patchCustomer: RequestHandler = async (req, res) => {
   if (reqUser.role !== USER_ROLE.EMPLOYEE) {
     throw new UnauthError();
   }
+<<<<<<< HEAD
   const customerId = parseInt(req.params.customerId, 10);
   //const data = create(req.body, PatchCustomerBodyStruct);
   //const customer = await customerService.patchCustomer(customerId, data);
   //res.status(200).send(customer);
+=======
+  const userCompanyId = await userService.getCompanyIdById(reqUser.id);
+  const { customerId } = create(req.params, CustomerIdParamStruct);
+  const customerCompanyId = await customerService.getCompanyIdById(customerId);
+  if (userCompanyId !== customerCompanyId) {
+    throw new UnauthError();
+  }
+  const rawData = create(req.body, PatchCustomerBodyStruct);
+  const transformedData = new RequestUpdateCustomerDTO(rawData);
+  const customer = await customerService.updateCustomer(customerId, transformedData);
+  const reverseTransformedData = new ResponseCustomerDTO(customer);
+  res.status(200).send(reverseTransformedData);
+>>>>>>> 96a8d3c5885b743b4ab3439251462527fd6988f6
 };
 
 export const deleteCustomer: RequestHandler = async (req, res) => {
@@ -108,9 +148,20 @@ export const deleteCustomer: RequestHandler = async (req, res) => {
   if (reqUser.role !== USER_ROLE.EMPLOYEE) {
     throw new UnauthError();
   }
+<<<<<<< HEAD
   const customerId = parseInt(req.params.customerId, 10);
   //await customerService.deleteCustomer(customerId);
   res.status(204).send();
+=======
+  const userCompanyId = await userService.getCompanyIdById(reqUser.id);
+  const { customerId } = create(req.params, CustomerIdParamStruct);
+  const customerCompanyId = await customerService.getCompanyIdById(customerId);
+  if (userCompanyId !== customerCompanyId) {
+    throw new UnauthError();
+  }
+  await customerService.deleteCustomer(customerId);
+  res.status(200).send({ message: '고객 삭제 성공' });
+>>>>>>> 96a8d3c5885b743b4ab3439251462527fd6988f6
 };
 
 export const postCustomers: RequestHandler = async (req, res) => {
