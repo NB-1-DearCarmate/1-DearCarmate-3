@@ -13,6 +13,7 @@ import { defaultNotFoundHandler, globalErrorHandler } from './controllers/errorC
 import imageRouter from './routers/imageRouter';
 import dotenv from 'dotenv';
 import customerRouter from './routers/customerRouter';
+import contractDcmtRouter from './routers/comtractDcmtRouter';
 
 const app = express();
 dotenv.config();
@@ -27,6 +28,7 @@ app.use('/users', userRouter);
 app.use('/auth', authRouter);
 app.use('/customers', customerRouter);
 app.use('/companies', companyRouter);
+app.use('/contractDocuments', contractDcmtRouter);
 
 app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
 app.use('/images', imageRouter);
