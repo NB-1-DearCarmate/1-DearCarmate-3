@@ -19,6 +19,10 @@ async function createCustomer(companyId: number, customer: RequestCustomerDTO) {
   return await customerRepository.create(data);
 }
 
+async function getCustomer(customerId: number) {
+  return await customerRepository.getById(customerId);
+}
+
 async function getCustomers(
   companyId: number,
   { page, pageSize, searchBy, keyword }: PageParamsType,
@@ -82,6 +86,7 @@ async function getCompanyIdById(customerId: number) {
 
 export default {
   createCustomer,
+  getCustomer,
   getCustomers,
   updateCustomer,
   getCompanyIdById,
