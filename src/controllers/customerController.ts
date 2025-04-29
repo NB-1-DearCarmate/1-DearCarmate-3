@@ -22,9 +22,13 @@ export const getCustomer: RequestHandler = async (req, res) => {
   if (reqUser.role !== USER_ROLE.EMPLOYEE) {
     throw new UnauthError();
   }
-  const customerId = parseInt(req.params.customerId, 10);
-  //const customer = await customerService.getCustomer(customerId);
-  //res.status(200).send(customer);
+  const userCompanyId = await userService.getCompanyIdById(reqUser.id);
+  const { customerId } = create(req.params, CustomerIdParamStruct);
+  const customer = await customerService.getCustomer(customerId);
+  if (userCompanyId !== customer.companyId) {
+    throw new UnauthError();
+  }
+  res.status(200).send(new ResponseCustomerDTO(customer));
 };
 
 export const getCustomerList: RequestHandler = async (req, res) => {
