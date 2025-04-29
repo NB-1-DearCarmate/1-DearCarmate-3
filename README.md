@@ -1,97 +1,94 @@
 ```mermaid
 erDiagram
-USER {
-  UUID id PK
+User {
+  Int id PK
+  Int companyId FK
   Varchar name
   Varchar email
-  Varchar phone_number
-  Varchar password
-  Varchar user_code
+  Varchar phoneNumber
+  Varchar encryptedPassword
   USER_ROLE role
-  Datetime created_at
-  UUID company_id FK
+  Varchar employeeNumber
+  Varchar imageUrl
+  Datetime createdAt
 }
-%% ENUM TYPE: USER_ROLE
-%% VALUES: ADMIN, OWNER, EMPLOYEE
 
-CUSTOMER{
-  UUID id PK
+Customer {
+  Int id PK
+  Int companyId FK
   Varchar name
   Varchar email
   Varchar gender
-  Varchar phone_number
-  Int age_group
+  Varchar phoneNumber
+  Int ageGroup
   Varchar region
-  Int contract_count
+  Int contractCount
   Text memo
-  Datetime created_at
-  UUID company_id FK
+  Datetime createdAt
 }
 
-CAR{
-  UUID id PK
-  Varchar car_number
-  Int manufacturing_year
+Car {
+  Int id PK
+  Int companyId FK
+  Int modelId FK
+  Varchar carNumber
+  Int manufacturingYear
   Int mileage
   Decimal price
   CAR_STATUS status
-  Int accident_count
-  Varchar content
-  Varchar accident_details
-  Datetime created_at
-  UUID company_id FK
-  UUID car_model_id FK
+  Int accidentCount
+  Varchar explanation
+  Varchar accidentDetails
+  Datetime Datetime
 }
-%% ENUM TYPE: CAR_STATUS
-%% VALUES: AVAILABLE, PENDING, SOLD
 
-CONTRACT{
-  UUID id PK
+Contract {
+  Int id PK
+  Int customerId FK
+  Int carId FK
+  Int userId FK
+  Int companyId FK
   CONTRACT_STATUS status
-  Datetime finalized_at
-  Datetime created_at
-  UUID customer_id FK
-  UUID car_id FK
-  UUID user_id FK
-}
-%% ENUM TYPE: CONTRACT_STATUS
-%% VALUES: VEHICLE_CHECKING, PRICE_CHECKING, CONTRACT_PREPARING, CONTRACT_SUCCESS, CONTRACT_FAILED
-
-CONTRACTDOCUMENT{
-  UUID id PK
-  Varchar file_name
-  Varchar file_path
-  Int     file_size
-  UUID contract_id FK
+  Decimal contractPrice
+  Datetime resolutionDate
+  Datetime createdAt
 }
 
-MANUFACTURER{
-  UUID id PK
+ContractDocument {
+  Int id PK
+  Varchar fileName
+  Varchar filePath
+  Int fileSize
+  Int contractId FK
+}
+
+Manufacturer {
+  Int id PK
   Varchar name
 }
 
-CARTYPE{
-  UUID id PK
-  Varchar name
+CarType {
+  Int id PK
+  Varchar type
 }
 
-CARMODEL{
-  UUID id PK
-  Varchar name
-  UUID manufacturer_id FK
-  UUID car_type_id FK
+CarModel {
+  Int id PK
+  Varchar model
+  Int manufacturerId FK
+  Int typeId FK
 }
 
-MEETING{
-  UUID id
+Meeting {
+  Int id PK
   Datetime time
-  UUID contract_id FK
+  Int contractId FK
 }
 
-COMPANY{
-  UUID id
-  Varchar name
-  Varchar code
+Company {
+  Int id PK
+  Varchar companyName
+  Varchar companyCode
 }
 
     COMPANY ||--o{ USER : "소속회사"

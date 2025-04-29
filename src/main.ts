@@ -1,13 +1,21 @@
 import express from 'express';
+import swaggerUi from 'swagger-ui-express';
+import swaggerSpec from './swagger';
 import cors from 'cors';
 import path from 'path';
 import cookieParser from 'cookie-parser';
+import companyRouter from './routers/companyRouter';
 import passport from './middlewares/passport/passport';
-import { PORT, UPLOAD_FOLDER, STATIC_PATH } from './config/constants';
-import exampleRouter from './routers/exampleRouter';
+import { PORT } from './config/constants';
+import userRouter from './routers/userRouter';
+import authRouter from './routers/authRouter';
 import { defaultNotFoundHandler, globalErrorHandler } from './controllers/errorController';
+import imageRouter from './routers/imageRouter';
+import dotenv from 'dotenv';
+import customerRouter from './routers/customerRouter';
 
 const app = express();
+dotenv.config();
 
 app.use(cors());
 app.use(express.json());
@@ -15,9 +23,15 @@ app.use(cookieParser());
 
 app.use(passport.initialize());
 
-app.use(STATIC_PATH, express.static(path.resolve(process.cwd(), UPLOAD_FOLDER)));
+app.use('/users', userRouter);
+app.use('/auth', authRouter);
+app.use('/customers', customerRouter);
+app.use('/companies', companyRouter);
 
-app.use('/users', exampleRouter);
+app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
+app.use('/images', imageRouter);
+
+app.use('/', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use(defaultNotFoundHandler);
 app.use(globalErrorHandler);

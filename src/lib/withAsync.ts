@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 
 export function withAsync(
-  handler: (req: Request, res: Response, next: NextFunction) => Promise<void>,
+  handler: (req: Request, res: Response, next: NextFunction) => Promise<void> | void,
 ) {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
