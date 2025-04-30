@@ -53,7 +53,7 @@ model Car {
   carNumber         String     @unique @db.VarChar(50)
   manufacturingYear Int        @db.Integer
   mileage           Int        @db.Integer
-  price             Decimal    @db.Decimal(20, 2)
+  price             Int        @db.Integer
   status            CAR_STATUS @default(AVAILABLE)
   accidentCount     Int        @default(0) @db.Integer
   explanation       String?
