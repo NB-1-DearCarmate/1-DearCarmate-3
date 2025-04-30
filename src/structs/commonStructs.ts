@@ -13,6 +13,10 @@ import {
 
 export const integerString = coerce(integer(), string(), (value) => parseInt(value));
 
+export const CarIdParamsStruct = object({
+  carId: integerString,
+});
+
 const urlRegExp = /^(https?:\/\/)/;
 
 export const PageParamsStruct = object({
