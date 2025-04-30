@@ -11,6 +11,25 @@ import {
 import { uploadHandler } from '../lib/fileUploader';
 const contractDcmtRouter = express.Router();
 
+const extArray = [
+  'jpg',
+  'png',
+  'webp',
+  'gif',
+  'avif',
+  'bmp',
+  'ico',
+  'txt',
+  'pdf',
+  'docx',
+  'xlsx',
+  'csv',
+  'zip',
+  'rar',
+  '7z',
+  'hwp',
+];
+
 contractDcmtRouter.get(
   '/draft',
   passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
@@ -23,6 +42,7 @@ contractDcmtRouter.post(
   uploadHandler({
     uploadFolder: DOCUMENT_PATH,
     fileSizeLimit: 50 * 1024 * 1024,
+    allowedExt: extArray,
   }).single('contractDocument'),
   withAsync(uploadDocument),
 );
