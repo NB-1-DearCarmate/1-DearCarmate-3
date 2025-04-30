@@ -4,7 +4,6 @@ import { ACCESS_TOKEN_STRATEGY, IMAGE_PATH } from '../config/constants';
 import { withAsync } from '../lib/withAsync';
 import { uploadHandler } from '../lib/fileUploader';
 import { uploadImage } from '../controllers/imageController';
-
 const router = Router();
 
 router.post(

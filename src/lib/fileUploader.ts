@@ -7,15 +7,19 @@ import EmptyUploadError from '../lib/errors/EmptyUploadError';
 import FileExtError from '../lib/errors/FileExtError';
 
 interface UploadHandlerOptions {
-  uploadFolder: string;
-  fileSizeLimit: number;
+  uploadFolder?: string;
+  fileSizeLimit?: number;
   memoryFlag?: boolean;
 }
 
 const dirname = path.resolve();
 
 export function uploadHandler(options: UploadHandlerOptions) {
-  const { uploadFolder, fileSizeLimit, memoryFlag = false } = options;
+  const {
+    uploadFolder = 'public/temp',
+    fileSizeLimit = 100 * 1024 * 1024,
+    memoryFlag = false,
+  } = options;
 
   const storage = multer.diskStorage({
     destination: (req, file, cb) => {
