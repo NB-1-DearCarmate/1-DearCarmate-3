@@ -7,6 +7,12 @@ async function create(data: Prisma.CustomerCreateInput) {
   });
 }
 
+async function createMany(data: Prisma.CustomerCreateManyInput[]) {
+  return await prisma.customer.createMany({
+    data,
+  });
+}
+
 async function getList(params: Prisma.CustomerFindManyArgs) {
   return await prisma.customer.findMany({
     ...params,
@@ -50,6 +56,7 @@ export async function deleteById(id: number) {
 
 export default {
   create,
+  createMany,
   getList,
   getById,
   getCount,
