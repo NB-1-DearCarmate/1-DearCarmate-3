@@ -11,13 +11,13 @@ import {
 import { PageParamsStruct } from '../structs/commonStructs';
 import { ResponseContractChoiceDTO, ResponseContractDcmtDTO } from '../lib/dtos/contractDTO';
 import { DOCUMENT_PATH } from '../config/constants';
-import { mimeTypeVerifier } from '../lib/fileUploader';
 import contractDcmtService from '../services/contractDcmtService';
 import { CreateDocumentDTO, ResponseDocumentIdDTO } from '../lib/dtos/contractDcmtDTO';
 import { DownloadDocumentStruct } from '../structs/contractDcmtStructs';
 import NotFoundError from '../lib/errors/NotFoundError';
 import UnauthError from '../lib/errors/UnauthError';
 import path from 'path';
+import EmptyUploadError from '../lib/errors/EmptyUploadError';
 
 export const getDocumentList: RequestHandler = async (req, res) => {
   const reqUser = req.user as OmittedUser;
@@ -39,24 +39,10 @@ export const getContractChoice: RequestHandler = async (req, res) => {
 
 export const uploadDocument = async (req: Request, res: Response): Promise<void> => {
   //인가는 클라이언트에서 patch하는 과정을 실행하며 진행
-  const file = await mimeTypeVerifier(req, DOCUMENT_PATH, [
-    'jpg',
-    'png',
-    'webp',
-    'gif',
-    'avif',
-    'bmp',
-    'ico',
-    'txt',
-    'pdf',
-    'docx',
-    'xlsx',
-    'csv',
-    'zip',
-    'rar',
-    '7z',
-    'hwp',
-  ]);
+  const file = req.file;
+  if (!file) {
+    throw new EmptyUploadError();
+  }
   const fileSize = file.size / 1024 / 1024; // MB
   //TODO: test
   console.log(file.path);
