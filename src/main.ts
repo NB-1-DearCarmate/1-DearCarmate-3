@@ -29,9 +29,10 @@ app.use('/auth', authRouter);
 app.use('/customers', customerRouter);
 app.use('/companies', companyRouter);
 app.use('/contractDocuments', contractDcmtRouter);
-
-app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
 app.use('/images', imageRouter);
+
+app.use('/public/images', express.static(path.join(__dirname, '../public/images')));
+app.use('/public/documents', express.static(path.join(__dirname, '../public/documents')));
 
 app.use('/', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 

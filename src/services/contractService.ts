@@ -278,6 +278,5 @@ export async function getContractDraft(companyId: number) {
     },
   };
 
-  console.log(prismaParams);
   return await contractRepository.findManyDraft(prismaParams);
 }
