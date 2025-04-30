@@ -250,5 +250,34 @@ export async function getContractListWithDcmt(
   const totalItemCount = await contractRepository.getCount({ where: prismaParams.where });
 
   return { contracts, page, pageSize, totalItemCount };
-  // return new ContractWithDcmtResDTO(contracts, page, pageSize, totalItemCount);
+}
+
+export async function getContractDraft(companyId: number) {
+  let prismaParams: {
+    include: {
+      car: {
+        include: {
+          carModel: true;
+        };
+      };
+      customer: true;
+    };
+    where: Prisma.ContractWhereInput;
+  } = {
+    include: {
+      car: {
+        include: {
+          carModel: true,
+        },
+      },
+      customer: true,
+    },
+    where: {
+      companyId: companyId,
+      status: CONTRACT_STATUS.CONTRACT_SUCCESS,
+    },
+  };
+
+  console.log(prismaParams);
+  return await contractRepository.findManyDraft(prismaParams);
 }

@@ -13,9 +13,9 @@ import NotFoundError from '../lib/errors/NotFoundError';
 import { OmittedUser } from '../../types/OmittedUser';
 import { USER_ROLE } from '@prisma/client';
 import UnauthError from '../lib/errors/UnauthError';
-import { getContractListWithDcmt } from '../services/contractService';
+import { getContractListWithDcmt, getContractDraft } from '../services/contractService';
 import { PageParamsStruct } from '../structs/commonStructs';
-import { ResponseContractDcmtDTO } from '../lib/dtos/contractDTO';
+import { ResponseContractChoiceDTO, ResponseContractDcmtDTO } from '../lib/dtos/contractDTO';
 
 export const createUser: RequestHandler = async (req, res) => {
   const data = create(req.body, CreateUserBodyStruct);
@@ -40,6 +40,13 @@ export const getDocumentList: RequestHandler = async (req, res) => {
     data,
   );
   res.send(new ResponseContractDcmtDTO(contracts, page, pageSize, totalItemCount));
+};
+
+export const getContractChoice: RequestHandler = async (req, res) => {
+  const reqUser = req.user as OmittedUser;
+  const userCompanyId = await userService.getCompanyIdById(reqUser.id);
+  const contracts = await getContractDraft(userCompanyId);
+  res.send(new ResponseContractChoiceDTO(contracts).data);
 };
 
 export const editInfo: RequestHandler = async (req, res) => {

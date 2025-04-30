@@ -55,6 +55,21 @@ async function findManyWithDcmt(
   return await prisma.contract.findMany(params);
 }
 
+async function findManyDraft(
+  params: Omit<Prisma.ContractFindManyArgs, 'include'> & {
+    include: {
+      car: {
+        include: {
+          carModel: true;
+        };
+      };
+      customer: true;
+    };
+  },
+) {
+  return await prisma.contract.findMany(params);
+}
+
 async function findCompanyIdbycontractId(contractId: number) {
   return await prisma.contract.findUnique({
     where: {
@@ -82,6 +97,7 @@ export default {
   findById,
   findMany,
   findManyWithDcmt,
+  findManyDraft,
   findCompanyIdbycontractId,
   getCount,
   getEntityName,

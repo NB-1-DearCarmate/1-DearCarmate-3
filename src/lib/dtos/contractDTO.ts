@@ -54,3 +54,26 @@ export type ContractWithRelations = Contract & {
   };
   customer: { id: number; name: string };
 };
+
+export class ResponseContractChoiceDTO {
+  data: {
+    id: number;
+    contractName: string;
+  }[];
+
+  constructor(contracts: DraftContractWithRelations[]) {
+    this.data = contracts.map((contract) => ({
+      id: contract.id,
+      contractName: `${contract.car.carModel.model} - ${contract.customer.name} 고객님`,
+    }));
+  }
+}
+
+export type DraftContractWithRelations = Contract & {
+  car: {
+    id: number;
+    carNumber: string;
+    carModel: { id: number; model: string };
+  };
+  customer: { id: number; name: string };
+};
