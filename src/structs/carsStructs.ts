@@ -1,4 +1,14 @@
-import { nonempty, object, string, min, integer, partial } from 'superstruct';
+import {
+  nonempty,
+  object,
+  string,
+  min,
+  integer,
+  partial,
+  optional,
+  enums,
+  assign,
+} from 'superstruct';
 import { PageParamsStruct } from './commonStructs';
 
 export const CreateCarBodyStruct = object({
@@ -13,6 +23,13 @@ export const CreateCarBodyStruct = object({
   accidentDetails: string(),
 });
 
-export const GetCarListParamsStruct = PageParamsStruct;
+export const GetCarListParamsStruct = assign(
+  PageParamsStruct,
+  object({
+    status: optional(enums(['possession', 'contractProceeding', 'contractCompleted'])),
+    searchBy: optional(enums(['companyName', 'name', 'email'])),
+    keyword: optional(nonempty(string())),
+  }),
+);
 
 export const UpdateCarBodyStruct = partial(CreateCarBodyStruct);

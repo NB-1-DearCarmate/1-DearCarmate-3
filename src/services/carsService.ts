@@ -111,7 +111,7 @@ export async function getCar(id: number): Promise<CarInfo> {
     throw new BadRequestError('잘못된 요청입니다');
   }
 
-  const carModel = await carsModelRepository.getCarModelById(car.carModelId);
+  const carModel = await carsModelRepository.getCarModelById(car.modelId);
   if (!carModel) {
     throw new BadRequestError('잘못된 요청입니다');
   }
