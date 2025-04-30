@@ -1,31 +1,13 @@
 import express from 'express';
 import { withAsync } from '../lib/withAsync';
 import passport from '../middlewares/passport/passport';
-import { ACCESS_TOKEN_STRATEGY } from '../config/constants';
-import { getDocumentList, getContractChoice } from '../controllers/contractDcmtController';
-import { createUploadHandler } from '../lib/fileUploader';
-const { upload, uploadFile } = createUploadHandler({
-  uploadFolder: 'public/documents',
-  fileSizeLimit: 50 * 1024 * 1024,
-  allowedExt: [
-    'jpg',
-    'png',
-    'webp',
-    'gif',
-    'avif',
-    'bmp',
-    'ico',
-    'txt',
-    'pdf',
-    'docx',
-    'xlsx',
-    'csv',
-    'zip',
-    'rar',
-    '7z',
-    'hwp',
-  ],
-});
+import { ACCESS_TOKEN_STRATEGY, DOCUMENT_PATH } from '../config/constants';
+import {
+  getDocumentList,
+  getContractChoice,
+  uploadDocument,
+} from '../controllers/contractDcmtController';
+import { uploadHandler } from '../lib/fileUploader';
 const contractDcmtRouter = express.Router();
 
 contractDcmtRouter.get(
@@ -37,8 +19,11 @@ contractDcmtRouter.get(
 contractDcmtRouter.post(
   '/upload',
   passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
-  upload.single('contractDocument'),
-  withAsync(uploadFile),
+  uploadHandler({
+    uploadFolder: DOCUMENT_PATH,
+    fileSizeLimit: 50 * 1024 * 1024,
+  }).single('contractDocument'),
+  withAsync(uploadDocument),
 );
 
 contractDcmtRouter.get(

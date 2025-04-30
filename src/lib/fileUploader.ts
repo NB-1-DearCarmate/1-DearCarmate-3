@@ -9,12 +9,12 @@ import FileExtError from '../lib/errors/FileExtError';
 interface UploadHandlerOptions {
   uploadFolder: string;
   fileSizeLimit: number;
-  allowedExt: string[];
 }
 
-export function createUploadHandler(options: UploadHandlerOptions) {
-  const dirname = path.resolve();
-  const { uploadFolder, fileSizeLimit, allowedExt } = options;
+const dirname = path.resolve();
+
+export function uploadHandler(options: UploadHandlerOptions) {
+  const { uploadFolder, fileSizeLimit } = options;
 
   const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -35,23 +35,23 @@ export function createUploadHandler(options: UploadHandlerOptions) {
     limits: { fieldNameSize: 100, fileSize: fileSizeLimit },
   });
 
-  const uploadFile = async (req: Request, res: Response): Promise<void> => {
-    if (!req.file) throw new EmptyUploadError();
+  return upload;
+}
 
-    const filePath = `${dirname}/${uploadFolder}/${req.file.filename}`;
-    const mimeType = await fileTypeFromFile(filePath);
-    const ext = mimeType?.ext ?? null;
+function hasFile(req: Request): req is Request & { file: Express.Multer.File } {
+  return !!req.file;
+}
 
-    if (!ext || !allowedExt.includes(ext)) {
-      fs.unlink(filePath, (err) => {
-        if (err) console.error('Failed to delete file:', err);
-      });
-      throw new FileExtError();
-    }
-
-    const downloadUrl = `${process.env.PROTOCOL}://${req.get('host')}/${uploadFolder}/${req.file.filename}`;
-    res.status(201).json({ imageUrl: downloadUrl });
-  };
-
-  return { upload, uploadFile };
+export async function mimeTypeVerifier(req: Request, uploadFolder: string, allowedExt: string[]) {
+  if (!hasFile(req)) throw new EmptyUploadError();
+  const filePath = path.join(dirname, uploadFolder, req.file.filename);
+  const mimeType = await fileTypeFromFile(filePath);
+  const ext = mimeType?.ext ?? null;
+  if (!ext || !allowedExt.includes(ext)) {
+    fs.unlink(filePath, (err) => {
+      if (err) console.error('Failed to delete file:', err);
+    });
+    throw new FileExtError();
+  }
+  return req.file;
 }
