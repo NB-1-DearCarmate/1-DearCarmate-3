@@ -72,8 +72,8 @@ export async function getCarList({
     mileage: car.mileage,
     price: car.price,
     accidentCount: car.accidentCount,
-    explanation: car.explanation,
-    accidentDetails: car.accidentDetails,
+    explanation: car.explanation ?? undefined,
+    accidentDetails: car.accidentDetails ?? undefined,
     status: car.status,
   }));
 
