@@ -6,6 +6,7 @@ import {
   getDocumentList,
   getContractChoice,
   uploadDocument,
+  downloadDocument,
 } from '../controllers/contractDcmtController';
 import { uploadHandler } from '../lib/fileUploader';
 const contractDcmtRouter = express.Router();
@@ -24,6 +25,12 @@ contractDcmtRouter.post(
     fileSizeLimit: 50 * 1024 * 1024,
   }).single('contractDocument'),
   withAsync(uploadDocument),
+);
+
+contractDcmtRouter.get(
+  '/:contractDocumentId/download',
+  passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
+  withAsync(downloadDocument),
 );
 
 contractDcmtRouter.get(

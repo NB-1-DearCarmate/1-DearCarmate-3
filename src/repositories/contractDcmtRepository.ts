@@ -7,21 +7,18 @@ async function create(contractDocument: Prisma.ContractDocumentUncheckedCreateIn
   });
 }
 
-async function update(id: number, data: Prisma.ContractDocumentUncheckedUpdateInput) {
-  return await prisma.contractDocument.update({
-    where: {
-      id,
-    },
-    data: data,
-  });
-}
-
-async function remove(id: number) {
-  return await prisma.contractDocument.delete({
-    where: {
-      id: id,
-    },
-  });
+async function findWithCompanyByDocumentId(
+  params: Omit<Prisma.ContractDocumentFindUniqueArgs, 'include'> & {
+    include: {
+      contract: {
+        include: {
+          company: true;
+        };
+      };
+    };
+  },
+) {
+  return await prisma.contractDocument.findUnique(params);
 }
 
 async function findById(id: number) {
@@ -32,27 +29,13 @@ async function findById(id: number) {
   });
 }
 
-async function findMany(params: Prisma.ContractDocumentFindManyArgs) {
-  return await prisma.contractDocument.findMany({
-    ...params,
-  });
-}
-
-async function getCount(params: Prisma.ContractDocumentCountArgs) {
-  return await prisma.contractDocument.count({
-    ...params,
-  });
-}
 function getEntityName() {
   return prisma.contractDocument.getEntityName();
 }
 
 export default {
   create,
-  update,
-  remove,
+  findWithCompanyByDocumentId,
   findById,
-  findMany,
-  getCount,
   getEntityName,
 };

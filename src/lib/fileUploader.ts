@@ -9,12 +9,13 @@ import FileExtError from '../lib/errors/FileExtError';
 interface UploadHandlerOptions {
   uploadFolder: string;
   fileSizeLimit: number;
+  memoryFlag?: boolean;
 }
 
 const dirname = path.resolve();
 
 export function uploadHandler(options: UploadHandlerOptions) {
-  const { uploadFolder, fileSizeLimit } = options;
+  const { uploadFolder, fileSizeLimit, memoryFlag = false } = options;
 
   const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -30,12 +31,19 @@ export function uploadHandler(options: UploadHandlerOptions) {
     },
   });
 
-  const upload = multer({
+  const upload_memory = multer({
+    storage: multer.memoryStorage(),
+    limits: { fieldNameSize: 100, fileSize: fileSizeLimit },
+  });
+  if (memoryFlag) {
+    return upload_memory;
+  }
+
+  const upload_storage = multer({
     storage,
     limits: { fieldNameSize: 100, fileSize: fileSizeLimit },
   });
-
-  return upload;
+  return upload_storage;
 }
 
 function hasFile(req: Request): req is Request & { file: Express.Multer.File } {
