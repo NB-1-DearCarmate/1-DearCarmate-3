@@ -1,27 +1,57 @@
-import { Router } from "express";
-import { createContract, updateContract, getAllContracts, getContractById, deleteContract, updateContractStatus, getCustomerDropdown, getUserDropdown } from "../controllers/contractController";
+import express from "express";
 import passport from "passport";
+import { withAsync } from "../lib/withAsync";
+import { ACCESS_TOKEN_STRATEGY } from "../config/constants";
+import contractController from "../controllers/contractController";
 
-const router = Router();
-
-router.post("/", passport.authenticate("jwt", { session: false }), createContract);
-
-router.patch("/:id", passport.authenticate("jwt", { session: false }), updateContract);
-
-router.get("/", passport.authenticate("jwt", { session: false }), getAllContracts);
-router.get("/:id", passport.authenticate("jwt", { session: false }), getContractById);
-
-router.delete("/:id", passport.authenticate("jwt", { session: false }), deleteContract);
-
-router.patch("/:id/status", passport.authenticate("jwt", { session: false }), updateContractStatus);
+const router = express.Router();
 
 router.get(
-    "/customers",
-    passport.authenticate("jwt", { session: false }),
-    getCustomerDropdown
-  );
+  "/customers",
+  passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
+  withAsync(contractController.getCustomerDropdown),
+);
 
-  router.get("/users", passport.authenticate("jwt", { session: false }), getUserDropdown);
-  
+router.get(
+  "/users",
+  passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
+  withAsync(contractController.getUserDropdown),
+);
+
+router.patch(
+  "/:id/status",
+  passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
+  withAsync(contractController.updateContractStatus),
+);
+
+router.get(
+  "/:id",
+  passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
+  withAsync(contractController.getContractById),
+);
+
+router.patch(
+  "/:id",
+  passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
+  withAsync(contractController.updateContract),
+);
+
+router.delete(
+  "/:id",
+  passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
+  withAsync(contractController.deleteContract),
+);
+
+router.get(
+  "/",
+  passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
+  withAsync(contractController.getAllContracts),
+);
+
+router.post(
+  "/",
+  passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
+  withAsync(contractController.createContract),
+);
 
 export default router;
