@@ -6,6 +6,7 @@ import UnauthError from '../lib/errors/UnauthError';
 import { Prisma } from '@prisma/client';
 import { NextFunction, Request, Response } from 'express';
 import CommonError from '../lib/errors/CommonError';
+import BadRequestError from '../lib/errors/BadRequestError';
 
 export function defaultNotFoundHandler(_req: Request, res: Response, next: NextFunction) {
   res.status(404).send({ message: 'Not found' });
@@ -14,7 +15,7 @@ export function defaultNotFoundHandler(_req: Request, res: Response, next: NextF
 export function globalErrorHandler(err: unknown, _req: Request, res: Response, next: NextFunction) {
   if (err instanceof CommonError) {
     res.status(err.status).send({ message: err.message });
-  } else if (err instanceof StructError) {
+  } else if (err instanceof StructError || err instanceof BadRequestError) {
     /** From superstruct or application error */
     res.status(400).send({ message: err.message });
   } else if (
