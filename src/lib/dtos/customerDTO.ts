@@ -63,7 +63,7 @@ const reverseRegionMap: Record<REGION, string> = {
   [REGION.JEJU]: '제주',
 };
 
-export class RequestCustomerDTO {
+export class CreateCustomerDTO {
   name: string;
   gender: string;
   phoneNumber: string;
@@ -107,7 +107,7 @@ export class ResponseCustomerDTO {
   }
 }
 
-export class RequestUpdateCustomerDTO {
+export class UpdateCustomerDTO {
   name?: string;
   gender?: string;
   phoneNumber?: string;
