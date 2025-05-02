@@ -5,11 +5,11 @@ import userRepository from '../repositories/userRepository';
 import NotFoundError from '../lib/errors/NotFoundError';
 import UnauthError from '../lib/errors/UnauthError';
 import { Prisma, User } from '@prisma/client';
-import { OmittedUser } from '../../types/OmittedUser';
 import { CreateUserDTO } from '../lib/dtos/userDTO';
 import CommonError from '../lib/errors/CommonError';
 import { UpdateUserBodyType } from '../structs/userStructs';
 import { PageParamsType } from '../structs/commonStructs';
+import { OmittedUser } from '../types/OmittedUser';
 
 async function hashingPassword(password: string) {
   return await bcrypt.hash(password, 10);
@@ -99,11 +99,7 @@ async function getUsers({ page, pageSize, searchBy, keyword }: PageParamsType) {
 
   const users = await userRepository.findMany(prismaParams);
   const totalItemCount = await userRepository.getCount({ where: prismaWhereCondition });
-  const omitedUsers = users.map((user) => {
-    const { encryptedPassword, ...rest } = user;
-    const omitedUser: OmittedUser = rest;
-    return omitedUser;
-  });
+  const omitedUsers = users.map(filterSensitiveUserData);
   return {
     currentPage: page,
     totalPages: Math.ceil(totalItemCount / pageSize),

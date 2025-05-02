@@ -8,7 +8,7 @@ import {
 import * as carsService from '../services/carsService';
 import carResponseDTO from '../lib/dtos/carResponseDTO';
 import { CarIdParamsStruct } from '../structs/commonStructs';
-import { OmittedUser } from '../../types/OmittedUser';
+import { OmittedUser } from '../types/OmittedUser';
 
 /**
  * @openapi

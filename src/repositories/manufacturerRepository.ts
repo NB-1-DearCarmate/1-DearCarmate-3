@@ -1,22 +1,19 @@
-import { Manufacturer } from '@prisma/client';
 import { prismaClient } from '../lib/prismaClient';
 
 export async function getManufacturerByName(name: string) {
-  const manufacturer = await prismaClient.manufacturer.findUnique({
+  return await prismaClient.manufacturer.findUnique({
     where: {
       name,
     },
   });
-  return manufacturer;
 }
 
 export async function getManufacturerById(id: number) {
-  const manufacturer = await prismaClient.manufacturer.findUnique({
+  return await prismaClient.manufacturer.findUnique({
     where: {
       id,
     },
   });
-  return manufacturer;
 }
 
 export async function getManufacturerList() {

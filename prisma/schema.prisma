@@ -80,7 +80,7 @@ model Contract {
   user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   contractDocuments ContractDocument[]
   meetings          Meeting[]
-  Company           Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  company           Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
 model ContractDocument {
@@ -88,9 +88,9 @@ model ContractDocument {
   fileName   String @db.VarChar(50)
   filePath   String @db.VarChar(255)
   fileSize   Int?   @db.Integer
-  contractId Int
+  contractId Int?
 
-  contract Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  contract Contract? @relation(fields: [contractId], references: [id], onDelete: Cascade)
 }
 
 model Manufacturer {

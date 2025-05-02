@@ -1,5 +1,5 @@
 import { USER_ROLE } from '@prisma/client';
-import { OmittedUser } from '../../types/OmittedUser';
+import { OmittedUser } from '../types/OmittedUser';
 import { RequestHandler } from 'express';
 import UnauthError from '../lib/errors/UnauthError';
 import customerService from '../services/customerService';
@@ -16,6 +16,9 @@ import {
   RequestUpdateCustomerDTO,
   ResponseCustomerDTO,
 } from '../lib/dtos/customerDTO';
+import { parse } from 'csv-parse/sync';
+import { StructError } from 'superstruct';
+import BadRequestError from '../lib/errors/BadRequestError';
 
 /**
  * @openapi
@@ -55,7 +58,7 @@ export const getCustomer: RequestHandler = async (req, res) => {
   if (userCompanyId !== customer.companyId) {
     throw new UnauthError();
   }
-  res.status(200).send(new ResponseCustomerDTO(customer));
+  res.send(new ResponseCustomerDTO(customer));
 };
 
 /**
@@ -87,13 +90,14 @@ export const getCustomer: RequestHandler = async (req, res) => {
  */
 export const getCustomerList: RequestHandler = async (req, res) => {
   const reqUser = req.user as OmittedUser;
-  if (reqUser.role !== USER_ROLE.EMPLOYEE) {
+  if (reqUser.role !== USER_ROLE.EMPLOYEE && reqUser.role !== USER_ROLE.OWNER) {
     throw new UnauthError();
   }
+
   const page = create(req.query, PageParamsStruct);
   const userCompanyId = await userService.getCompanyIdById(reqUser.id);
   const customers = await customerService.getCustomers(userCompanyId, page);
-  res.status(200).send(customers);
+  res.send(customers);
 };
 
 /**
@@ -206,7 +210,7 @@ export const patchCustomer: RequestHandler = async (req, res) => {
   const transformedData = new RequestUpdateCustomerDTO(rawData);
   const customer = await customerService.updateCustomer(customerId, transformedData);
   const reverseTransformedData = new ResponseCustomerDTO(customer);
-  res.status(200).send(reverseTransformedData);
+  res.send(reverseTransformedData);
 };
 
 /**
@@ -247,12 +251,72 @@ export const deleteCustomer: RequestHandler = async (req, res) => {
   res.status(200).send({ message: '고객 삭제 성공' });
 };
 
+/**
+ * @openapi
+ * /customers/upload:
+ *   post:
+ *     summary: 고객 일괄 등록
+ *     description: CSV 파일을 통해 여러 고객을 일괄 등록합니다.
+ *     tags:
+ *       - Customer
+ *     security:
+ *       - accessToken: []
+ *     requestBody:
+ *       required: true
+ *       description: CSV 파일을 업로드합니다.
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               file:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: 고객 일괄 등록 성공
+ */
 export const postCustomers: RequestHandler = async (req, res) => {
   const reqUser = req.user as OmittedUser;
   if (reqUser.role !== USER_ROLE.EMPLOYEE) {
     throw new UnauthError();
   }
-  // const data = create(req.body, CreateCustomerBodyStruct);
-  // const customers = await customerService.createCustomers(data);
-  // res.status(201).send(customers);
+  if (!req.file) {
+    throw new BadRequestError('잘못된 요청입니다.');
+  }
+  const customerList: any[] = [];
+  const invalidcustomerList: {
+    record: any;
+    errorMessage: string;
+  }[] = [];
+
+  const records = parse(req.file.buffer, {
+    columns: true,
+    trim: true,
+    bom: true,
+  });
+  for (const record of records) {
+    try {
+      const validated = CreateCustomerBodyStruct.create(record);
+      customerList.push(new RequestCustomerDTO(validated));
+    } catch (err) {
+      if (err instanceof StructError) {
+        invalidcustomerList.push({
+          record,
+          errorMessage: err.message,
+        });
+      } else {
+        throw err;
+      }
+    }
+  }
+  if (customerList.length === 0) {
+    throw new BadRequestError('잘못된 요청입니다.');
+  }
+  const userCompanyId = await userService.getCompanyIdById(reqUser.id);
+  await customerService.createCustomers(userCompanyId, customerList);
+  res.status(200).send({
+    message: '성공적으로 등록되었습니다.',
+    invalidcustomerList,
+  });
 };

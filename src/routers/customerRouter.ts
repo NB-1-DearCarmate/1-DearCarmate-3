@@ -10,22 +10,22 @@ import {
 } from '../controllers/customerController';
 import passport from 'passport';
 import { ACCESS_TOKEN_STRATEGY } from '../config/constants';
+import { uploadHandler } from '../lib/fileUploader';
 
 const customerRouter = express.Router();
-customerRouter.get(
-  '/',
-  passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
-  withAsync(getCustomerList),
-);
 
 customerRouter.post(
   '/',
   passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
   withAsync(postCustomer),
 );
-customerRouter.get(
+customerRouter.post(
   '/upload',
   passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
+  uploadHandler({
+    allowedExt: ['csv'],
+    memoryFlag: true,
+  }).single('file'),
   withAsync(postCustomers),
 );
 customerRouter.get(
@@ -43,6 +43,16 @@ customerRouter.delete(
   '/:customerId',
   passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
   withAsync(deleteCustomer),
+);
+customerRouter.get(
+  '/',
+  passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
+  withAsync(getCustomerList),
+);
+customerRouter.post(
+  '/',
+  passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
+  withAsync(postCustomer),
 );
 
 export default customerRouter;
