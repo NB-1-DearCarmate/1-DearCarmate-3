@@ -18,7 +18,7 @@ async function getList(params: Prisma.CustomerFindManyArgs) {
   });
 }
 
-export async function getById(id: number) {
+async function getById(id: number) {
   return await prisma.customer.findUniqueOrThrow({
     where: { id },
     include: {
@@ -35,17 +35,21 @@ async function getCount(params: Prisma.CustomerCountArgs) {
   });
 }
 
-export async function update(id: number, data: Prisma.CustomerUpdateInput) {
+async function update(id: number, data: Prisma.CustomerUpdateInput) {
   return await prisma.customer.update({
     where: { id },
     data,
   });
 }
 
-export async function deleteById(id: number) {
+async function deleteById(id: number) {
   return await prisma.customer.delete({
     where: { id },
   });
+}
+
+function getEntityName() {
+  return prisma.user.getEntityName();
 }
 
 export default {
@@ -55,4 +59,5 @@ export default {
   getCount,
   update,
   deleteById,
+  getEntityName,
 };

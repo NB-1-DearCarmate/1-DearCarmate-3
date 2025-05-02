@@ -10,7 +10,7 @@ import { CreateUserDTO, ResponseUserDTO } from '../lib/dtos/userDTO';
 import companyService from '../services/companyService';
 import CommonError from '../lib/errors/CommonError';
 import NotFoundError from '../lib/errors/NotFoundError';
-import { OmittedUser } from '../../types/OmittedUser';
+import { OmittedUser } from '../types/OmittedUser';
 import { USER_ROLE } from '@prisma/client';
 import UnauthError from '../lib/errors/UnauthError';
 

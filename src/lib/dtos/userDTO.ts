@@ -1,5 +1,5 @@
 import { USER_ROLE } from '@prisma/client';
-import { OmittedUser } from '../../../types/OmittedUser';
+import { OmittedUser } from '../../types/OmittedUser';
 import { CompanyDTO } from './authDTO';
 import { CreateUserBodyType } from '../../structs/userStructs';
 

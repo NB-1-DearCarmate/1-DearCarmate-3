@@ -5,11 +5,11 @@ import userRepository from '../repositories/userRepository';
 import NotFoundError from '../lib/errors/NotFoundError';
 import UnauthError from '../lib/errors/UnauthError';
 import { Prisma, User } from '@prisma/client';
-import { OmittedUser } from '../../types/OmittedUser';
 import { CreateUserDTO } from '../lib/dtos/userDTO';
 import CommonError from '../lib/errors/CommonError';
 import { UpdateUserBodyType } from '../structs/userStructs';
 import { PageParamsType } from '../structs/commonStructs';
+import { OmittedUser } from '../types/OmittedUser';
 
 async function hashingPassword(password: string) {
   return await bcrypt.hash(password, 10);
