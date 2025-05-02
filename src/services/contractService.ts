@@ -61,6 +61,8 @@ export const updateContractService = async (id: number, data: any) => {
     },
     include: {
       meetings: true,
+      contractDocuments: true,
+      customer: true,
     },
   });
 
