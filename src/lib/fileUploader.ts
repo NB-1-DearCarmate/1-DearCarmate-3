@@ -55,6 +55,7 @@ export function uploadHandler(options: UploadHandlerOptions) {
   const upload_memory = multer({
     storage: multer.memoryStorage(),
     limits: { fieldNameSize: 100, fileSize: fileSizeLimit },
+    fileFilter: fileFilter,
   });
   if (memoryFlag) {
     return upload_memory;
@@ -63,6 +64,7 @@ export function uploadHandler(options: UploadHandlerOptions) {
   const upload_storage = multer({
     storage,
     limits: { fieldNameSize: 100, fileSize: fileSizeLimit },
+    fileFilter: fileFilter,
   });
   return upload_storage;
 }

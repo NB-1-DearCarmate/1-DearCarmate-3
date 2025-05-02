@@ -11,7 +11,6 @@ import {
 import passport from 'passport';
 import { ACCESS_TOKEN_STRATEGY } from '../config/constants';
 import { uploadHandler } from '../lib/fileUploader';
-import upload from '../lib/multer';
 
 const customerRouter = express.Router();
 customerRouter.get(
