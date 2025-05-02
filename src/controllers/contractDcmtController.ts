@@ -2,7 +2,7 @@ import { create } from 'superstruct';
 import { Request, Response } from 'express';
 import userService from '../services/userService';
 import { RequestHandler } from 'express';
-import { OmittedUser } from '../../types/OmittedUser';
+import { OmittedUser } from '../types/OmittedUser';
 import {
   getContractListWithDcmt,
   getContractDraft,
