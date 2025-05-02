@@ -6,7 +6,10 @@ import UnauthError from '../lib/errors/UnauthError';
 import { Prisma } from '@prisma/client';
 import { NextFunction, Request, Response } from 'express';
 import CommonError from '../lib/errors/CommonError';
+import EmptyUploadError from '../lib/errors/EmptyUploadError';
+import FileExtError from '../lib/errors/FileExtError';
 import BadRequestError from '../lib/errors/BadRequestError';
+
 
 export function defaultNotFoundHandler(_req: Request, res: Response, next: NextFunction) {
   res.status(404).send({ message: 'Not found' });
@@ -29,6 +32,12 @@ export function globalErrorHandler(err: unknown, _req: Request, res: Response, n
     if (err.code === 'LIMIT_FILE_SIZE') {
       res.status(400).send({ message: 'File size exceeds the 5MB limit.' });
     } else res.status(500).send({ message: 'File upload failed.' });
+  } else if (err instanceof FileExtError) {
+    /** From imageController */
+    res.status(400).send({ message: 'Make sure you are uploading a correct type.' });
+  } else if (err instanceof EmptyUploadError) {
+    /** From imageController */
+    res.status(400).send({ message: 'No file uploaded.' });
   } else if (err instanceof UnauthError) {
     /** From userService */
     res.status(401).send({ message: 'Unauthorized' });

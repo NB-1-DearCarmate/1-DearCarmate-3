@@ -1,5 +1,5 @@
 import { nonempty, object, string, Infer, optional, literal, union } from 'superstruct';
-import { integerString } from './commonStructs';
+import { emailRegExp, integerString, phoneNumberRegExp } from './commonStructs';
 
 const AgeGroupEnum = union([
   literal('10대'),
@@ -35,10 +35,10 @@ const RegionEnum = union([
 export const CreateCustomerBodyStruct = object({
   name: nonempty(string()),
   gender: nonempty(string()),
-  phoneNumber: nonempty(string()),
+  phoneNumber: phoneNumberRegExp,
   ageGroup: AgeGroupEnum,
   region: RegionEnum,
-  email: nonempty(string()),
+  email: emailRegExp,
   memo: optional(string()),
 });
 export type CreateCustomerBodyType = Infer<typeof CreateCustomerBodyStruct>;
@@ -46,10 +46,10 @@ export type CreateCustomerBodyType = Infer<typeof CreateCustomerBodyStruct>;
 export const PatchCustomerBodyStruct = object({
   name: optional(string()),
   gender: optional(string()),
-  phoneNumber: optional(string()),
+  phoneNumber: phoneNumberRegExp,
   ageGroup: optional(AgeGroupEnum),
   region: optional(RegionEnum),
-  email: optional(string()),
+  email: emailRegExp,
   memo: optional(string()),
 });
 export type PatchCustomerBodyType = Infer<typeof PatchCustomerBodyStruct>;

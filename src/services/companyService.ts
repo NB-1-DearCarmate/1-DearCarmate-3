@@ -3,6 +3,7 @@ import companyRepository from '../repositories/companyRepository';
 import { Prisma } from '@prisma/client';
 import { PageParamsType } from '../structs/commonStructs';
 import { CreateCompanyBodyType, PatchCompanyBodyType } from '../structs/companyStructs';
+import NotFoundError from '../lib/errors/NotFoundError';
 
 async function createCompany(company: CreateCompanyBodyType) {
   const createdCompany = await companyRepository.create(company);
@@ -15,7 +16,11 @@ async function updateCompany(companyId: number, body: PatchCompanyBodyType) {
 }
 
 async function getByName(companyName: string) {
-  return await companyRepository.findByName(companyName);
+  const company = await companyRepository.findByName(companyName);
+  if (!company) {
+    throw new NotFoundError(companyRepository.getEntityName(), companyName);
+  }
+  return company;
 }
 
 function getEntityName() {
