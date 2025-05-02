@@ -35,9 +35,10 @@ export const getCustomer: RequestHandler = async (req, res) => {
 
 export const getCustomerList: RequestHandler = async (req, res) => {
   const reqUser = req.user as OmittedUser;
-  if (reqUser.role !== USER_ROLE.EMPLOYEE) {
+  if (reqUser.role !== USER_ROLE.EMPLOYEE && reqUser.role !== USER_ROLE.OWNER) {
     throw new UnauthError();
   }
+
   const page = create(req.query, PageParamsStruct);
   const userCompanyId = await userService.getCompanyIdById(reqUser.id);
   const customers = await customerService.getCustomers(userCompanyId, page);
