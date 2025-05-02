@@ -149,7 +149,10 @@ export const postCustomers: RequestHandler = async (req, res) => {
     return;
   }
   const customerList: any[] = [];
-  const invalidcustomerList: { record: any; error: StructError }[] = [];
+  const invalidcustomerList: {
+    record: any;
+    errorMessage: string;
+  }[] = [];
 
   console.log('req.file', req.file);
   try {
@@ -158,23 +161,33 @@ export const postCustomers: RequestHandler = async (req, res) => {
       trim: true,
       bom: true,
     });
-    console.log(records);
     for (const record of records) {
       try {
         const validated = CreateCustomerBodyStruct.create(record);
         customerList.push(new RequestCustomerDTO(validated));
       } catch (err) {
         if (err instanceof StructError) {
-          invalidcustomerList.push({ record, error: err });
+          invalidcustomerList.push({
+            record,
+            errorMessage: err.message,
+          });
         } else {
           throw err;
         }
       }
     }
+    if (customerList.length === 0) {
+      res.status(400).json({
+        message: '잘못된 요청입니다.',
+        invalidcustomerList,
+      });
+      return;
+    }
     const userCompanyId = await userService.getCompanyIdById(reqUser.id);
     await customerService.createCustomers(userCompanyId, customerList);
     res.status(200).send({
       message: '성공적으로 등록되었습니다.',
+      invalidcustomerList,
     });
   } catch (err) {
     res.status(500).json({ message: '파일 처리 중 에러 발생', error: err });
