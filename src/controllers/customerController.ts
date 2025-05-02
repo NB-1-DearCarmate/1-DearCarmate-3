@@ -1,5 +1,5 @@
 import { USER_ROLE } from '@prisma/client';
-import { OmittedUser } from '../../types/OmittedUser';
+import { OmittedUser } from '../types/OmittedUser';
 import { RequestHandler } from 'express';
 import UnauthError from '../lib/errors/UnauthError';
 import customerService from '../services/customerService';
@@ -17,6 +17,7 @@ import {
 } from '../lib/dtos/customerDTO';
 import { parse } from 'csv-parse/sync';
 import { StructError } from 'superstruct';
+import BadRequestError from '../lib/errors/BadRequestError';
 
 export const getCustomer: RequestHandler = async (req, res) => {
   const reqUser = req.user as OmittedUser;
@@ -28,17 +29,18 @@ export const getCustomer: RequestHandler = async (req, res) => {
   if (reqUser.companyId !== customer.companyId) {
     throw new UnauthError();
   }
-  res.status(200).send(new ResponseCustomerDTO(customer));
+  res.send(new ResponseCustomerDTO(customer));
 };
 
 export const getCustomerList: RequestHandler = async (req, res) => {
   const reqUser = req.user as OmittedUser;
-  if (reqUser.role !== USER_ROLE.EMPLOYEE) {
+  if (reqUser.role !== USER_ROLE.EMPLOYEE && reqUser.role !== USER_ROLE.OWNER) {
     throw new UnauthError();
   }
+
   const page = create(req.query, PageParamsStruct);
   const customers = await customerService.getCustomers(reqUser.companyId, page);
-  res.status(200).send(customers);
+  res.send(customers);
 };
 
 /**
@@ -116,7 +118,7 @@ export const patchCustomer: RequestHandler = async (req, res) => {
   const transformedData = new RequestUpdateCustomerDTO(rawData);
   const customer = await customerService.updateCustomer(customerId, transformedData);
   const reverseTransformedData = new ResponseCustomerDTO(customer);
-  res.status(200).send(reverseTransformedData);
+  res.send(reverseTransformedData);
 };
 
 export const deleteCustomer: RequestHandler = async (req, res) => {
@@ -139,37 +141,40 @@ export const postCustomers: RequestHandler = async (req, res) => {
     throw new UnauthError();
   }
   if (!req.file) {
-    res.status(400).json({ message: '잘못된 요청입니다' });
-    return;
+    throw new BadRequestError('잘못된 요청입니다.');
   }
   const customerList: any[] = [];
-  const invalidcustomerList: { record: any; error: StructError }[] = [];
+  const invalidcustomerList: {
+    record: any;
+    errorMessage: string;
+  }[] = [];
 
-  console.log('req.file', req.file);
-  try {
-    const records = parse(req.file.buffer, {
-      columns: true,
-      trim: true,
-      bom: true,
-    });
-    console.log(records);
-    for (const record of records) {
-      try {
-        const validated = CreateCustomerBodyStruct.create(record);
-        customerList.push(new RequestCustomerDTO(validated));
-      } catch (err) {
-        if (err instanceof StructError) {
-          invalidcustomerList.push({ record, error: err });
-        } else {
-          throw err;
-        }
+  const records = parse(req.file.buffer, {
+    columns: true,
+    trim: true,
+    bom: true,
+  });
+  for (const record of records) {
+    try {
+      const validated = CreateCustomerBodyStruct.create(record);
+      customerList.push(new RequestCustomerDTO(validated));
+    } catch (err) {
+      if (err instanceof StructError) {
+        invalidcustomerList.push({
+          record,
+          errorMessage: err.message,
+        });
+      } else {
+        throw err;
       }
     }
-    await customerService.createCustomers(reqUser.companyId, customerList);
-    res.status(200).send({
-      message: '성공적으로 등록되었습니다.',
-    });
-  } catch (err) {
-    res.status(500).json({ message: '파일 처리 중 에러 발생', error: err });
   }
+  if (customerList.length === 0) {
+    throw new BadRequestError('잘못된 요청입니다.');
+  }
+  await customerService.createCustomers(reqUser.companyId, customerList);
+  res.status(200).send({
+    message: '성공적으로 등록되었습니다.',
+    invalidcustomerList,
+  });
 };

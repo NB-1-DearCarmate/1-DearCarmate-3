@@ -10,7 +10,6 @@ import EmptyUploadError from '../lib/errors/EmptyUploadError';
 import FileExtError from '../lib/errors/FileExtError';
 import BadRequestError from '../lib/errors/BadRequestError';
 
-
 export function defaultNotFoundHandler(_req: Request, res: Response, next: NextFunction) {
   res.status(404).send({ message: 'Not found' });
 }

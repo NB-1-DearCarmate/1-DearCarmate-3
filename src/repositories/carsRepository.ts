@@ -3,13 +3,12 @@ import { prismaClient } from '../lib/prismaClient';
 import { PagePaginationParams } from '../types/pagination';
 
 export async function createCar(data: Omit<Car, 'id' | 'status'>) {
-  const createdCar = await prismaClient.car.create({
+  return await prismaClient.car.create({
     data: {
       ...data,
       status: 'AVAILABLE',
     },
   });
-  return createdCar;
 }
 
 export async function getCarList({
@@ -86,11 +85,10 @@ export async function getCarList({
 }
 
 export async function updateCar(id: number, data: Partial<Car>) {
-  const updatedCar = await prismaClient.car.update({
+  return await prismaClient.car.update({
     where: { id },
     data,
   });
-  return updatedCar;
 }
 
 export async function deleteCar(id: number) {
@@ -100,8 +98,7 @@ export async function deleteCar(id: number) {
 }
 
 export async function getCar(id: number) {
-  const car = await prismaClient.car.findUnique({
+  return await prismaClient.car.findUnique({
     where: { id },
   });
-  return car;
 }

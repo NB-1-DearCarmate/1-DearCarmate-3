@@ -1,6 +1,6 @@
 import userService from '../services/userService';
 import { Request, RequestHandler, Response } from 'express';
-import { OmittedUser } from '../../types/OmittedUser';
+import { OmittedUser } from '../types/OmittedUser';
 import { ACCESS_tOKEN_STRING, REFRESH_tOKEN_STRING } from '../config/constants';
 import { LoginResponseDTO } from '../lib/dtos/authDTO';
 
@@ -53,13 +53,13 @@ export const login: RequestHandler = async (req: Request, res: Response) => {
  *     tags:
  *       - Auth
  *     responses:
- *       204:
+ *       200:
  *         description: 성공적으로 로그아웃됨
  */
 export const logout: RequestHandler = async (req: Request, res: Response) => {
   res.clearCookie(ACCESS_tOKEN_STRING, { path: '/' });
   res.clearCookie(REFRESH_tOKEN_STRING, { path: '/' });
-  res.status(204).send('로그아웃');
+  res.send('로그아웃');
 };
 
 /**

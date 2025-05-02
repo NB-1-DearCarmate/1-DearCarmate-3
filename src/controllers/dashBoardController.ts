@@ -1,6 +1,5 @@
-import { OmittedUser } from '../../types/OmittedUser';
+import { OmittedUser } from '../types/OmittedUser';
 import { RequestHandler } from 'express';
-import { ResponseCustomerDTO } from '../lib/dtos/customerDTO';
 import dashBoardService from '../services/dashBoardService';
 import { ResponseDashBoardDTO } from '../lib/dtos/dashBoardDTO';
 
