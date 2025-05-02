@@ -1,7 +1,7 @@
 import { RequestHandler } from 'express';
 import companyService from '../services/companyService';
 import { USER_ROLE } from '@prisma/client';
-import { OmittedUser } from '../../types/OmittedUser';
+import { OmittedUser } from '../types/OmittedUser';
 import UnauthError from '../lib/errors/UnauthError';
 import userService from '../services/userService';
 import { PageParamsStruct } from '../structs/commonStructs';
@@ -249,7 +249,7 @@ export const patchCompany: RequestHandler = async (req, res) => {
   const { companyId } = create(req.params, CompanyIdParamStruct);
   const data = create(req.query, PatchCompanyBodyStruct);
   const company = await companyService.updateCompany(companyId, data);
-  res.status(200).json(company);
+  res.send(company);
 };
 
 /**

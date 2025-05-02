@@ -1,5 +1,5 @@
 import { USER_ROLE } from '@prisma/client';
-import { OmittedUser } from '../../types/OmittedUser';
+import { OmittedUser } from '../types/OmittedUser';
 import { RequestHandler } from 'express';
 import UnauthError from '../lib/errors/UnauthError';
 import customerService from '../services/customerService';
@@ -31,7 +31,7 @@ export const getCustomer: RequestHandler = async (req, res) => {
   if (userCompanyId !== customer.companyId) {
     throw new UnauthError();
   }
-  res.status(200).send(new ResponseCustomerDTO(customer));
+  res.send(new ResponseCustomerDTO(customer));
 };
 
 export const getCustomerList: RequestHandler = async (req, res) => {
@@ -43,7 +43,7 @@ export const getCustomerList: RequestHandler = async (req, res) => {
   const page = create(req.query, PageParamsStruct);
   const userCompanyId = await userService.getCompanyIdById(reqUser.id);
   const customers = await customerService.getCustomers(userCompanyId, page);
-  res.status(200).send(customers);
+  res.send(customers);
 };
 
 /**
@@ -123,7 +123,7 @@ export const patchCustomer: RequestHandler = async (req, res) => {
   const transformedData = new RequestUpdateCustomerDTO(rawData);
   const customer = await customerService.updateCustomer(customerId, transformedData);
   const reverseTransformedData = new ResponseCustomerDTO(customer);
-  res.status(200).send(reverseTransformedData);
+  res.send(reverseTransformedData);
 };
 
 export const deleteCustomer: RequestHandler = async (req, res) => {

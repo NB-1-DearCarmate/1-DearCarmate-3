@@ -55,8 +55,7 @@ export async function createCar(data: CreateCarData): Promise<CarInfo> {
 export async function getCarList(
   params: PagePaginationParams,
 ): Promise<PagePaginationResult<GetCarListInfo>> {
-  const cars = await carsRepository.getCarList(params);
-  return cars;
+  return await carsRepository.getCarList(params);
 }
 
 export async function updateCar(id: number, data: UpdateCarData): Promise<CarInfo> {
@@ -137,6 +136,5 @@ export async function getCar(id: number): Promise<CarInfo> {
 }
 
 export async function getCarModelList() {
-  const carModels = await manufacturerRepository.getManufacturerList();
-  return carModels;
+  return await manufacturerRepository.getManufacturerList();
 }
