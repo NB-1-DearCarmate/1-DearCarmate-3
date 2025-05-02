@@ -21,6 +21,10 @@ export const phoneNumberRegExp = pattern(string(), /^\d{2,3}-\d{3,4}-\d{4}$/);
 
 export const integerString = coerce(integer(), string(), (value) => parseInt(value));
 
+export const CarIdParamsStruct = object({
+  carId: integerString,
+});
+
 const urlRegExp = /^(https?:\/\/)/;
 
 export const PageParamsStruct = object({
