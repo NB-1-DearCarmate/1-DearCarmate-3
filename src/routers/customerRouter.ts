@@ -10,7 +10,6 @@ import {
 } from '../controllers/customerController';
 import passport from 'passport';
 import { ACCESS_TOKEN_STRATEGY } from '../config/constants';
-import upload from '../lib/multer';
 import { uploadHandler } from '../lib/fileUploader';
 
 const customerRouter = express.Router();
@@ -29,8 +28,7 @@ customerRouter.post(
   '/upload',
   passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
   uploadHandler({
-    uploadFolder: 'public/',
-    fileSizeLimit: 5 * 1024 * 1024,
+    allowedExt: ['csv'],
     memoryFlag: true,
   }).single('file'),
   withAsync(postCustomers),
