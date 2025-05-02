@@ -99,11 +99,7 @@ async function getUsers({ page, pageSize, searchBy, keyword }: PageParamsType) {
 
   const users = await userRepository.findMany(prismaParams);
   const totalItemCount = await userRepository.getCount({ where: prismaWhereCondition });
-  const omitedUsers = users.map((user) => {
-    const { encryptedPassword, ...rest } = user;
-    const omitedUser: OmittedUser = rest;
-    return omitedUser;
-  });
+  const omitedUsers = users.map(filterSensitiveUserData);
   return {
     currentPage: page,
     totalPages: Math.ceil(totalItemCount / pageSize),

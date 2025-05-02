@@ -20,6 +20,16 @@ async function createCustomer(companyId: number, customer: RequestCustomerDTO) {
   return await customerRepository.create(data);
 }
 
+async function createCustomers(companyId: number, customers: RequestCustomerDTO[]) {
+  const data = customers.map((customer) => {
+    return {
+      ...customer,
+      companyId: companyId,
+    };
+  });
+  return await customerRepository.createMany(data);
+}
+
 async function getCustomer(customerId: number) {
   return await customerRepository.getById(customerId);
 }
@@ -91,6 +101,7 @@ async function deleteCustomer(customerId: number) {
 
 export default {
   createCustomer,
+  createCustomers,
   getCustomer,
   getCustomers,
   updateCustomer,
