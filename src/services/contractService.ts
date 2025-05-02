@@ -4,7 +4,6 @@ import { ContractCreateStruct } from '../structs/contractStructs';
 import { CONTRACT_STATUS, Prisma } from '@prisma/client';
 import { PageParamsType } from '../structs/commonStructs';
 import contractRepository from '../repositories/contractRepository';
-import { ResponseContractDcmtDTO, ContractWithRelations } from '../lib/dtos/contractDTO';
 
 type CreateContractData = {
   customerId: number;
