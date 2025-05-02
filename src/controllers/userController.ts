@@ -95,8 +95,7 @@ export const createUser: RequestHandler = async (req, res) => {
  */
 export const getInfo: RequestHandler = async (req, res) => {
   const reqUser = req.user as OmittedUser;
-  const user = await userService.getUserById(reqUser.id);
-  res.send(new ResponseUserDTO(user));
+  res.send(new ResponseUserDTO(reqUser));
 };
 
 /**

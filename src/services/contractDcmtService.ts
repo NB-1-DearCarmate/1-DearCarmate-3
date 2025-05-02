@@ -10,7 +10,7 @@ async function createDocument(data: CreateDocumentDTO) {
 async function getDocumentById(id: number) {
   const document = await contractDcmtRepository.findById(id);
   if (!document) {
-    throw new NotFoundError(contractDcmtRepository.getEntityName(), id);
+    throw new NotFoundError('ContractDocument', id);
   }
   return document;
 }
@@ -39,18 +39,13 @@ async function getDocumentWithCompany(id: number) {
   };
   const document = await contractDcmtRepository.findWithCompanyByDocumentId(prismaParams);
   if (!document) {
-    throw new NotFoundError(contractDcmtRepository.getEntityName(), id);
+    throw new NotFoundError('ContractDocument', id);
   }
   return document;
-}
-
-function getEntityName() {
-  return contractDcmtRepository.getEntityName();
 }
 
 export default {
   createDocument,
   getDocumentById,
   getDocumentWithCompany,
-  getEntityName,
 };

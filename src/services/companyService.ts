@@ -18,13 +18,9 @@ async function updateCompany(companyId: number, body: PatchCompanyBodyType) {
 async function getByName(companyName: string) {
   const company = await companyRepository.findByName(companyName);
   if (!company) {
-    throw new NotFoundError(companyRepository.getEntityName(), companyName);
+    throw new NotFoundError('Company', companyName);
   }
   return company;
-}
-
-function getEntityName() {
-  return companyRepository.getEntityName();
 }
 
 async function getCompanies({ page, pageSize, searchBy, keyword }: PageParamsType) {
@@ -74,7 +70,6 @@ export default {
   createCompany,
   updateCompany,
   getByName,
-  getEntityName,
   getCompanies,
   deleteCompany,
 };

@@ -86,9 +86,6 @@ async function getCount(params: Prisma.ContractCountArgs) {
     ...params,
   });
 }
-function getEntityName() {
-  return prisma.contract.getEntityName();
-}
 
 export default {
   create,
@@ -100,5 +97,4 @@ export default {
   findManyDraft,
   findCompanyIdbycontractId,
   getCount,
-  getEntityName,
 };
