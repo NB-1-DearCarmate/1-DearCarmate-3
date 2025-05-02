@@ -10,7 +10,6 @@ import {
 } from '../controllers/customerController';
 import passport from 'passport';
 import { ACCESS_TOKEN_STRATEGY } from '../config/constants';
-import upload from '../lib/multer';
 import { uploadHandler } from '../lib/fileUploader';
 
 const customerRouter = express.Router();
