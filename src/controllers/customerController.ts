@@ -9,7 +9,6 @@ import {
   PatchCustomerBodyStruct,
 } from '../structs/customerStructs';
 import { create } from 'superstruct';
-import userService from '../services/userService';
 import { PageParamsStruct } from '../structs/commonStructs';
 import {
   RequestCustomerDTO,
@@ -25,10 +24,9 @@ export const getCustomer: RequestHandler = async (req, res) => {
   if (reqUser.role !== USER_ROLE.EMPLOYEE) {
     throw new UnauthError();
   }
-  const userCompanyId = await userService.getCompanyIdById(reqUser.id);
   const { customerId } = create(req.params, CustomerIdParamStruct);
   const customer = await customerService.getCustomer(customerId);
-  if (userCompanyId !== customer.companyId) {
+  if (reqUser.companyId !== customer.companyId) {
     throw new UnauthError();
   }
   res.send(new ResponseCustomerDTO(customer));
@@ -41,8 +39,7 @@ export const getCustomerList: RequestHandler = async (req, res) => {
   }
 
   const page = create(req.query, PageParamsStruct);
-  const userCompanyId = await userService.getCompanyIdById(reqUser.id);
-  const customers = await customerService.getCustomers(userCompanyId, page);
+  const customers = await customerService.getCustomers(reqUser.companyId, page);
   res.send(customers);
 };
 
@@ -101,9 +98,8 @@ export const postCustomer: RequestHandler = async (req, res) => {
     throw new UnauthError();
   }
   const rawData = create(req.body, CreateCustomerBodyStruct);
-  const userCompanyId = await userService.getCompanyIdById(reqUser.id);
   const transformedData = new RequestCustomerDTO(rawData);
-  const customer = await customerService.createCustomer(userCompanyId, transformedData);
+  const customer = await customerService.createCustomer(reqUser.companyId, transformedData);
   const reverseTransformedData = new ResponseCustomerDTO(customer);
   res.status(201).send(reverseTransformedData);
 };
@@ -113,10 +109,9 @@ export const patchCustomer: RequestHandler = async (req, res) => {
   if (reqUser.role !== USER_ROLE.EMPLOYEE) {
     throw new UnauthError();
   }
-  const userCompanyId = await userService.getCompanyIdById(reqUser.id);
   const { customerId } = create(req.params, CustomerIdParamStruct);
   const customerCompanyId = await customerService.getCompanyIdById(customerId);
-  if (userCompanyId !== customerCompanyId) {
+  if (reqUser.companyId !== customerCompanyId) {
     throw new UnauthError();
   }
   const rawData = create(req.body, PatchCustomerBodyStruct);
@@ -131,10 +126,9 @@ export const deleteCustomer: RequestHandler = async (req, res) => {
   if (reqUser.role !== USER_ROLE.EMPLOYEE) {
     throw new UnauthError();
   }
-  const userCompanyId = await userService.getCompanyIdById(reqUser.id);
   const { customerId } = create(req.params, CustomerIdParamStruct);
   const customerCompanyId = await customerService.getCompanyIdById(customerId);
-  if (userCompanyId !== customerCompanyId) {
+  if (reqUser.companyId !== customerCompanyId) {
     throw new UnauthError();
   }
   await customerService.deleteCustomer(customerId);
@@ -178,8 +172,7 @@ export const postCustomers: RequestHandler = async (req, res) => {
   if (customerList.length === 0) {
     throw new BadRequestError('잘못된 요청입니다.');
   }
-  const userCompanyId = await userService.getCompanyIdById(reqUser.id);
-  await customerService.createCustomers(userCompanyId, customerList);
+  await customerService.createCustomers(reqUser.companyId, customerList);
   res.status(200).send({
     message: '성공적으로 등록되었습니다.',
     invalidcustomerList,

@@ -29,13 +29,8 @@ async function findById(id: number) {
   });
 }
 
-function getEntityName() {
-  return prisma.contractDocument.getEntityName();
-}
-
 export default {
   create,
   findWithCompanyByDocumentId,
   findById,
-  getEntityName,
 };

@@ -62,9 +62,6 @@ async function getCount(params: Prisma.UserCountArgs) {
     ...params,
   });
 }
-function getEntityName() {
-  return prisma.user.getEntityName();
-}
 
 export default {
   create,
@@ -75,5 +72,4 @@ export default {
   findMany,
   findCompanyIdbyUserId,
   getCount,
-  getEntityName,
 };

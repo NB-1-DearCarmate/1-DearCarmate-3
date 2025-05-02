@@ -1,13 +1,8 @@
 import { create } from 'superstruct';
 import { Request, Response } from 'express';
-import userService from '../services/userService';
 import { RequestHandler } from 'express';
 import { OmittedUser } from '../types/OmittedUser';
-import {
-  getContractListWithDcmt,
-  getContractDraft,
-  getEntityName,
-} from '../services/contractService';
+import { getContractListWithDcmt, getContractDraft } from '../services/contractService';
 import { PageParamsStruct } from '../structs/commonStructs';
 import { ResponseContractChoiceDTO, ResponseContractDcmtDTO } from '../lib/dtos/contractDTO';
 import { DOCUMENT_PATH } from '../config/constants';
@@ -22,9 +17,8 @@ import EmptyUploadError from '../lib/errors/EmptyUploadError';
 export const getDocumentList: RequestHandler = async (req, res) => {
   const reqUser = req.user as OmittedUser;
   const data = create(req.query, PageParamsStruct);
-  const userCompanyId = await userService.getCompanyIdById(reqUser.id);
   const { contracts, page, pageSize, totalItemCount } = await getContractListWithDcmt(
-    userCompanyId,
+    reqUser.companyId,
     data,
   );
   res.send(new ResponseContractDcmtDTO(contracts, page, pageSize, totalItemCount));
@@ -32,8 +26,7 @@ export const getDocumentList: RequestHandler = async (req, res) => {
 
 export const getContractChoice: RequestHandler = async (req, res) => {
   const reqUser = req.user as OmittedUser;
-  const userCompanyId = await userService.getCompanyIdById(reqUser.id);
-  const contracts = await getContractDraft(userCompanyId);
+  const contracts = await getContractDraft(reqUser.companyId);
   res.send(new ResponseContractChoiceDTO(contracts).data);
 };
 
@@ -56,14 +49,13 @@ export const uploadDocument = async (req: Request, res: Response): Promise<void>
 
 export const downloadDocument = async (req: Request, res: Response): Promise<void> => {
   const reqUser = req.user as OmittedUser;
-  const userCompanyId = await userService.getCompanyIdById(reqUser.id);
   const { contractDocumentId } = create(req.params, DownloadDocumentStruct);
 
   const contractDocument = await contractDcmtService.getDocumentWithCompany(contractDocumentId);
   if (!contractDocument.contract) {
-    throw new NotFoundError(getEntityName(), 'contract');
+    throw new NotFoundError('Contract', 'contract');
   }
-  if (contractDocument.contract.companyId !== userCompanyId) {
+  if (contractDocument.contract.companyId !== reqUser.companyId) {
     throw new UnauthError();
   }
 

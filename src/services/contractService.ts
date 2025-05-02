@@ -282,7 +282,3 @@ export async function getContractDraft(companyId: number) {
 
   return await contractRepository.findManyDraft(prismaParams);
 }
-
-export function getEntityName() {
-  return contractRepository.getEntityName();
-}

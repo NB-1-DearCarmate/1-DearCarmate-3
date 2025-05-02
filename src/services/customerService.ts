@@ -90,7 +90,7 @@ async function updateCustomer(customerId: number, customer: RequestUpdateCustome
 async function getCompanyIdById(customerId: number) {
   const customer = await customerRepository.getById(customerId);
   if (!customer) {
-    throw new NotFoundError(customerRepository.getEntityName(), customerId);
+    throw new NotFoundError('Customer', customerId);
   }
   return customer.companyId;
 }

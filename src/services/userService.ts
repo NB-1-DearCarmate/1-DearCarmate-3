@@ -38,7 +38,7 @@ async function getUserById(id: number) {
   const user = await userRepository.findById(id);
 
   if (!user) {
-    throw new NotFoundError(userRepository.getEntityName(), id);
+    throw new NotFoundError('user', id);
   }
 
   return filterSensitiveUserData(user);
@@ -111,7 +111,7 @@ async function getUsers({ page, pageSize, searchBy, keyword }: PageParamsType) {
 async function getCompanyIdById(userId: number) {
   const user = await userRepository.findCompanyIdbyUserId(userId);
   if (!user) {
-    throw new NotFoundError(userRepository.getEntityName(), userId);
+    throw new NotFoundError('user', userId);
   }
   return user.companyId;
 }
