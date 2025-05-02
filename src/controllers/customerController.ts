@@ -154,7 +154,6 @@ export const postCustomers: RequestHandler = async (req, res) => {
     errorMessage: string;
   }[] = [];
 
-  console.log('req.file', req.file);
   try {
     const records = parse(req.file.buffer, {
       columns: true,
