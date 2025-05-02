@@ -3,30 +3,97 @@ import { OmittedUser } from '../../types/OmittedUser';
 import { RequestHandler } from 'express';
 import UnauthError from '../lib/errors/UnauthError';
 import customerService from '../services/customerService';
-import { CreateCustomerBodyStruct } from '../structs/customerStructs';
+import {
+  CreateCustomerBodyStruct,
+  CustomerIdParamStruct,
+  PatchCustomerBodyStruct,
+} from '../structs/customerStructs';
 import { create } from 'superstruct';
 import userService from '../services/userService';
 import { PageParamsStruct } from '../structs/commonStructs';
-import { RequestCustomerDTO, ResponseCustomerDTO } from '../lib/dtos/customerDTO';
+import {
+  RequestCustomerDTO,
+  RequestUpdateCustomerDTO,
+  ResponseCustomerDTO,
+} from '../lib/dtos/customerDTO';
 
+/**
+ * @openapi
+ * /customers/{customerId}:
+ *   get:
+ *     summary: 고객 상세 조회
+ *     description: 고객 ID를 통해 특정 고객 정보를 조회합니다.
+ *     tags:
+ *       - Customer
+ *     security:
+ *       - accessToken: []
+ *     parameters:
+ *       - in: path
+ *         name: customerId
+ *         required: true
+ *         schema:
+ *           type: number
+ *         description: 조회할 고객의 ID
+ *     responses:
+ *       200:
+ *         description: 고객 정보 조회 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ResponseCustomerDTO'
+ *       401:
+ *         description: 직원 권한이 없는 사용자입니다.
+ */
 export const getCustomer: RequestHandler = async (req, res) => {
   const reqUser = req.user as OmittedUser;
   if (reqUser.role !== USER_ROLE.EMPLOYEE) {
     throw new UnauthError();
   }
-  const customerId = parseInt(req.params.customerId, 10);
-  //const customer = await customerService.getCustomer(customerId);
-  //res.status(200).send(customer);
+  const userCompanyId = await userService.getCompanyIdById(reqUser.id);
+  const { customerId } = create(req.params, CustomerIdParamStruct);
+  const customer = await customerService.getCustomer(customerId);
+  if (userCompanyId !== customer.companyId) {
+    throw new UnauthError();
+  }
+  res.status(200).send(new ResponseCustomerDTO(customer));
 };
 
+/**
+ * @openapi
+ * /customers:
+ *   get:
+ *     summary: 고객 목록 조회
+ *     description: 페이지 정보를 기반으로 고객 목록을 조회합니다.
+ *     tags:
+ *       - Customer
+ *     security:
+ *       - accessToken: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         required: false
+ *         schema:
+ *           type: number
+ *         description: 페이지 번호
+ *       - in: query
+ *         name: pageSize
+ *         required: false
+ *         schema:
+ *           type: number
+ *         description: 페이지당 항목 수
+ *     responses:
+ *       200:
+ *         description: 고객 목록 조회 성공
+ */
 export const getCustomerList: RequestHandler = async (req, res) => {
   const reqUser = req.user as OmittedUser;
   if (reqUser.role !== USER_ROLE.EMPLOYEE) {
     throw new UnauthError();
   }
   const page = create(req.query, PageParamsStruct);
-  //const customers = await customerService.getCustomers(page);
-  // res.status(200).send(customers);
+  const userCompanyId = await userService.getCompanyIdById(reqUser.id);
+  const customers = await customerService.getCustomers(userCompanyId, page);
+  res.status(200).send(customers);
 };
 
 /**
@@ -91,25 +158,93 @@ export const postCustomer: RequestHandler = async (req, res) => {
   res.status(201).send(reverseTransformedData);
 };
 
+/**
+ * @openapi
+ * /customers/{customerId}:
+ *   patch:
+ *     summary: 고객 정보 수정
+ *     description: 고객의 정보를 수정합니다.
+ *     tags:
+ *       - Customer
+ *     security:
+ *       - accessToken: []
+ *     parameters:
+ *       - in: path
+ *         name: customerId
+ *         required: true
+ *         schema:
+ *           type: number
+ *         description: 수정할 고객의 ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/PatchCustomerBodyType'
+ *     responses:
+ *       200:
+ *         description: 고객 수정 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ResponseCustomerDTO'
+ *       401:
+ *         description: 권한이 없거나 회사가 일치하지 않습니다.
+ */
 export const patchCustomer: RequestHandler = async (req, res) => {
   const reqUser = req.user as OmittedUser;
   if (reqUser.role !== USER_ROLE.EMPLOYEE) {
     throw new UnauthError();
   }
-  const customerId = parseInt(req.params.customerId, 10);
-  //const data = create(req.body, PatchCustomerBodyStruct);
-  //const customer = await customerService.patchCustomer(customerId, data);
-  //res.status(200).send(customer);
+  const userCompanyId = await userService.getCompanyIdById(reqUser.id);
+  const { customerId } = create(req.params, CustomerIdParamStruct);
+  const customerCompanyId = await customerService.getCompanyIdById(customerId);
+  if (userCompanyId !== customerCompanyId) {
+    throw new UnauthError();
+  }
+  const rawData = create(req.body, PatchCustomerBodyStruct);
+  const transformedData = new RequestUpdateCustomerDTO(rawData);
+  const customer = await customerService.updateCustomer(customerId, transformedData);
+  const reverseTransformedData = new ResponseCustomerDTO(customer);
+  res.status(200).send(reverseTransformedData);
 };
 
+/**
+ * @openapi
+ * /customers/{customerId}:
+ *   delete:
+ *     summary: 고객 삭제
+ *     description: 특정 고객 정보를 삭제합니다.
+ *     tags:
+ *       - Customer
+ *     security:
+ *       - accessToken: []
+ *     parameters:
+ *       - in: path
+ *         name: customerId
+ *         required: true
+ *         schema:
+ *           type: number
+ *         description: 삭제할 고객의 ID
+ *     responses:
+ *       200:
+ *         description: 고객 삭제 성공
+ *       401:
+ *         description: 권한이 없거나 회사가 일치하지 않습니다.
+ */
 export const deleteCustomer: RequestHandler = async (req, res) => {
   const reqUser = req.user as OmittedUser;
   if (reqUser.role !== USER_ROLE.EMPLOYEE) {
     throw new UnauthError();
   }
-  const customerId = parseInt(req.params.customerId, 10);
-  //await customerService.deleteCustomer(customerId);
-  res.status(204).send();
+  const userCompanyId = await userService.getCompanyIdById(reqUser.id);
+  const { customerId } = create(req.params, CustomerIdParamStruct);
+  const customerCompanyId = await customerService.getCompanyIdById(customerId);
+  if (userCompanyId !== customerCompanyId) {
+    throw new UnauthError();
+  }
+  await customerService.deleteCustomer(customerId);
+  res.status(200).send({ message: '고객 삭제 성공' });
 };
 
 export const postCustomers: RequestHandler = async (req, res) => {

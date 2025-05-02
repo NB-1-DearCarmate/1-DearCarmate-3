@@ -1,48 +1,48 @@
 import express from 'express';
 import { withAsync } from '../lib/withAsync';
 import {
-  deleteCustomer,
-  getCustomer,
-  getCustomerList,
-  patchCustomer,
-  postCustomer,
-  postCustomers,
-} from '../controllers/customerController';
+  createCar,
+  deleteCar,
+  getCar,
+  getCarList,
+  updateCar,
+  getCarModelList,
+} from '../controllers/carsController';
 import passport from 'passport';
 import { ACCESS_TOKEN_STRATEGY } from '../config/constants';
 
-const customerRouter = express.Router();
-customerRouter.get(
+const carsRouter = express.Router();
+
+carsRouter.post(
   '/',
   passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
-  withAsync(getCustomerList),
+  withAsync(createCar),
 );
-
-customerRouter.post(
+carsRouter.get(
   '/',
   passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
-  withAsync(postCustomer),
-);
-customerRouter.get(
-  '/upload',
-  passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
-  withAsync(postCustomers),
-);
-customerRouter.get(
-  '/:customerId',
-  passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
-  withAsync(getCustomer),
-);
-customerRouter.patch(
-  '/:customerId',
-  passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
-  withAsync(patchCustomer),
+  withAsync(getCarList),
 );
 
-customerRouter.delete(
-  '/:customerId',
+carsRouter.get(
+  '/models',
   passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
-  withAsync(deleteCustomer),
+  withAsync(getCarModelList),
+);
+carsRouter.patch(
+  '/:carId',
+  passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
+  withAsync(updateCar),
+);
+carsRouter.delete(
+  '/:carId',
+  passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
+  withAsync(deleteCar),
+);
+carsRouter.get(
+  '/:carId',
+  passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
+  withAsync(getCar),
 );
 
-export default customerRouter;
+export default carsRouter;

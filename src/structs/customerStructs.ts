@@ -1,4 +1,5 @@
 import { nonempty, object, string, Infer, optional, literal, union } from 'superstruct';
+import { integerString } from './commonStructs';
 
 const AgeGroupEnum = union([
   literal('10대'),
@@ -43,12 +44,16 @@ export const CreateCustomerBodyStruct = object({
 export type CreateCustomerBodyType = Infer<typeof CreateCustomerBodyStruct>;
 
 export const PatchCustomerBodyStruct = object({
-  name: optional(nonempty(string())),
-  gender: optional(nonempty(string())),
-  phoneNumber: optional(nonempty(string())),
+  name: optional(string()),
+  gender: optional(string()),
+  phoneNumber: optional(string()),
   ageGroup: optional(AgeGroupEnum),
   region: optional(RegionEnum),
-  email: optional(nonempty(string())),
+  email: optional(string()),
   memo: optional(string()),
 });
 export type PatchCustomerBodyType = Infer<typeof PatchCustomerBodyStruct>;
+
+export const CustomerIdParamStruct = object({
+  customerId: integerString,
+});
