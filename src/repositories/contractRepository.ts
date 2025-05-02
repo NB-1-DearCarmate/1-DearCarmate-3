@@ -87,6 +87,60 @@ async function getCount(params: Prisma.ContractCountArgs) {
   });
 }
 
+async function getContractPriceSum(
+  companyId: number,
+  startDate: Date,
+  endDate: Date,
+  tx: Prisma.TransactionClient,
+) {
+  return await tx.contract.aggregate({
+    _sum: { contractPrice: true },
+    where: {
+      companyId,
+      status: 'CONTRACT_SUCCESS',
+      resolutionDate: {
+        gte: startDate,
+        lt: endDate,
+      },
+    },
+  });
+}
+async function getInProgressContractCount(companyId: number, tx: Prisma.TransactionClient) {
+  return await tx.contract.count({
+    where: {
+      companyId,
+      status: {
+        notIn: ['CONTRACT_SUCCESS', 'CONTRACT_FAILED'],
+      },
+    },
+  });
+}
+
+async function getContractSummary(companyId: number, tx: Prisma.TransactionClient) {
+  return await tx.contract.findMany({
+    where: {
+      companyId,
+      status: 'CONTRACT_SUCCESS',
+    },
+    select: {
+      contractPrice: true,
+      car: {
+        select: {
+          carModel: {
+            select: {
+              carType: {
+                select: {
+                  type: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+}
+
 export default {
   create,
   update,
@@ -97,4 +151,7 @@ export default {
   findManyDraft,
   findCompanyIdbycontractId,
   getCount,
+  getContractPriceSum,
+  getInProgressContractCount,
+  getContractSummary,
 };
