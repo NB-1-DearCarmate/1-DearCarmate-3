@@ -30,15 +30,15 @@ export class CreateUserDTO {
   email: string;
   employeeNumber: string;
   phoneNumber: string;
-  password: string;
+  encryptedPassword: string;
   companyId: number;
   role: USER_ROLE = USER_ROLE.EMPLOYEE;
-  constructor(user: CreateUserBodyType, companyId: number) {
+  constructor(user: CreateUserBodyType, companyId: number, hashedPassword: string) {
     this.name = user.name;
     this.email = user.email;
     this.employeeNumber = user.employeeNumber;
     this.phoneNumber = user.phoneNumber;
-    this.password = user.password;
+    this.encryptedPassword = hashedPassword;
     this.companyId = companyId;
   }
 }

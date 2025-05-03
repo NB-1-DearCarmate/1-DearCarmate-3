@@ -7,7 +7,7 @@ import UnauthError from '../lib/errors/UnauthError';
 import { Prisma, User } from '@prisma/client';
 import { CreateUserDTO } from '../lib/dtos/userDTO';
 import CommonError from '../lib/errors/CommonError';
-import { UpdateUserBodyType } from '../structs/userStructs';
+import { CreateUserBodyType, UpdateUserBodyType } from '../structs/userStructs';
 import { PageParamsType } from '../structs/commonStructs';
 import { OmittedUser } from '../types/OmittedUser';
 
@@ -15,17 +15,15 @@ async function hashingPassword(password: string) {
   return await bcrypt.hash(password, 10);
 }
 
-async function createUser(user: CreateUserDTO) {
-  const hashedPassword = await hashingPassword(user.password);
-  const { password, ...rest } = user;
-  const createdUser = await userRepository.create({
-    ...rest,
-    encryptedPassword: hashedPassword,
-  });
+async function createUser(data: CreateUserBodyType, companyId: number) {
+  const hashedPassword = await hashingPassword(data.password);
+  const createdUser = await userRepository.create(
+    new CreateUserDTO(data, companyId, hashedPassword),
+  );
   return filterSensitiveUserData(createdUser);
 }
 
-async function getUser(email: string, password: string) {
+async function authenticateUser(email: string, password: string) {
   const user = await userRepository.findByEmail(email);
   if (!user) {
     throw new UnauthError();
@@ -150,7 +148,7 @@ async function refreshToken(userId: number) {
 async function verifyPassword(inputPassword: string, savedPassword: string) {
   const isValid = await bcrypt.compare(inputPassword, savedPassword);
   if (!isValid) {
-    throw new CommonError('Wrong Password', 400);
+    throw new UnauthError();
   }
 }
 
@@ -171,7 +169,7 @@ function createToken(authedUser: OmittedUser, type?: String) {
 
 export default {
   createUser,
-  getUser,
+  getUser: authenticateUser,
   getUserById,
   getCompanyIdById,
   updateUser,

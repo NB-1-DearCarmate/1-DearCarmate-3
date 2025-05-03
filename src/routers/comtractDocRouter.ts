@@ -7,9 +7,9 @@ import {
   getContractChoice,
   uploadDocument,
   downloadDocument,
-} from '../controllers/contractDcmtController';
+} from '../controllers/contractDocController';
 import { uploadHandler } from '../lib/fileUploader';
-const contractDcmtRouter = express.Router();
+const contractDocRouter = express.Router();
 
 const extArray = [
   'jpg',
@@ -30,13 +30,13 @@ const extArray = [
   'hwp',
 ];
 
-contractDcmtRouter.get(
+contractDocRouter.get(
   '/draft',
   passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
   withAsync(getContractChoice),
 );
 
-contractDcmtRouter.post(
+contractDocRouter.post(
   '/upload',
   passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
   uploadHandler({
@@ -47,16 +47,16 @@ contractDcmtRouter.post(
   withAsync(uploadDocument),
 );
 
-contractDcmtRouter.get(
+contractDocRouter.get(
   '/:contractDocumentId/download',
   passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
   withAsync(downloadDocument),
 );
 
-contractDcmtRouter.get(
+contractDocRouter.get(
   '/',
   passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
   withAsync(getDocumentList),
 );
 
-export default contractDcmtRouter;
+export default contractDocRouter;

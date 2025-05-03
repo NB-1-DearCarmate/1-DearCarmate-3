@@ -148,7 +148,7 @@ export const getCarDropdownService = async (companyId: number) => {
   });
 };
 
-export async function getContractListWithDcmt(
+export async function getContractListWithDoc(
   companyId: number,
   { page, pageSize, searchBy, keyword }: PageParamsType,
 ) {
@@ -247,7 +247,7 @@ export async function getContractListWithDcmt(
   };
 
   console.log(prismaParams);
-  const contracts = await contractRepository.findManyWithDcmt(prismaParams);
+  const contracts = await contractRepository.findManyWithDoc(prismaParams);
   const totalItemCount = await contractRepository.getCount({ where: prismaParams.where });
 
   return { contracts, page, pageSize, totalItemCount };

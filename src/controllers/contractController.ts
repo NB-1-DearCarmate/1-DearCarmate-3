@@ -25,12 +25,12 @@ export const updateContract = async (req: Request, res: Response) => {
   try {
     const contractId = parseInt(req.params.id);
     const existingContract = await getContractByIdService(contractId);
-    const existingDcmtId = new Set(existingContract?.contractDocuments.map((dcmt) => dcmt.id));
+    const existingDocId = new Set(existingContract?.contractDocuments.map((doc) => doc.id));
 
     const updated = await updateContractService(contractId, req.body);
 
     const { contractDocuments, customer, ...tempResponse } = updated;
-    if (contractDocuments.some((dcmt) => !existingDcmtId.has(dcmt.id))) {
+    if (contractDocuments.some((doc) => !existingDocId.has(doc.id))) {
       sendEmail(customer.email);
     }
     res.status(200).json(tempResponse);
