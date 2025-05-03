@@ -1,6 +1,5 @@
 import { ResponseCompanyDTO } from '../lib/dtos/companyDTO';
 import companyRepository from '../repositories/companyRepository';
-import { Prisma } from '@prisma/client';
 import { PageParamsType } from '../structs/commonStructs';
 import { CreateCompanyBodyType, PatchCompanyBodyType } from '../structs/companyStructs';
 import NotFoundError from '../lib/errors/NotFoundError';
@@ -38,10 +37,8 @@ async function getCompanies(params: PageParamsType) {
   });
 
   return {
-    currentPage: params.page,
-    totalPages: Math.ceil(totalItemCount / params.pageSize),
     totalItemCount,
-    data: companies.map((company) => new ResponseCompanyDTO(company)),
+    companies,
   };
 }
 

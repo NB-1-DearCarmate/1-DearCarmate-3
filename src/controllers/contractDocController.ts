@@ -4,7 +4,7 @@ import { RequestHandler } from 'express';
 import { OmittedUser } from '../types/OmittedUser';
 import { getContractListWithDoc, getContractDraft } from '../services/contractService';
 import { PageParamsStruct } from '../structs/commonStructs';
-import { ResponseContractChoiceDTO, ResponseContractDocsDTO } from '../lib/dtos/contractDocDTO';
+import { ResponseContractChoiceDTO, ResponseContractDocListDTO } from '../lib/dtos/contractDocDTO';
 import { DOCUMENT_PATH } from '../config/constants';
 import contractDocService from '../services/contractDocService';
 import { ResponseDocumentIdDTO } from '../lib/dtos/contractDocDTO';
@@ -21,7 +21,7 @@ export const getDocumentList: RequestHandler = async (req, res) => {
     reqUser.companyId,
     data,
   );
-  res.send(new ResponseContractDocsDTO(contracts, page, pageSize, totalItemCount));
+  res.send(new ResponseContractDocListDTO(contracts, page, pageSize, totalItemCount));
 };
 
 export const getContractChoice: RequestHandler = async (req, res) => {

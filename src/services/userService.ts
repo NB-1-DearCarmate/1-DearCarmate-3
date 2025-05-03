@@ -59,12 +59,7 @@ async function getUsers(params: PageParamsType) {
   const users = await userRepository.findMany(prismaParams);
   const totalItemCount = await userRepository.getCount({ where });
   const omitedUsers = users.map(filterSensitiveUserData);
-  return {
-    currentPage: params.page,
-    totalPages: Math.ceil(totalItemCount / params.pageSize),
-    totalItemCount: totalItemCount,
-    data: omitedUsers,
-  };
+  return { totalItemCount, omitedUsers };
 }
 
 async function getCompanyIdById(userId: number) {

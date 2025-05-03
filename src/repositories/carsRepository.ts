@@ -7,7 +7,7 @@ export async function createCar(data: Omit<Car, 'id' | 'status'>) {
   return await prismaClient.car.create({
     data: {
       ...data,
-      status: 'AVAILABLE',
+      status: CAR_STATUS.AVAILABLE,
     },
   });
 }
@@ -75,10 +75,8 @@ export async function getCarList({
   }));
 
   return {
-    currentPage: page,
-    totalPages: Math.ceil(totalItemCount / pageSize),
     totalItemCount,
-    data: mappedCars,
+    mappedCars,
   };
 }
 

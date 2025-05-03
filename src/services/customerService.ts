@@ -4,8 +4,10 @@ import customerRepository from '../repositories/customerRepositry';
 import { PageParamsType } from '../structs/commonStructs';
 import NotFoundError from '../lib/errors/NotFoundError';
 import { buildSearchCondition } from '../lib/searchCondition';
+import { CreateCustomerBodyType, PatchCustomerBodyType } from '../structs/customerStructs';
 
-async function createCustomer(companyId: number, customer: CreateCustomerDTO) {
+async function createCustomer(companyId: number, rawData: CreateCustomerBodyType) {
+  const customer = new CreateCustomerDTO(rawData);
   const data = {
     ...customer,
     company: {
@@ -47,15 +49,13 @@ async function getCustomers(companyId: number, params: PageParamsType) {
     where,
   });
   return {
-    currentPage: params.page,
-    totalPages: Math.ceil(totalItemCount / params.pageSize),
     totalItemCount,
-    data: customers.map((customer) => new ResponseCustomerDTO(customer)),
+    customers,
   };
 }
 
-async function updateCustomer(customerId: number, customer: UpdateCustomerDTO) {
-  return await customerRepository.update(customerId, customer);
+async function updateCustomer(customerId: number, rawData: PatchCustomerBodyType) {
+  return await customerRepository.update(customerId, new UpdateCustomerDTO(rawData));
 }
 
 async function getCompanyIdById(customerId: number) {

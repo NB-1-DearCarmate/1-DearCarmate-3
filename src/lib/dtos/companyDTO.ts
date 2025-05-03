@@ -12,3 +12,24 @@ export class ResponseCompanyDTO {
     this.userCount = company._count?.users ?? 0;
   }
 }
+
+export class ResponseCompanyListDTO {
+  currentPage: number;
+  totalPages: number;
+  totalItemCount: number;
+  data: ResponseCompanyDTO[];
+
+  constructor(
+    page: number,
+    pageSize: number,
+    result: {
+      totalItemCount: number;
+      companies: (Company & { _count?: { users: number } })[];
+    },
+  ) {
+    this.currentPage = page;
+    this.totalPages = Math.ceil(result.totalItemCount / pageSize);
+    this.totalItemCount = result.totalItemCount;
+    this.data = result.companies.map((company) => new ResponseCompanyDTO(company));
+  }
+}

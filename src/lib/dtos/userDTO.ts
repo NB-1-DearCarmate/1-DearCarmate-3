@@ -42,3 +42,24 @@ export class CreateUserDTO {
     this.companyId = companyId;
   }
 }
+
+export class ResponseUserListDTO {
+  currentPage: number;
+  totalPages: number;
+  totalItemCount: number;
+  data: OmittedUser[];
+
+  constructor(
+    page: number,
+    pageSize: number,
+    result: {
+      totalItemCount: number;
+      omitedUsers: OmittedUser[];
+    },
+  ) {
+    this.currentPage = page;
+    this.totalPages = Math.ceil(result.totalItemCount / pageSize);
+    this.totalItemCount = result.totalItemCount;
+    this.data = result.omitedUsers;
+  }
+}

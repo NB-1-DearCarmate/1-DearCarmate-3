@@ -126,3 +126,24 @@ export class UpdateCustomerDTO {
     if (customer.memo !== undefined) this.memo = customer.memo;
   }
 }
+
+export class ResponseCustomerListDTO {
+  currentPage: number;
+  totalPages: number;
+  totalItemCount: number;
+  data: ResponseCustomerDTO[];
+
+  constructor(
+    page: number,
+    pageSize: number,
+    result: {
+      totalItemCount: number;
+      customers: (Customer & { _count?: { contracts: number } })[];
+    },
+  ) {
+    this.currentPage = page;
+    this.totalPages = Math.ceil(result.totalItemCount / pageSize);
+    this.totalItemCount = result.totalItemCount;
+    this.data = result.customers.map((customer) => new ResponseCustomerDTO(customer));
+  }
+}

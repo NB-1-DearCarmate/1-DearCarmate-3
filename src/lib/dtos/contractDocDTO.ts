@@ -18,7 +18,7 @@ export class ResponseDocumentIdDTO {
   }
 }
 
-export class ResponseContractDocsDTO {
+export class ResponseContractDocListDTO {
   currentPage: number;
   totalPages: number;
   totalItemCount: number;
