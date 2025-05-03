@@ -7,6 +7,7 @@ import {
 import customerRepository from '../repositories/customerRepositry';
 import { PageParamsType } from '../structs/commonStructs';
 import NotFoundError from '../lib/errors/NotFoundError';
+import { buildSearchCondition } from '../lib/searchCondition';
 
 async function createCustomer(companyId: number, customer: RequestCustomerDTO) {
   const data = {
@@ -34,50 +35,24 @@ async function getCustomer(customerId: number) {
   return await customerRepository.getById(customerId);
 }
 
-async function getCustomers(
-  companyId: number,
-  { page, pageSize, searchBy, keyword }: PageParamsType,
-) {
-  let prismaParams: {
-    skip: number;
-    take: number;
-    where?: Prisma.CustomerWhereInput;
-  } = {
-    skip: (page - 1) * pageSize,
-    take: pageSize,
+async function getCustomers(companyId: number, params: PageParamsType) {
+  const searchCondition = buildSearchCondition(params, ['name', 'email']);
+  const where = {
+    ...searchCondition.whereCondition,
+    companyId: companyId,
   };
-  let prismaWhereCondition: Prisma.CustomerWhereInput = { companyId: companyId };
-  if (searchBy && keyword) {
-    switch (searchBy) {
-      case 'name':
-        prismaWhereCondition = {
-          ...prismaWhereCondition,
-          name: {
-            contains: keyword,
-          },
-        };
-        break;
-      case 'email':
-        prismaWhereCondition = {
-          ...prismaWhereCondition,
-          email: {
-            contains: keyword,
-          },
-        };
-    }
-  }
-  prismaParams = {
-    ...prismaParams,
-    where: prismaWhereCondition,
+  const prismaParams = {
+    ...searchCondition.pageCondition,
+    where,
   };
 
   const customers = await customerRepository.getList(prismaParams);
   const totalItemCount = await customerRepository.getCount({
-    where: prismaWhereCondition,
+    where,
   });
   return {
-    currentPage: page,
-    totalPages: Math.ceil(totalItemCount / pageSize),
+    currentPage: params.page,
+    totalPages: Math.ceil(totalItemCount / params.pageSize),
     totalItemCount,
     data: customers.map((customer) => new ResponseCustomerDTO(customer)),
   };

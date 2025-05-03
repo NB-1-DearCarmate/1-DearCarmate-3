@@ -7,7 +7,7 @@ import { PageParamsStruct } from '../structs/commonStructs';
 import { ResponseContractChoiceDTO, ResponseContractDocsDTO } from '../lib/dtos/contractDocDTO';
 import { DOCUMENT_PATH } from '../config/constants';
 import contractDocService from '../services/contractDocService';
-import { CreateDocumentDTO, ResponseDocumentIdDTO } from '../lib/dtos/contractDocDTO';
+import { ResponseDocumentIdDTO } from '../lib/dtos/contractDocDTO';
 import { DownloadDocumentStruct } from '../structs/contractDocStructs';
 import NotFoundError from '../lib/errors/NotFoundError';
 import UnauthError from '../lib/errors/UnauthError';

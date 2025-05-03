@@ -10,6 +10,7 @@ import CommonError from '../lib/errors/CommonError';
 import { CreateUserBodyType, UpdateUserBodyType } from '../structs/userStructs';
 import { PageParamsType } from '../structs/commonStructs';
 import { OmittedUser } from '../types/OmittedUser';
+import { buildSearchCondition } from '../lib/searchCondition';
 
 async function hashingPassword(password: string) {
   return await bcrypt.hash(password, 10);
@@ -42,65 +43,25 @@ async function getUserById(id: number) {
   return filterSensitiveUserData(user);
 }
 
-async function getUsers({ page, pageSize, searchBy, keyword }: PageParamsType) {
-  let prismaParams: {
-    skip: number;
-    take: number;
-    include: {
-      company: {
-        select: { companyName: true };
-      };
-    };
-    where?: Prisma.UserWhereInput;
-  } = {
-    skip: (page - 1) * pageSize,
-    take: pageSize,
+async function getUsers(params: PageParamsType) {
+  const searchCondition = buildSearchCondition(params, ['companyName', 'email', 'name']);
+  const where = searchCondition.whereCondition;
+  const prismaParams = {
+    ...searchCondition.pageCondition,
     include: {
       company: {
         select: { companyName: true },
       },
     },
-  };
-  let prismaWhereCondition: Prisma.UserWhereInput = {};
-
-  if (searchBy && keyword) {
-    switch (searchBy) {
-      case 'companyName':
-        prismaWhereCondition = {
-          company: {
-            companyName: {
-              contains: keyword,
-            },
-          },
-        };
-        break;
-      case 'email':
-        prismaWhereCondition = {
-          email: {
-            contains: keyword,
-          },
-        };
-        break;
-      case 'name':
-        prismaWhereCondition = {
-          name: {
-            contains: keyword,
-          },
-        };
-        break;
-    }
-  }
-  prismaParams = {
-    ...prismaParams,
-    where: prismaWhereCondition,
+    where,
   };
 
   const users = await userRepository.findMany(prismaParams);
-  const totalItemCount = await userRepository.getCount({ where: prismaWhereCondition });
+  const totalItemCount = await userRepository.getCount({ where });
   const omitedUsers = users.map(filterSensitiveUserData);
   return {
-    currentPage: page,
-    totalPages: Math.ceil(totalItemCount / pageSize),
+    currentPage: params.page,
+    totalPages: Math.ceil(totalItemCount / params.pageSize),
     totalItemCount: totalItemCount,
     data: omitedUsers,
   };
