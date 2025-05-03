@@ -10,11 +10,7 @@ import {
 } from '../structs/customerStructs';
 import { create } from 'superstruct';
 import { PageParamsStruct } from '../structs/commonStructs';
-import {
-  RequestCustomerDTO,
-  RequestUpdateCustomerDTO,
-  ResponseCustomerDTO,
-} from '../lib/dtos/customerDTO';
+import { CreateCustomerDTO, UpdateCustomerDTO, ResponseCustomerDTO } from '../lib/dtos/customerDTO';
 import { parse } from 'csv-parse/sync';
 import { StructError } from 'superstruct';
 import BadRequestError from '../lib/errors/BadRequestError';
@@ -98,7 +94,7 @@ export const postCustomer: RequestHandler = async (req, res) => {
     throw new UnauthError();
   }
   const rawData = create(req.body, CreateCustomerBodyStruct);
-  const transformedData = new RequestCustomerDTO(rawData);
+  const transformedData = new CreateCustomerDTO(rawData);
   const customer = await customerService.createCustomer(reqUser.companyId, transformedData);
   const reverseTransformedData = new ResponseCustomerDTO(customer);
   res.status(201).send(reverseTransformedData);
@@ -115,7 +111,7 @@ export const patchCustomer: RequestHandler = async (req, res) => {
     throw new UnauthError();
   }
   const rawData = create(req.body, PatchCustomerBodyStruct);
-  const transformedData = new RequestUpdateCustomerDTO(rawData);
+  const transformedData = new UpdateCustomerDTO(rawData);
   const customer = await customerService.updateCustomer(customerId, transformedData);
   const reverseTransformedData = new ResponseCustomerDTO(customer);
   res.send(reverseTransformedData);
@@ -157,7 +153,7 @@ export const postCustomers: RequestHandler = async (req, res) => {
   for (const record of records) {
     try {
       const validated = CreateCustomerBodyStruct.create(record);
-      customerList.push(new RequestCustomerDTO(validated));
+      customerList.push(new CreateCustomerDTO(validated));
     } catch (err) {
       if (err instanceof StructError) {
         invalidcustomerList.push({

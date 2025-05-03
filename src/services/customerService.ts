@@ -1,15 +1,11 @@
 import { Prisma } from '@prisma/client';
-import {
-  RequestCustomerDTO,
-  RequestUpdateCustomerDTO,
-  ResponseCustomerDTO,
-} from '../lib/dtos/customerDTO';
+import { CreateCustomerDTO, UpdateCustomerDTO, ResponseCustomerDTO } from '../lib/dtos/customerDTO';
 import customerRepository from '../repositories/customerRepositry';
 import { PageParamsType } from '../structs/commonStructs';
 import NotFoundError from '../lib/errors/NotFoundError';
 import { buildSearchCondition } from '../lib/searchCondition';
 
-async function createCustomer(companyId: number, customer: RequestCustomerDTO) {
+async function createCustomer(companyId: number, customer: CreateCustomerDTO) {
   const data = {
     ...customer,
     company: {
@@ -21,7 +17,7 @@ async function createCustomer(companyId: number, customer: RequestCustomerDTO) {
   return await customerRepository.create(data);
 }
 
-async function createCustomers(companyId: number, customers: RequestCustomerDTO[]) {
+async function createCustomers(companyId: number, customers: CreateCustomerDTO[]) {
   const data = customers.map((customer) => {
     return {
       ...customer,
@@ -58,7 +54,7 @@ async function getCustomers(companyId: number, params: PageParamsType) {
   };
 }
 
-async function updateCustomer(customerId: number, customer: RequestUpdateCustomerDTO) {
+async function updateCustomer(customerId: number, customer: UpdateCustomerDTO) {
   return await customerRepository.update(customerId, customer);
 }
 
