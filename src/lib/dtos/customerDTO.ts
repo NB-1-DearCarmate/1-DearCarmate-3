@@ -94,7 +94,7 @@ export class ResponseCustomerDTO {
   memo: string;
   contractCount: number;
 
-  constructor(customer: Customer) {
+  constructor(customer: Customer & { _count?: { contracts: number } }) {
     this.id = customer.id;
     this.name = customer.name;
     this.gender = customer.gender;
@@ -103,6 +103,26 @@ export class ResponseCustomerDTO {
     this.region = reverseRegionMap[customer.region];
     this.email = customer.email;
     this.memo = customer.memo ?? '';
-    this.contractCount = customer.contractCount ?? 0;
+    this.contractCount = customer._count?.contracts ?? 0;
+  }
+}
+
+export class RequestUpdateCustomerDTO {
+  name?: string;
+  gender?: string;
+  phoneNumber?: string;
+  ageGroup?: AGE_GROUP;
+  region?: REGION;
+  email?: string;
+  memo?: string;
+
+  constructor(customer: Partial<CreateCustomerBodyType>) {
+    if (customer.name !== undefined) this.name = customer.name;
+    if (customer.gender !== undefined) this.gender = customer.gender;
+    if (customer.phoneNumber !== undefined) this.phoneNumber = customer.phoneNumber;
+    if (customer.ageGroup !== undefined) this.ageGroup = ageGroupMap[customer.ageGroup];
+    if (customer.region !== undefined) this.region = regionMap[customer.region];
+    if (customer.email !== undefined) this.email = customer.email;
+    if (customer.memo !== undefined) this.memo = customer.memo;
   }
 }

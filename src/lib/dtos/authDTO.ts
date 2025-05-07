@@ -1,4 +1,4 @@
-import { OmittedUser } from '../../../types/OmittedUser';
+import { OmittedUser } from '../../types/OmittedUser';
 import { ResponseUserDTO } from './userDTO';
 
 export class CompanyDTO {

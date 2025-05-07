@@ -5,11 +5,11 @@ import userRepository from '../repositories/userRepository';
 import NotFoundError from '../lib/errors/NotFoundError';
 import UnauthError from '../lib/errors/UnauthError';
 import { Prisma, User } from '@prisma/client';
-import { OmittedUser } from '../../types/OmittedUser';
 import { CreateUserDTO } from '../lib/dtos/userDTO';
 import CommonError from '../lib/errors/CommonError';
 import { UpdateUserBodyType } from '../structs/userStructs';
 import { PageParamsType } from '../structs/commonStructs';
+import { OmittedUser } from '../types/OmittedUser';
 
 async function hashingPassword(password: string) {
   return await bcrypt.hash(password, 10);
@@ -38,7 +38,7 @@ async function getUserById(id: number) {
   const user = await userRepository.findById(id);
 
   if (!user) {
-    throw new NotFoundError(userRepository.getEntityName(), id);
+    throw new NotFoundError('user', id);
   }
 
   return filterSensitiveUserData(user);
@@ -99,11 +99,7 @@ async function getUsers({ page, pageSize, searchBy, keyword }: PageParamsType) {
 
   const users = await userRepository.findMany(prismaParams);
   const totalItemCount = await userRepository.getCount({ where: prismaWhereCondition });
-  const omitedUsers = users.map((user) => {
-    const { encryptedPassword, ...rest } = user;
-    const omitedUser: OmittedUser = rest;
-    return omitedUser;
-  });
+  const omitedUsers = users.map(filterSensitiveUserData);
   return {
     currentPage: page,
     totalPages: Math.ceil(totalItemCount / pageSize),
@@ -115,7 +111,7 @@ async function getUsers({ page, pageSize, searchBy, keyword }: PageParamsType) {
 async function getCompanyIdById(userId: number) {
   const user = await userRepository.findCompanyIdbyUserId(userId);
   if (!user) {
-    throw new NotFoundError(userRepository.getEntityName(), userId);
+    throw new NotFoundError('user', userId);
   }
   return user.companyId;
 }

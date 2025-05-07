@@ -1,32 +1,46 @@
 import { USER_ROLE } from '@prisma/client';
-import { OmittedUser } from '../../types/OmittedUser';
+import { OmittedUser } from '../types/OmittedUser';
 import { RequestHandler } from 'express';
 import UnauthError from '../lib/errors/UnauthError';
 import customerService from '../services/customerService';
-import { CreateCustomerBodyStruct } from '../structs/customerStructs';
+import {
+  CreateCustomerBodyStruct,
+  CustomerIdParamStruct,
+  PatchCustomerBodyStruct,
+} from '../structs/customerStructs';
 import { create } from 'superstruct';
-import userService from '../services/userService';
 import { PageParamsStruct } from '../structs/commonStructs';
-import { RequestCustomerDTO, ResponseCustomerDTO } from '../lib/dtos/customerDTO';
+import {
+  RequestCustomerDTO,
+  RequestUpdateCustomerDTO,
+  ResponseCustomerDTO,
+} from '../lib/dtos/customerDTO';
+import { parse } from 'csv-parse/sync';
+import { StructError } from 'superstruct';
+import BadRequestError from '../lib/errors/BadRequestError';
 
 export const getCustomer: RequestHandler = async (req, res) => {
   const reqUser = req.user as OmittedUser;
   if (reqUser.role !== USER_ROLE.EMPLOYEE) {
     throw new UnauthError();
   }
-  const customerId = parseInt(req.params.customerId, 10);
-  //const customer = await customerService.getCustomer(customerId);
-  //res.status(200).send(customer);
+  const { customerId } = create(req.params, CustomerIdParamStruct);
+  const customer = await customerService.getCustomer(customerId);
+  if (reqUser.companyId !== customer.companyId) {
+    throw new UnauthError();
+  }
+  res.send(new ResponseCustomerDTO(customer));
 };
 
 export const getCustomerList: RequestHandler = async (req, res) => {
   const reqUser = req.user as OmittedUser;
-  if (reqUser.role !== USER_ROLE.EMPLOYEE) {
+  if (reqUser.role !== USER_ROLE.EMPLOYEE && reqUser.role !== USER_ROLE.OWNER) {
     throw new UnauthError();
   }
+
   const page = create(req.query, PageParamsStruct);
-  //const customers = await customerService.getCustomers(page);
-  // res.status(200).send(customers);
+  const customers = await customerService.getCustomers(reqUser.companyId, page);
+  res.send(customers);
 };
 
 /**
@@ -84,9 +98,8 @@ export const postCustomer: RequestHandler = async (req, res) => {
     throw new UnauthError();
   }
   const rawData = create(req.body, CreateCustomerBodyStruct);
-  const userCompanyId = await userService.getCompanyIdById(reqUser.id);
   const transformedData = new RequestCustomerDTO(rawData);
-  const customer = await customerService.createCustomer(userCompanyId, transformedData);
+  const customer = await customerService.createCustomer(reqUser.companyId, transformedData);
   const reverseTransformedData = new ResponseCustomerDTO(customer);
   res.status(201).send(reverseTransformedData);
 };
@@ -96,10 +109,16 @@ export const patchCustomer: RequestHandler = async (req, res) => {
   if (reqUser.role !== USER_ROLE.EMPLOYEE) {
     throw new UnauthError();
   }
-  const customerId = parseInt(req.params.customerId, 10);
-  //const data = create(req.body, PatchCustomerBodyStruct);
-  //const customer = await customerService.patchCustomer(customerId, data);
-  //res.status(200).send(customer);
+  const { customerId } = create(req.params, CustomerIdParamStruct);
+  const customerCompanyId = await customerService.getCompanyIdById(customerId);
+  if (reqUser.companyId !== customerCompanyId) {
+    throw new UnauthError();
+  }
+  const rawData = create(req.body, PatchCustomerBodyStruct);
+  const transformedData = new RequestUpdateCustomerDTO(rawData);
+  const customer = await customerService.updateCustomer(customerId, transformedData);
+  const reverseTransformedData = new ResponseCustomerDTO(customer);
+  res.send(reverseTransformedData);
 };
 
 export const deleteCustomer: RequestHandler = async (req, res) => {
@@ -107,9 +126,13 @@ export const deleteCustomer: RequestHandler = async (req, res) => {
   if (reqUser.role !== USER_ROLE.EMPLOYEE) {
     throw new UnauthError();
   }
-  const customerId = parseInt(req.params.customerId, 10);
-  //await customerService.deleteCustomer(customerId);
-  res.status(204).send();
+  const { customerId } = create(req.params, CustomerIdParamStruct);
+  const customerCompanyId = await customerService.getCompanyIdById(customerId);
+  if (reqUser.companyId !== customerCompanyId) {
+    throw new UnauthError();
+  }
+  await customerService.deleteCustomer(customerId);
+  res.status(200).send({ message: '고객 삭제 성공' });
 };
 
 export const postCustomers: RequestHandler = async (req, res) => {
@@ -117,7 +140,41 @@ export const postCustomers: RequestHandler = async (req, res) => {
   if (reqUser.role !== USER_ROLE.EMPLOYEE) {
     throw new UnauthError();
   }
-  // const data = create(req.body, CreateCustomerBodyStruct);
-  // const customers = await customerService.createCustomers(data);
-  // res.status(201).send(customers);
+  if (!req.file) {
+    throw new BadRequestError('잘못된 요청입니다.');
+  }
+  const customerList: any[] = [];
+  const invalidcustomerList: {
+    record: any;
+    errorMessage: string;
+  }[] = [];
+
+  const records = parse(req.file.buffer, {
+    columns: true,
+    trim: true,
+    bom: true,
+  });
+  for (const record of records) {
+    try {
+      const validated = CreateCustomerBodyStruct.create(record);
+      customerList.push(new RequestCustomerDTO(validated));
+    } catch (err) {
+      if (err instanceof StructError) {
+        invalidcustomerList.push({
+          record,
+          errorMessage: err.message,
+        });
+      } else {
+        throw err;
+      }
+    }
+  }
+  if (customerList.length === 0) {
+    throw new BadRequestError('잘못된 요청입니다.');
+  }
+  await customerService.createCustomers(reqUser.companyId, customerList);
+  res.status(200).send({
+    message: '성공적으로 등록되었습니다.',
+    invalidcustomerList,
+  });
 };

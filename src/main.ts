@@ -14,6 +14,9 @@ import imageRouter from './routers/imageRouter';
 import dotenv from 'dotenv';
 import customerRouter from './routers/customerRouter';
 import contractRouter from './routers/contractRouter';
+import contractDcmtRouter from './routers/comtractDcmtRouter';
+import carsRouter from './routers/carsRouter';
+import dashBoardRouter from './routers/dashBoardRouter';
 
 const app = express();
 dotenv.config();
@@ -28,10 +31,14 @@ app.use('/users', userRouter);
 app.use('/auth', authRouter);
 app.use('/customers', customerRouter);
 app.use('/companies', companyRouter);
+app.use('/contractDocuments', contractDcmtRouter);
+app.use('/cars', carsRouter);
+app.use('/dashboard', dashBoardRouter);
 app.use('/contracts', contractRouter);
 
-app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
 app.use('/images', imageRouter);
+
+app.use('/public/images', express.static(path.join(__dirname, '../public/images')));
 
 app.use('/', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 

@@ -10,7 +10,7 @@ import { CreateUserDTO, ResponseUserDTO } from '../lib/dtos/userDTO';
 import companyService from '../services/companyService';
 import CommonError from '../lib/errors/CommonError';
 import NotFoundError from '../lib/errors/NotFoundError';
-import { OmittedUser } from '../../types/OmittedUser';
+import { OmittedUser } from '../types/OmittedUser';
 import { USER_ROLE } from '@prisma/client';
 import UnauthError from '../lib/errors/UnauthError';
 
@@ -70,9 +70,6 @@ import UnauthError from '../lib/errors/UnauthError';
 export const createUser: RequestHandler = async (req, res) => {
   const data = create(req.body, CreateUserBodyStruct);
   const company = await companyService.getByName(data.company);
-  if (!company) {
-    throw new NotFoundError(companyService.getEntityName(), data.company);
-  }
   if (company.companyCode !== data.companyCode) {
     throw new CommonError('Company code is wrong', 404);
   }
@@ -98,8 +95,7 @@ export const createUser: RequestHandler = async (req, res) => {
  */
 export const getInfo: RequestHandler = async (req, res) => {
   const reqUser = req.user as OmittedUser;
-  const user = await userService.getUserById(reqUser.id);
-  res.send(new ResponseUserDTO(user));
+  res.send(new ResponseUserDTO(reqUser));
 };
 
 /**

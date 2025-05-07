@@ -1,7 +1,16 @@
+<<<<<<< HEAD
 import contractRepository from '../repositories/contractRepository';
 import { assert } from 'superstruct';
 import { ContractCreateStruct } from '../structs/contractStructs';
 import { CONTRACT_STATUS } from '@prisma/client';
+=======
+import prisma from '../config/prismaClient';
+import { assert } from 'superstruct';
+import { ContractCreateStruct } from '../structs/contractStructs';
+import { CONTRACT_STATUS, Prisma } from '@prisma/client';
+import { PageParamsType } from '../structs/commonStructs';
+import contractRepository from '../repositories/contractRepository';
+>>>>>>> 2fa121fcff2e3fcf0797515a04fc0134b3ed447a
 
 type CreateContractData = {
   customerId: number;
@@ -12,6 +21,7 @@ type CreateContractData = {
   meetings: { time: string }[];
 };
 
+<<<<<<< HEAD
 const createContractService = async (data: CreateContractData) => {
   assert(data, ContractCreateStruct);
   const contract = await contractRepository.create(data);
@@ -39,10 +49,104 @@ const deleteContractService = async (id: number) => {
 };
 
 const updateContractStatusService = async (
+=======
+export const createContractService = async (data: CreateContractData) => {
+  assert(data, ContractCreateStruct);
+  const { customerId, carId, userId, companyId, contractPrice, meetings } = data;
+
+  const contract = await prisma.contract.create({
+    data: {
+      customerId,
+      carId,
+      userId,
+      companyId,
+      contractPrice,
+      status: 'CONTRACT_PREPARING',
+      meetings: {
+        create: meetings,
+      },
+    },
+    include: {
+      meetings: true,
+    },
+  });
+
+  return contract;
+};
+
+export const updateContractService = async (id: number, data: any) => {
+  const { meetings, ...contractData } = data;
+
+  const updatedContract = await prisma.contract.update({
+    where: { id },
+    data: {
+      customerId: contractData.customerId,
+      carId: contractData.carId,
+      userId: contractData.userId,
+      companyId: contractData.companyId,
+      contractPrice: contractData.contractPrice,
+      status: contractData.status,
+      resolutionDate: contractData.resolutionDate,
+      ...(meetings && {
+        meetings: {
+          deleteMany: {},
+          create: meetings,
+        },
+      }),
+    },
+    include: {
+      meetings: true,
+      contractDocuments: true,
+      customer: true,
+    },
+  });
+
+  return updatedContract;
+};
+export const getAllContractsService = async () => {
+  const contracts = await prisma.contract.findMany({
+    include: {
+      customer: true,
+      car: true,
+      user: true,
+      meetings: true,
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+  });
+
+  return contracts;
+};
+
+export const getContractByIdService = async (id: number) => {
+  const contract = await prisma.contract.findUnique({
+    where: { id },
+    include: {
+      customer: true,
+      car: true,
+      user: true,
+      meetings: true,
+      contractDocuments: true,
+    },
+  });
+
+  return contract;
+};
+
+export const deleteContractService = async (id: number) => {
+  return await prisma.contract.delete({
+    where: { id },
+  });
+};
+
+export const updateContractStatusService = async (
+>>>>>>> 2fa121fcff2e3fcf0797515a04fc0134b3ed447a
   id: number,
   status: CONTRACT_STATUS,
   resolutionDate?: Date | null,
 ) => {
+<<<<<<< HEAD
   const updatedContract = await contractRepository.updateStatus(id, status, resolutionDate);
   return updatedContract;
 };
@@ -70,3 +174,177 @@ export default {
   getUserDropdownService,
   getCarDropdownService,
 };
+=======
+  return await prisma.contract.update({
+    where: { id },
+    data: {
+      status,
+      resolutionDate: resolutionDate ?? null,
+    },
+  });
+};
+
+export const getCustomerDropdownService = async (companyId: number) => {
+  return await prisma.customer.findMany({
+    where: { companyId },
+    select: {
+      id: true,
+      name: true,
+    },
+  });
+};
+
+export const getUserDropdownService = async (companyId: number) => {
+  return await prisma.user.findMany({
+    where: { companyId },
+    select: {
+      id: true,
+      name: true,
+    },
+  });
+};
+
+export const getCarDropdownService = async (companyId: number) => {
+  return await prisma.car.findMany({
+    where: { companyId },
+    select: {
+      id: true,
+      carNumber: true,
+    },
+  });
+};
+
+export async function getContractListWithDcmt(
+  companyId: number,
+  { page, pageSize, searchBy, keyword }: PageParamsType,
+) {
+  let prismaParams: {
+    skip: number;
+    take: number;
+    include: {
+      contractDocuments: true;
+      user: true;
+      car: {
+        include: {
+          carModel: true;
+        };
+      };
+      customer: true;
+    };
+    where: Prisma.ContractWhereInput;
+  } = {
+    skip: (page - 1) * pageSize,
+    take: pageSize,
+    include: {
+      contractDocuments: true,
+      user: true,
+      car: {
+        include: {
+          carModel: true,
+        },
+      },
+      customer: true,
+    },
+    where: {
+      companyId: companyId,
+      contractDocuments: {
+        some: {},
+      },
+    },
+  };
+
+  let prismaWhereCondition: Prisma.ContractWhereInput = {};
+
+  if (searchBy && keyword) {
+    switch (searchBy) {
+      case 'userName':
+        prismaWhereCondition = {
+          user: {
+            name: {
+              contains: keyword,
+              mode: 'insensitive',
+            },
+          },
+        };
+        break;
+      case 'carNumber':
+        prismaWhereCondition = {
+          car: {
+            carNumber: {
+              contains: keyword,
+              mode: 'insensitive',
+            },
+          },
+        };
+        break;
+      case 'contractName':
+        prismaWhereCondition = {
+          OR: [
+            {
+              car: {
+                carModel: {
+                  model: {
+                    contains: keyword,
+                    mode: 'insensitive',
+                  },
+                },
+              },
+            },
+            {
+              customer: {
+                name: {
+                  contains: keyword,
+                  mode: 'insensitive',
+                },
+              },
+            },
+          ],
+        };
+        break;
+    }
+  }
+
+  prismaParams = {
+    ...prismaParams,
+    where: {
+      ...prismaParams.where,
+      ...prismaWhereCondition,
+    },
+  };
+
+  console.log(prismaParams);
+  const contracts = await contractRepository.findManyWithDcmt(prismaParams);
+  const totalItemCount = await contractRepository.getCount({ where: prismaParams.where });
+
+  return { contracts, page, pageSize, totalItemCount };
+}
+
+export async function getContractDraft(companyId: number) {
+  let prismaParams: {
+    include: {
+      car: {
+        include: {
+          carModel: true;
+        };
+      };
+      customer: true;
+    };
+    where: Prisma.ContractWhereInput;
+  } = {
+    include: {
+      car: {
+        include: {
+          carModel: true,
+        },
+      },
+      customer: true,
+    },
+    where: {
+      companyId: companyId,
+      status: CONTRACT_STATUS.CONTRACT_SUCCESS,
+    },
+  };
+
+  return await contractRepository.findManyDraft(prismaParams);
+}
+>>>>>>> 2fa121fcff2e3fcf0797515a04fc0134b3ed447a

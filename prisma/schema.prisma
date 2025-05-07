@@ -53,12 +53,11 @@ model Car {
   carNumber         String     @unique @db.VarChar(50)
   manufacturingYear Int        @db.Integer
   mileage           Int        @db.Integer
-  price             Decimal    @db.Decimal(20, 2)
+  price             Int        @db.Integer
   status            CAR_STATUS @default(AVAILABLE)
   accidentCount     Int        @default(0) @db.Integer
   explanation       String?
   accidentDetails   String?
-  Datetime          DateTime   @default(now())
 
   company   Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
   carModel  CarModel   @relation(fields: [modelId], references: [id], onDelete: Restrict)
@@ -81,7 +80,7 @@ model Contract {
   user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   contractDocuments ContractDocument[]
   meetings          Meeting[]
-  Company           Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  company           Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
 model ContractDocument {
@@ -89,9 +88,9 @@ model ContractDocument {
   fileName   String @db.VarChar(50)
   filePath   String @db.VarChar(255)
   fileSize   Int?   @db.Integer
-  contractId Int
+  contractId Int?
 
-  contract Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  contract Contract? @relation(fields: [contractId], references: [id], onDelete: Cascade)
 }
 
 model Manufacturer {
