@@ -73,8 +73,7 @@ export const createUser: RequestHandler = async (req, res) => {
   if (company.companyCode !== data.companyCode) {
     throw new CommonError('Company code is wrong', 404);
   }
-
-  const user = await userService.createUser(new CreateUserDTO(data, company.id));
+  const user = await userService.createUser(data, company.id);
   res.status(201).send(new ResponseUserDTO(user));
 };
 

@@ -38,7 +38,7 @@ async function findMany(params: Prisma.ContractFindManyArgs) {
   });
 }
 
-async function findManyWithDcmt(
+async function findManyWithDoc(
   params: Omit<Prisma.ContractFindManyArgs, 'include'> & {
     include: {
       contractDocuments: true;
@@ -147,7 +147,7 @@ export default {
   remove,
   findById,
   findMany,
-  findManyWithDcmt,
+  findManyWithDoc,
   findManyDraft,
   findCompanyIdbycontractId,
   getCount,

@@ -1,12 +1,13 @@
 import { Car, CAR_STATUS } from '@prisma/client';
 import { prismaClient } from '../lib/prismaClient';
 import { PagePaginationParams } from '../types/pagination';
+import { buildSearchCondition } from '../lib/searchCondition';
 
 export async function createCar(data: Omit<Car, 'id' | 'status'>) {
   return await prismaClient.car.create({
     data: {
       ...data,
-      status: 'AVAILABLE',
+      status: CAR_STATUS.AVAILABLE,
     },
   });
 }
@@ -18,12 +19,10 @@ export async function getCarList({
   searchBy,
   keyword,
 }: PagePaginationParams) {
-  const baseWhere =
-    searchBy === 'carNumber'
-      ? { carNumber: { contains: keyword } }
-      : searchBy === 'model'
-        ? { model: { contains: keyword } }
-        : {};
+  const searchCondition = buildSearchCondition({ page, pageSize, searchBy, keyword }, [
+    'carNumber',
+    'model',
+  ]);
 
   const dbStatus =
     status === 'possession'
@@ -35,7 +34,7 @@ export async function getCarList({
           : status;
 
   const where = {
-    ...baseWhere,
+    ...searchCondition.whereCondition,
     ...(dbStatus ? { status: dbStatus } : {}),
   };
 
@@ -44,8 +43,7 @@ export async function getCarList({
   });
 
   const cars = await prismaClient.car.findMany({
-    skip: (page - 1) * pageSize,
-    take: pageSize,
+    ...searchCondition.pageCondition,
     where,
     include: {
       carModel: {
@@ -77,10 +75,8 @@ export async function getCarList({
   }));
 
   return {
-    currentPage: page,
-    totalPages: Math.ceil(totalItemCount / pageSize),
     totalItemCount,
-    data: mappedCars,
+    mappedCars,
   };
 }
 

@@ -18,7 +18,7 @@ export class ResponseDocumentIdDTO {
   }
 }
 
-export class ResponseContractDcmtsDTO {
+export class ResponseContractDocListDTO {
   currentPage: number;
   totalPages: number;
   totalItemCount: number;
@@ -41,11 +41,11 @@ export class ResponseContractDcmtsDTO {
     this.currentPage = currentPage;
     this.totalItemCount = totalItemCount;
     this.totalPages = Math.ceil(totalItemCount / pageSize);
-    this.data = contracts.map((contract) => new ResponseContractDcmtDTO(contract));
+    this.data = contracts.map((contract) => new ResponseContractDocDTO(contract));
   }
 }
 
-export class ResponseContractDcmtDTO {
+export class ResponseContractDocDTO {
   id: number;
   contractName: string;
   resolutionDate: string | null;

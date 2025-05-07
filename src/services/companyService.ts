@@ -1,9 +1,9 @@
 import { ResponseCompanyDTO } from '../lib/dtos/companyDTO';
 import companyRepository from '../repositories/companyRepository';
-import { Prisma } from '@prisma/client';
 import { PageParamsType } from '../structs/commonStructs';
 import { CreateCompanyBodyType, PatchCompanyBodyType } from '../structs/companyStructs';
 import NotFoundError from '../lib/errors/NotFoundError';
+import { buildSearchCondition } from '../lib/searchCondition';
 
 async function createCompany(company: CreateCompanyBodyType) {
   const createdCompany = await companyRepository.create(company);
@@ -23,42 +23,22 @@ async function getByName(companyName: string) {
   return company;
 }
 
-async function getCompanies({ page, pageSize, searchBy, keyword }: PageParamsType) {
-  let prismaParams: {
-    skip: number;
-    take: number;
-    where?: Prisma.CompanyWhereInput;
-  } = {
-    skip: (page - 1) * pageSize,
-    take: pageSize,
-  };
-  let prismaWhereCondition: Prisma.CompanyWhereInput = {};
-  if (searchBy && keyword) {
-    switch (searchBy) {
-      case 'companyName':
-        prismaWhereCondition = {
-          companyName: {
-            contains: keyword,
-          },
-        };
-        break;
-    }
-  }
-  prismaParams = {
-    ...prismaParams,
-    where: prismaWhereCondition,
+async function getCompanies(params: PageParamsType) {
+  const searchCondition = buildSearchCondition(params, ['companyName']);
+  const where = searchCondition.whereCondition;
+  const prismaParams = {
+    ...searchCondition.pageCondition,
+    where,
   };
 
   const companies = await companyRepository.getList(prismaParams);
   const totalItemCount = await companyRepository.getCount({
-    where: prismaWhereCondition,
+    where,
   });
 
   return {
-    currentPage: page,
-    totalPages: Math.ceil(totalItemCount / pageSize),
     totalItemCount,
-    data: companies.map((company) => new ResponseCompanyDTO(company)),
+    companies,
   };
 }
 

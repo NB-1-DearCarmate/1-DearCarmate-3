@@ -2,13 +2,13 @@ import { create } from 'superstruct';
 import { Request, Response } from 'express';
 import { RequestHandler } from 'express';
 import { OmittedUser } from '../types/OmittedUser';
-import { getContractListWithDcmt, getContractDraft } from '../services/contractService';
+import { getContractListWithDoc, getContractDraft } from '../services/contractService';
 import { PageParamsStruct } from '../structs/commonStructs';
-import { ResponseContractChoiceDTO, ResponseContractDcmtsDTO } from '../lib/dtos/contractDcmtDTO';
+import { ResponseContractChoiceDTO, ResponseContractDocListDTO } from '../lib/dtos/contractDocDTO';
 import { DOCUMENT_PATH } from '../config/constants';
-import contractDcmtService from '../services/contractDcmtService';
-import { CreateDocumentDTO, ResponseDocumentIdDTO } from '../lib/dtos/contractDcmtDTO';
-import { DownloadDocumentStruct } from '../structs/contractDcmtStructs';
+import contractDocService from '../services/contractDocService';
+import { ResponseDocumentIdDTO } from '../lib/dtos/contractDocDTO';
+import { DownloadDocumentStruct } from '../structs/contractDocStructs';
 import NotFoundError from '../lib/errors/NotFoundError';
 import UnauthError from '../lib/errors/UnauthError';
 import path from 'path';
@@ -17,11 +17,11 @@ import EmptyUploadError from '../lib/errors/EmptyUploadError';
 export const getDocumentList: RequestHandler = async (req, res) => {
   const reqUser = req.user as OmittedUser;
   const data = create(req.query, PageParamsStruct);
-  const { contracts, page, pageSize, totalItemCount } = await getContractListWithDcmt(
+  const { contracts, page, pageSize, totalItemCount } = await getContractListWithDoc(
     reqUser.companyId,
     data,
   );
-  res.send(new ResponseContractDcmtsDTO(contracts, page, pageSize, totalItemCount));
+  res.send(new ResponseContractDocListDTO(contracts, page, pageSize, totalItemCount));
 };
 
 export const getContractChoice: RequestHandler = async (req, res) => {
@@ -41,9 +41,7 @@ export const uploadDocument = async (req: Request, res: Response): Promise<void>
   console.log(file.path);
   const filePath = path.join(path.resolve(), DOCUMENT_PATH, file.filename);
   console.log(filePath);
-  const document = await contractDcmtService.createDocument(
-    new CreateDocumentDTO(file.filename, filePath, fileSize),
-  );
+  const document = await contractDocService.createDocument(file.filename, filePath, fileSize);
   res.status(201).send(new ResponseDocumentIdDTO(document.id));
 };
 
@@ -51,7 +49,7 @@ export const downloadDocument = async (req: Request, res: Response): Promise<voi
   const reqUser = req.user as OmittedUser;
   const { contractDocumentId } = create(req.params, DownloadDocumentStruct);
 
-  const contractDocument = await contractDcmtService.getDocumentWithCompany(contractDocumentId);
+  const contractDocument = await contractDocService.getDocumentWithCompany(contractDocumentId);
   if (!contractDocument.contract) {
     throw new NotFoundError('Contract', 'contract');
   }
