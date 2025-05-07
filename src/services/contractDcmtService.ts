@@ -37,7 +37,7 @@ async function getDocumentWithCompany(id: number) {
       id: id,
     },
   };
-  const document = await contractDcmtRepository.findWithCompanyByDocumentId(prismaParams);
+  const document = await contractDcmtRepository.findWithCompanyByDocumentId(id);
   if (!document) {
     throw new NotFoundError('ContractDocument', id);
   }

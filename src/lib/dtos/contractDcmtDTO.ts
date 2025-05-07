@@ -4,10 +4,12 @@ export class CreateDocumentDTO {
   fileName: string;
   filePath: string;
   fileSize: number;
-  constructor(fileName: string, filePath: string, fileSize: number) {
+  contractId: number;
+  constructor(fileName: string, filePath: string, fileSize: number, contractId: number) {
     this.fileName = fileName;
     this.filePath = filePath;
     this.fileSize = fileSize;
+    this.contractId = contractId;
   }
 }
 

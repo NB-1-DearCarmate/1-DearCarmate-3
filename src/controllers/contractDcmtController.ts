@@ -2,7 +2,7 @@ import { create } from 'superstruct';
 import { Request, Response } from 'express';
 import { RequestHandler } from 'express';
 import { OmittedUser } from '../types/OmittedUser';
-import { getContractListWithDcmt, getContractDraft } from '../services/contractService';
+import contractService from '../services/contractService';
 import { PageParamsStruct } from '../structs/commonStructs';
 import { ResponseContractChoiceDTO, ResponseContractDcmtsDTO } from '../lib/dtos/contractDcmtDTO';
 import { DOCUMENT_PATH } from '../config/constants';
@@ -13,6 +13,8 @@ import NotFoundError from '../lib/errors/NotFoundError';
 import UnauthError from '../lib/errors/UnauthError';
 import path from 'path';
 import EmptyUploadError from '../lib/errors/EmptyUploadError';
+
+const { getContractListWithDcmt, getContractDraft } = contractService;
 
 export const getDocumentList: RequestHandler = async (req, res) => {
   const reqUser = req.user as OmittedUser;
@@ -41,8 +43,11 @@ export const uploadDocument = async (req: Request, res: Response): Promise<void>
   console.log(file.path);
   const filePath = path.join(path.resolve(), DOCUMENT_PATH, file.filename);
   console.log(filePath);
+
+  const { contractId } = req.body;
+
   const document = await contractDcmtService.createDocument(
-    new CreateDocumentDTO(file.filename, filePath, fileSize),
+    new CreateDocumentDTO(file.filename, filePath, fileSize, contractId),
   );
   res.status(201).send(new ResponseDocumentIdDTO(document.id));
 };

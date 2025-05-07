@@ -63,7 +63,13 @@ const getCarDropdownService = async (companyId: number) => {
 
 // develop 계약 문서 포함 리스트 조회
 const getContractListWithDcmt = async (companyId: number, params: PageParamsType) => {
-  return await contractRepository.findManyWithDcmt(companyId, params);
+  const contracts = await contractRepository.findManyWithDcmt(companyId, params);
+  return {
+    contracts,
+    page: params.page,
+    pageSize: params.pageSize,
+    totalItemCount: contracts.length,
+  };
 };
 
 // develop 계약서 드래프트용 조회
