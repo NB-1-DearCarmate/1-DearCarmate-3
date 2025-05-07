@@ -7,36 +7,29 @@ async function create(contractDocument: Prisma.ContractDocumentUncheckedCreateIn
   });
 }
 
-// async function findWithCompanyByDocumentId(
-//   params: Omit<Prisma.ContractDocumentFindUniqueArgs, 'include'> & {
-//     include: {
-//       contract: {
-//         include: {
-//           company: true;
-//         };
-//       };
-//     };
-//   },
-// ) {
-//   return await prisma.contractDocument.findUnique(params);
-// }
-
-// contractDcmtRepository.ts
 async function findWithCompanyByDocumentId(id: number) {
-  return await prisma.contractDocument.findUnique({
-    where: { id },
+  let prismaParams: {
     include: {
       contract: {
         include: {
-          user: {
-            include: {
-              company: true,
-            },
-          },
+          company: true;
+        };
+      };
+    };
+    where: Prisma.ContractDocumentWhereUniqueInput;
+  } = {
+    include: {
+      contract: {
+        include: {
+          company: true,
         },
       },
     },
-  });
+    where: {
+      id: id,
+    },
+  };
+  return await prisma.contractDocument.findUnique(prismaParams);
 }
 
 async function findById(id: number) {

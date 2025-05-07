@@ -1,4 +1,3 @@
-import prisma from '../config/prismaClient';
 import { assert } from 'superstruct';
 import { ContractCreateStruct } from '../structs/contractStructs';
 import { CONTRACT_STATUS, Prisma } from '@prisma/client';
@@ -61,21 +60,14 @@ const getCarDropdownService = async (companyId: number) => {
   return await contractRepository.findCarDropdown(companyId);
 };
 
-// develop 계약 문서 포함 리스트 조회
-const getContractListWithDcmt = async (companyId: number, params: PageParamsType) => {
-  const contracts = await contractRepository.findManyWithDcmt(companyId, params);
-  return {
-    contracts,
-    page: params.page,
-    pageSize: params.pageSize,
-    totalItemCount: contracts.length,
-  };
-};
-
 // develop 계약서 드래프트용 조회
 const getContractDraft = async (companyId: number) => {
   return await contractRepository.findManyDraft(companyId);
 };
+
+export async function getContractListWithDoc(companyId: number, params: PageParamsType) {
+  return await contractRepository.findManyWithDoc(companyId, params);
+}
 
 export default {
   createContractService,
@@ -87,6 +79,6 @@ export default {
   getCustomerDropdownService,
   getUserDropdownService,
   getCarDropdownService,
-  getContractListWithDcmt,
+  getContractListWithDoc,
   getContractDraft,
 };

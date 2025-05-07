@@ -34,10 +34,3 @@ export const PageParamsStruct = object({
   keyword: optional(string()),
 });
 export type PageParamsType = Infer<typeof PageParamsStruct>;
-
-export const CursorParamsStruct = object({
-  cursor: defaulted(integerString, 0),
-  limit: defaulted(integerString, 10),
-  orderBy: optional(enums(['recent'])),
-  keyword: optional(nonempty(string())),
-});

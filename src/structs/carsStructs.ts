@@ -8,6 +8,7 @@ import {
   optional,
   enums,
   assign,
+  Infer,
 } from 'superstruct';
 import { PageParamsStruct } from './commonStructs';
 
@@ -22,6 +23,7 @@ export const CreateCarBodyStruct = object({
   explanation: string(),
   accidentDetails: string(),
 });
+export type CreateCarBodyType = Infer<typeof CreateCarBodyStruct>;
 
 export const GetCarListParamsStruct = assign(
   PageParamsStruct,
@@ -33,3 +35,4 @@ export const GetCarListParamsStruct = assign(
 );
 
 export const UpdateCarBodyStruct = partial(CreateCarBodyStruct);
+export type UpdateCarBodyType = Infer<typeof UpdateCarBodyStruct>;

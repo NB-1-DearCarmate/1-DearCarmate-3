@@ -31,7 +31,7 @@ const updateContract = async (req: Request, res: Response) => {
   );
 
   if (isNewDocumentAdded) {
-    await sendEmail(customer.email);
+    sendEmail(customer.email);
   }
 
   res.status(200).json(tempResponse);

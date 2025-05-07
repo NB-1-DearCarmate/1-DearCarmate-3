@@ -6,24 +6,21 @@ import {
   UpdateCarBodyStruct,
 } from '../structs/carsStructs';
 import * as carsService from '../services/carsService';
-import carResponseDTO from '../lib/dtos/carResponseDTO';
+import { carResponseDTO, ResponseCarListDTO, ResponseCarModelListDTO } from '../lib/dtos/carDTO';
 import { CarIdParamsStruct } from '../structs/commonStructs';
 import { OmittedUser } from '../types/OmittedUser';
 
 export async function createCar(req: Request, res: Response) {
   const reqUser = req.user as OmittedUser;
   const data = create(req.body, CreateCarBodyStruct);
-  const createdCar = await carsService.createCar({
-    ...data,
-    companyId: reqUser.companyId,
-  });
+  const createdCar = await carsService.createCar(data, reqUser.companyId);
   res.status(201).json(carResponseDTO(createdCar));
 }
 
 export async function getCarList(req: Request, res: Response) {
   const params = create(req.query, GetCarListParamsStruct);
   const result = await carsService.getCarList(params);
-  res.send(result);
+  res.send(new ResponseCarListDTO(params.page, params.pageSize, result));
 }
 
 export async function updateCar(req: Request, res: Response) {
@@ -47,5 +44,5 @@ export async function getCar(req: Request, res: Response) {
 
 export async function getCarModelList(req: Request, res: Response) {
   const result = await carsService.getCarModelList();
-  res.send(result);
+  res.send(new ResponseCarModelListDTO(result));
 }

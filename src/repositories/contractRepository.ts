@@ -1,5 +1,6 @@
 import { Prisma } from '@prisma/client';
 import prisma from '../config/prismaClient';
+import { PageParamsType } from '../structs/commonStructs';
 
 async function create(data: {
   customerId: number;
@@ -121,19 +122,9 @@ async function findCarDropdown(companyId: number) {
 }
 
 // develop의 계약 문서 포함 필터링 리스트
-async function findManyWithDcmt(
+async function findManyWithDoc(
   companyId: number,
-  {
-    page,
-    pageSize,
-    searchBy,
-    keyword,
-  }: {
-    page: number;
-    pageSize: number;
-    searchBy?: string;
-    keyword?: string;
-  },
+  { page, pageSize, searchBy, keyword }: PageParamsType,
 ) {
   const skip = (page - 1) * pageSize;
   const take = pageSize;
@@ -160,7 +151,7 @@ async function findManyWithDcmt(
     }
   }
 
-  const result = await prisma.contract.findMany({
+  const contracts = await prisma.contract.findMany({
     skip,
     take,
     where,
@@ -171,8 +162,9 @@ async function findManyWithDcmt(
       customer: true,
     },
   });
+  const totalItemCount = await getCount({ where });
 
-  return result;
+  return { contracts, totalItemCount };
 }
 
 // develop의 계약 드래프트 리스트
@@ -266,7 +258,7 @@ export default {
   findCustomerDropdown,
   findUserDropdown,
   findCarDropdown,
-  findManyWithDcmt,
+  findManyWithDoc,
   findManyDraft,
   getCount,
   findCompanyIdbycontractId,

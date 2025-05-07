@@ -11,6 +11,8 @@ import {
   CreateCompanyBodyStruct,
   PatchCompanyBodyStruct,
 } from '../structs/companyStructs';
+import { ResponseCompanyListDTO } from '../lib/dtos/companyDTO';
+import { ResponseUserListDTO } from '../lib/dtos/userDTO';
 
 /**
  * @openapi
@@ -128,8 +130,8 @@ export const getCompanyList: RequestHandler = async (req, res) => {
     throw new UnauthError();
   }
   const data = create(req.query, PageParamsStruct);
-  const companies = await companyService.getCompanies(data);
-  res.send(companies);
+  const result = await companyService.getCompanies(data);
+  res.send(new ResponseCompanyListDTO(data.page, data.pageSize, result));
 };
 
 /**
@@ -189,8 +191,8 @@ export const getCompanyUsers: RequestHandler = async (req, res) => {
     throw new UnauthError();
   }
   const data = create(req.query, PageParamsStruct);
-  const users = await userService.getUsers(data);
-  res.send(users);
+  const result = await userService.getUsers(data);
+  res.send(new ResponseUserListDTO(data.page, data.pageSize, result));
 };
 
 /**

@@ -1,3 +1,5 @@
+import { CAR_STATUS } from '@prisma/client';
+
 interface Car {
   id: number;
   companyId: number;
@@ -9,7 +11,7 @@ interface Car {
   accidentCount: number;
   explanation?: string;
   accidentDetails?: string;
-  status: string;
+  status: CAR_STATUS;
 }
 
 export default Car;

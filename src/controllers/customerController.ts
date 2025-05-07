@@ -11,9 +11,10 @@ import {
 import { create } from 'superstruct';
 import { PageParamsStruct } from '../structs/commonStructs';
 import {
-  RequestCustomerDTO,
-  RequestUpdateCustomerDTO,
+  CreateCustomerDTO,
+  UpdateCustomerDTO,
   ResponseCustomerDTO,
+  ResponseCustomerListDTO,
 } from '../lib/dtos/customerDTO';
 import { parse } from 'csv-parse/sync';
 import { StructError } from 'superstruct';
@@ -39,8 +40,8 @@ export const getCustomerList: RequestHandler = async (req, res) => {
   }
 
   const page = create(req.query, PageParamsStruct);
-  const customers = await customerService.getCustomers(reqUser.companyId, page);
-  res.send(customers);
+  const result = await customerService.getCustomers(reqUser.companyId, page);
+  res.send(new ResponseCustomerListDTO(page.page, page.pageSize, result));
 };
 
 /**
@@ -98,8 +99,7 @@ export const postCustomer: RequestHandler = async (req, res) => {
     throw new UnauthError();
   }
   const rawData = create(req.body, CreateCustomerBodyStruct);
-  const transformedData = new RequestCustomerDTO(rawData);
-  const customer = await customerService.createCustomer(reqUser.companyId, transformedData);
+  const customer = await customerService.createCustomer(reqUser.companyId, rawData);
   const reverseTransformedData = new ResponseCustomerDTO(customer);
   res.status(201).send(reverseTransformedData);
 };
@@ -115,8 +115,7 @@ export const patchCustomer: RequestHandler = async (req, res) => {
     throw new UnauthError();
   }
   const rawData = create(req.body, PatchCustomerBodyStruct);
-  const transformedData = new RequestUpdateCustomerDTO(rawData);
-  const customer = await customerService.updateCustomer(customerId, transformedData);
+  const customer = await customerService.updateCustomer(customerId, rawData);
   const reverseTransformedData = new ResponseCustomerDTO(customer);
   res.send(reverseTransformedData);
 };
@@ -157,7 +156,7 @@ export const postCustomers: RequestHandler = async (req, res) => {
   for (const record of records) {
     try {
       const validated = CreateCustomerBodyStruct.create(record);
-      customerList.push(new RequestCustomerDTO(validated));
+      customerList.push(new CreateCustomerDTO(validated));
     } catch (err) {
       if (err instanceof StructError) {
         invalidcustomerList.push({
