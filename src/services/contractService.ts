@@ -1,4 +1,4 @@
-import prisma from '../config/prismaClient';
+import contractRepository from '../repositories/contractRepository';
 import { assert } from 'superstruct';
 import { ContractCreateStruct } from '../structs/contractStructs';
 import { CONTRACT_STATUS } from '@prisma/client';
@@ -14,90 +14,28 @@ type CreateContractData = {
 
 const createContractService = async (data: CreateContractData) => {
   assert(data, ContractCreateStruct);
-  const { customerId, carId, userId, companyId, contractPrice, meetings } = data;
-
-  const contract = await prisma.contract.create({
-    data: {
-      customerId,
-      carId,
-      userId,
-      companyId,
-      contractPrice,
-      status: 'CONTRACT_PREPARING',
-      meetings: {
-        create: meetings,
-      },
-    },
-    include: {
-      meetings: true,
-    },
-  });
-
+  const contract = await contractRepository.create(data);
   return contract;
 };
 
 const updateContractService = async (id: number, data: any) => {
   const { meetings, ...contractData } = data;
-
-  const updatedContract = await prisma.contract.update({
-    where: { id },
-    data: {
-      customerId: contractData.customerId,
-      carId: contractData.carId,
-      userId: contractData.userId,
-      companyId: contractData.companyId,
-      contractPrice: contractData.contractPrice,
-      status: contractData.status,
-      resolutionDate: contractData.resolutionDate,
-      ...(meetings && {
-        meetings: {
-          deleteMany: {},
-          create: meetings,
-        },
-      }),
-    },
-    include: {
-      meetings: true,
-    },
-  });
-
+  const updatedContract = await contractRepository.update(id, contractData, meetings);
   return updatedContract;
 };
-const getAllContractsService = async () => {
-  const contracts = await prisma.contract.findMany({
-    include: {
-      customer: true,
-      car: true,
-      user: true,
-      meetings: true,
-    },
-    orderBy: {
-      createdAt: 'desc',
-    },
-  });
 
+const getAllContractsService = async () => {
+  const contracts = await contractRepository.findAll();
   return contracts;
 };
 
 const getContractByIdService = async (id: number) => {
-  const contract = await prisma.contract.findUnique({
-    where: { id },
-    include: {
-      customer: true,
-      car: true,
-      user: true,
-      meetings: true,
-      contractDocuments: true,
-    },
-  });
-
+  const contract = await contractRepository.findById(id);
   return contract;
 };
 
 const deleteContractService = async (id: number) => {
-  return await prisma.contract.delete({
-    where: { id },
-  });
+  return await contractRepository.deleteById(id);
 };
 
 const updateContractStatusService = async (
@@ -105,43 +43,20 @@ const updateContractStatusService = async (
   status: CONTRACT_STATUS,
   resolutionDate?: Date | null,
 ) => {
-  return await prisma.contract.update({
-    where: { id },
-    data: {
-      status,
-      resolutionDate: resolutionDate ?? null,
-    },
-  });
+  const updatedContract = await contractRepository.updateStatus(id, status, resolutionDate);
+  return updatedContract;
 };
 
 const getCustomerDropdownService = async (companyId: number) => {
-  return await prisma.customer.findMany({
-    where: { companyId },
-    select: {
-      id: true,
-      name: true,
-    },
-  });
+  return await contractRepository.findCustomerDropdown(companyId);
 };
 
 const getUserDropdownService = async (companyId: number) => {
-  return await prisma.user.findMany({
-    where: { companyId },
-    select: {
-      id: true,
-      name: true,
-    },
-  });
+  return await contractRepository.findUserDropdown(companyId);
 };
 
 const getCarDropdownService = async (companyId: number) => {
-  return await prisma.car.findMany({
-    where: { companyId },
-    select: {
-      id: true,
-      carNumber: true,
-    },
-  });
+  return await contractRepository.findCarDropdown(companyId);
 };
 
 export default {
