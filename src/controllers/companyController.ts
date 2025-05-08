@@ -12,7 +12,6 @@ import {
   PatchCompanyBodyStruct,
 } from '../structs/companyStructs';
 import { ResponseCompanyListDTO } from '../lib/dtos/companyDTO';
-import { ResponseUserListDTO } from '../lib/dtos/userDTO';
 
 /**
  * @openapi
@@ -190,9 +189,9 @@ export const getCompanyUsers: RequestHandler = async (req, res) => {
   if (reqUser.role !== USER_ROLE.ADMIN) {
     throw new UnauthError();
   }
-  const data = create(req.query, PageParamsStruct);
-  const result = await userService.getUsers(data);
-  res.send(new ResponseUserListDTO(data.page, data.pageSize, result));
+  const pageParams = create(req.query, PageParamsStruct);
+  const users = await userService.getUsers(pageParams);
+  res.send(users);
 };
 
 /**

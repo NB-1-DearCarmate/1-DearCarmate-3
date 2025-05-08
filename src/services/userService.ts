@@ -11,6 +11,7 @@ import { CreateUserBodyType, UpdateUserBodyType } from '../structs/userStructs';
 import { PageParamsType } from '../structs/commonStructs';
 import { OmittedUser } from '../types/OmittedUser';
 import { buildSearchCondition } from '../lib/searchCondition';
+import { ResponseCompanyUserDTO, ResponseCompanyUserListDTO } from '../lib/dtos/companyDTO';
 
 async function hashingPassword(password: string) {
   return await bcrypt.hash(password, 10);
@@ -43,7 +44,7 @@ async function getUserById(id: number) {
   return filterSensitiveUserData(user);
 }
 
-async function getUsers(params: PageParamsType) {
+async function getCompanyUsers(params: PageParamsType) {
   const searchCondition = buildSearchCondition(params, ['companyName', 'email', 'name']);
   const where = searchCondition.whereCondition;
   const prismaParams = {
@@ -58,8 +59,7 @@ async function getUsers(params: PageParamsType) {
 
   const users = await userRepository.findMany(prismaParams);
   const totalItemCount = await userRepository.getCount({ where });
-  const omitedUsers = users.map(filterSensitiveUserData);
-  return { totalItemCount, omitedUsers };
+  return new ResponseCompanyUserListDTO(params.page, params.pageSize, users, totalItemCount);
 }
 
 async function getCompanyIdById(userId: number) {
@@ -130,7 +130,7 @@ export default {
   getCompanyIdById,
   updateUser,
   deleteUser,
-  getUsers,
+  getUsers: getCompanyUsers,
   createToken,
   refreshToken,
 };
