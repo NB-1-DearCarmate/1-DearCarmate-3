@@ -34,7 +34,7 @@ export class ResponseCompanyListDTO {
   }
 }
 
-export class ResponseCompanyUserDTO {
+class ResponseCompanyUserDTO {
   id: number;
   name: string;
   email: string;
