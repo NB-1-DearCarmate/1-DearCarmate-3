@@ -7,9 +7,11 @@ import {
   getCarList,
   updateCar,
   getCarModelList,
+  carUpload,
 } from '../controllers/carsController';
-import passport from 'passport';
+import passport, { authenticate } from 'passport';
 import { ACCESS_TOKEN_STRATEGY } from '../config/constants';
+import { uploadCsv } from '../controllers/csvController';
 
 const carsRouter = express.Router();
 
@@ -29,6 +31,14 @@ carsRouter.get(
   passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
   withAsync(getCarModelList),
 );
+
+carsRouter.post(
+  '/upload',
+  passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
+  uploadCsv.single('file'),
+  withAsync(carUpload),
+);
+
 carsRouter.patch(
   '/:carId',
   passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),

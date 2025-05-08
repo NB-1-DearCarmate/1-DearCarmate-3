@@ -17,3 +17,5 @@ export const REFRESH_tOKEN_STRING = 'refreshToken';
 export const IMAGE_PATH = 'public/images';
 export const DOCUMENT_PATH = 'public/documents';
 export const EMAIL_PW = process.env.EMAIL_PW || '';
+export const PUBLIC_PATH = './public';
+export const STATIC_PATH = '/public';
