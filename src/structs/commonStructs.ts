@@ -34,3 +34,9 @@ export const PageParamsStruct = object({
   keyword: optional(string()),
 });
 export type PageParamsType = Infer<typeof PageParamsStruct>;
+
+export const SearchParamsStruct = object({
+  searchBy: nonempty(string()),
+  keyword: optional(string()),
+});
+export type SearchParamsType = Infer<typeof SearchParamsStruct>;

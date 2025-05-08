@@ -1,11 +1,21 @@
 import { Request, Response } from 'express';
 import contractService from '../services/contractService';
-import { ResponseContractDTO } from '../lib/dtos/contractDTO';
-import { validate } from 'superstruct';
+import {
+  ContractForResponse,
+  ResponseCarDropdownDTO,
+  ResponseContractDTO,
+  ResponseContractListDTO,
+  ResponseCustomerDropdownDTO,
+  ResponseUserDropdownDTO,
+} from '../lib/dtos/contractDTO';
+import { create, validate } from 'superstruct';
 import { ContractCreateStruct } from '../structs/contractStructs';
 import CommonError from '../lib/errors/CommonError';
-import { CONTRACT_STATUS } from '@prisma/client';
 import { sendEmail } from '../lib/emailHandler';
+import { OmittedUser } from '../types/OmittedUser';
+import { USER_ROLE } from '@prisma/client';
+import UnauthError from '../lib/errors/UnauthError';
+import { SearchParamsStruct } from '../structs/commonStructs';
 
 const createContract = async (req: Request, res: Response) => {
   const [error] = validate(req.body, ContractCreateStruct);
@@ -14,20 +24,19 @@ const createContract = async (req: Request, res: Response) => {
   }
 
   const contract = await contractService.createContractService(req.body);
-  res.status(201).json(new ResponseContractDTO(contract));
+  res.status(201).send(new ResponseContractDTO(contract));
 };
 
 const updateContract = async (req: Request, res: Response) => {
-  const contractId = parseInt(req.params.id);
+  const contractId = parseInt(req.params.contractId);
 
-  // 이메일 전송로직 추가
   const existingContract = await contractService.getContractByIdService(contractId);
   const existingDcmtId = new Set(existingContract?.contractDocuments.map((dcmt) => dcmt.id));
 
   const updated = await contractService.updateContractService(contractId, req.body);
 
-  const { contractDocuments, customer, ...tempResponse } = updated;
-  const isNewDocumentAdded = contractDocuments.some(
+  const { customer, createdAt, companyId, id, ...tempResponse } = updated;
+  const isNewDocumentAdded = updated.contractDocuments.some(
     (dcmt: { id: number }) => !existingDcmtId.has(dcmt.id),
   );
 
@@ -35,78 +44,53 @@ const updateContract = async (req: Request, res: Response) => {
     sendEmail(customer.email);
   }
 
-  res.status(200).json(tempResponse);
+  res.send(tempResponse);
 };
 
 const getAllContracts = async (req: Request, res: Response) => {
-  const contracts = await contractService.getAllContractsService();
-  res.status(200).json(contracts);
-};
-
-const getContractById = async (req: Request, res: Response) => {
-  const id = parseInt(req.params.id);
-  const contract = await contractService.getContractByIdService(id);
-  if (!contract) {
-    throw new CommonError('계약을 찾을 수 없습니다.', 404);
+  const reqUser = req.user as OmittedUser;
+  if (reqUser.role !== USER_ROLE.EMPLOYEE && reqUser.role !== USER_ROLE.OWNER) {
+    throw new UnauthError();
   }
-  res.status(200).json(new ResponseContractDTO(contract));
+  const params = create(req.query, SearchParamsStruct);
+  const contracts = await contractService.getAllContractsService(params, reqUser.companyId);
+  res.send(new ResponseContractListDTO(contracts));
 };
 
 const deleteContract = async (req: Request, res: Response) => {
-  const id = parseInt(req.params.id);
-  await contractService.deleteContractService(id);
-  res.status(200).json({ message: '계약이 삭제되었습니다.' });
-};
-
-const updateContractStatus = async (req: Request, res: Response) => {
-  const id = parseInt(req.params.id);
-  const { status, resolutionDate } = req.body;
-
-  if (!Object.values(CONTRACT_STATUS).includes(status)) {
-    throw new CommonError('유효하지 않은 계약 상태입니다.', 400);
+  const reqUser = req.user as OmittedUser;
+  const id = parseInt(req.params.contractId);
+  const existingContract = await contractService.getContractByIdService(id);
+  if (reqUser.companyId !== existingContract?.companyId) {
+    throw new CommonError('담당자만 삭제가 가능합니다.', 403);
   }
-
-  const updated = await contractService.updateContractStatusService(id, status, resolutionDate);
-  res.status(200).json(updated);
+  await contractService.deleteContractService(id);
+  res.send({ message: '계약이 삭제되었습니다.' });
 };
 
 const getCustomerDropdown = async (req: Request, res: Response) => {
-  const companyId = (req.user as { companyId: number })?.companyId;
-  if (!companyId) {
-    throw new CommonError('회사 정보가 없습니다.', 400);
-  }
-
-  const customers = await contractService.getCustomerDropdownService(companyId);
-  res.status(200).json(customers);
+  const reqUser = req.user as OmittedUser;
+  const customers = await contractService.getCustomerDropdownService(reqUser.companyId);
+  res.send(new ResponseCustomerDropdownDTO(customers));
 };
 
 const getUserDropdown = async (req: Request, res: Response) => {
-  const companyId = (req.user as { companyId: number })?.companyId;
-  if (!companyId) {
-    throw new CommonError('회사 정보가 없습니다.', 400);
-  }
-
-  const users = await contractService.getUserDropdownService(companyId);
-  res.status(200).json(users);
+  const reqUser = req.user as OmittedUser;
+  const users = await contractService.getUserDropdownService(reqUser.companyId);
+  res.send(new ResponseUserDropdownDTO(users));
 };
 
 const getCarDropdown = async (req: Request, res: Response) => {
-  const companyId = (req.user as { companyId: number })?.companyId;
-  if (!companyId) {
-    throw new CommonError('회사 정보가 없습니다.', 400);
-  }
-
-  const cars = await contractService.getCarDropdownService(companyId);
-  res.status(200).json(cars);
+  const reqUser = req.user as OmittedUser;
+  const cars = await contractService.getCarDropdownService(reqUser.companyId);
+  res.send(new ResponseCarDropdownDTO(cars));
 };
 
 export default {
   createContract,
   updateContract,
   getAllContracts,
-  getContractById,
   deleteContract,
-  updateContractStatus,
   getCustomerDropdown,
   getUserDropdown,
   getCarDropdown,

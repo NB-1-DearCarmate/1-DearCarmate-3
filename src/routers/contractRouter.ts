@@ -18,26 +18,20 @@ router.get(
   withAsync(contractController.getUserDropdown),
 );
 
-router.patch(
-  '/:id/status',
-  passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
-  withAsync(contractController.updateContractStatus),
-);
-
 router.get(
-  '/:id',
+  '/cars',
   passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
-  withAsync(contractController.getContractById),
+  withAsync(contractController.getCarDropdown),
 );
 
 router.patch(
-  '/:id',
+  '/:contractId',
   passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
   withAsync(contractController.updateContract),
 );
 
 router.delete(
-  '/:id',
+  '/:contractId',
   passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
   withAsync(contractController.deleteContract),
 );
