@@ -11,8 +11,7 @@ import {
   CreateCompanyBodyStruct,
   PatchCompanyBodyStruct,
 } from '../structs/companyStructs';
-import { ResponseCompanyListDTO } from '../lib/dtos/companyDTO';
-import { ResponseUserListDTO } from '../lib/dtos/userDTO';
+import { ResponseCompanyListDTO, ResponseCompanyUserListDTO } from '../lib/dtos/companyDTO';
 
 /**
  * @openapi
@@ -146,7 +145,7 @@ export const getCompanyList: RequestHandler = async (req, res) => {
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ResponseUserListDTO'
+ *               $ref: '#/components/schemas/ResponseCompanyUserListDTO'
  *       400:
  *         description: 잘못된 요청입니다. 유효하지 않은 페이지 번호 또는 페이지 크기일 수 있습니다.
  *       401:
@@ -159,9 +158,16 @@ export const getCompanyUsers: RequestHandler = async (req, res) => {
   if (reqUser.role !== USER_ROLE.ADMIN) {
     throw new UnauthError();
   }
-  const data = create(req.query, PageParamsStruct);
-  const result = await userService.getUsers(data);
-  res.send(new ResponseUserListDTO(data.page, data.pageSize, result));
+  const pageParams = create(req.query, PageParamsStruct);
+  const result = await userService.getCompanyUsers(pageParams);
+  res.send(
+    new ResponseCompanyUserListDTO(
+      pageParams.page,
+      pageParams.pageSize,
+      result.users,
+      result.totalItemCount,
+    ),
+  );
 };
 
 /**
@@ -179,12 +185,21 @@ export const getCompanyUsers: RequestHandler = async (req, res) => {
  *         schema:
  *           type: integer
  *         description: 수정할 회사 ID
- *       - in: query
- *         name: companyName
- *         schema:
- *           type: string
- *         description: 수정할 회사 이름
- *         example: "햇살카 수정"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               companyName:
+ *                 type: string
+ *                 description: 수정할 회사 이름
+ *                 example: 햇살카 수정
+ *               companyCode:
+ *                 type: string
+ *                 description: 수정할 회사 코드
+ *                 example: HS-001
  *     responses:
  *       200:
  *         description: 회사 정보가 성공적으로 수정되었습니다.
@@ -199,13 +214,14 @@ export const getCompanyUsers: RequestHandler = async (req, res) => {
  *       500:
  *         description: 서버 오류가 발생했습니다.
  */
+
 export const patchCompany: RequestHandler = async (req, res) => {
   const reqUser = req.user as OmittedUser;
   if (reqUser.role !== USER_ROLE.ADMIN) {
     throw new UnauthError();
   }
   const { companyId } = create(req.params, CompanyIdParamStruct);
-  const data = create(req.query, PatchCompanyBodyStruct);
+  const data = create(req.body, PatchCompanyBodyStruct);
   const company = await companyService.updateCompany(companyId, data);
   res.send(company);
 };

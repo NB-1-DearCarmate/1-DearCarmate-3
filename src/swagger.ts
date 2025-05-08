@@ -324,8 +324,8 @@ const swaggerDefinition = {
           company: { $ref: '#/components/schemas/CompanyDTO' },
         },
       },
-      // ResponseUserListDTO
-      ResponseUserListDTO: {
+      // ResponseCompanyUserListDTO
+      ResponseCompanyUserListDTO: {
         type: 'object',
         properties: {
           currentPage: { type: 'number' },
