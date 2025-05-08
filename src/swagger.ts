@@ -352,20 +352,175 @@ const swaggerDefinition = {
           },
         },
       },
-      // CreateCarBodyStruct: {
-      //   type: 'object',
-      //   properties: {
-      //     carNumber: { type: 'string' },
-      //     manufacturer: { type: 'string' },
-      //     model: { type: 'string' },
-      //     manufacturingYear: { type: 'number' },
-      //     mileage: { type: 'number' },
-      //     price: { type: 'number' },
-      //     accidentCount: { type: 'number' },
-      //     explanation: { type: 'string' },
-      //     accidentDetails: { type: 'string' },
-      //   },
-      // },
+      OmittedUser: {
+        type: 'object',
+        properties: {
+          id: { type: 'number' },
+          name: { type: 'string' },
+          companyId: { type: 'number' },
+          email: { type: 'string' },
+          phoneNumber: { type: 'string' },
+          role: {
+            type: 'string',
+            enum: ['EMPLOYEE', 'ADMIN', 'OWNER'], // USER_ROLE에 맞춰 수정된 enum 값
+          },
+          employeeNumber: { type: 'string' },
+          imageUrl: { type: 'string', nullable: true },
+          createdAt: { type: 'string', format: 'date-time' }, // Date 타입을 Swagger에서 처리하는 방식
+        },
+      },
+      ContractForResponse: {
+        type: 'object',
+        properties: {
+          id: { type: 'number' },
+          contractPrice: { type: 'string', format: 'decimal' }, // Swagger에는 Decimal 지원이 없으므로 string 처리
+          status: {
+            type: 'string',
+            enum: [
+              'VEHICLE_CHECKING',
+              'PRICE_CHECKING',
+              'CONTRACT_PREPARING',
+              'CONTRACT_SUCCESS',
+              'CONTRACT_FAILED',
+            ],
+          },
+          resolutionDate: { type: 'string', format: 'date-time', nullable: true },
+          user: {
+            type: 'object',
+            properties: {
+              id: { type: 'number' },
+              name: { type: 'string' },
+            },
+          },
+          customer: {
+            type: 'object',
+            properties: {
+              id: { type: 'number' },
+              name: { type: 'string' },
+            },
+          },
+          car: {
+            type: 'object',
+            properties: {
+              id: { type: 'number' },
+              carModel: {
+                type: 'object',
+                properties: {
+                  model: { type: 'string' },
+                },
+              },
+            },
+          },
+          meetings: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                time: { type: 'string', format: 'date-time' },
+              },
+            },
+          },
+          contractDocuments: {
+            type: 'array',
+            nullable: true,
+            items: {
+              type: 'object',
+              properties: {
+                id: { type: 'number' },
+                fileName: { type: 'string' },
+                filePath: { type: 'string' },
+                fileSize: { type: 'number', nullable: true },
+                contractId: { type: 'number', nullable: true },
+              },
+            },
+          },
+        },
+      },
+      ResponseContractListDTO: {
+        type: 'object',
+        properties: {
+          carInspection: {
+            type: 'object',
+            properties: {
+              totalItemCount: { type: 'number' },
+              data: {
+                type: 'array',
+                items: { $ref: '#/components/schemas/ContractForResponse' },
+              },
+            },
+          },
+          priceNegotiation: {
+            type: 'object',
+            properties: {
+              totalItemCount: { type: 'number' },
+              data: {
+                type: 'array',
+                items: { $ref: '#/components/schemas/ContractForResponse' },
+              },
+            },
+          },
+          contractDraft: {
+            type: 'object',
+            properties: {
+              totalItemCount: { type: 'number' },
+              data: {
+                type: 'array',
+                items: { $ref: '#/components/schemas/ContractForResponse' },
+              },
+            },
+          },
+          contractSuccessful: {
+            type: 'object',
+            properties: {
+              totalItemCount: { type: 'number' },
+              data: {
+                type: 'array',
+                items: { $ref: '#/components/schemas/ContractForResponse' },
+              },
+            },
+          },
+          contractFailed: {
+            type: 'object',
+            properties: {
+              totalItemCount: { type: 'number' },
+              data: {
+                type: 'array',
+                items: { $ref: '#/components/schemas/ContractForResponse' },
+              },
+            },
+          },
+        },
+      },
+      ResponseCustomerDropdownDTO: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            data: { type: 'string' },
+          },
+        },
+      },
+      ResponseCarDropdownDTO: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            data: { type: 'string' },
+          },
+        },
+      },
+      ResponseUserDropdownDTO: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            data: { type: 'string' },
+          },
+        },
+      },
     },
   },
 };

@@ -1,8 +1,10 @@
 import { assert } from 'superstruct';
 import { ContractCreateStruct } from '../structs/contractStructs';
 import { CONTRACT_STATUS, Prisma } from '@prisma/client';
-import { PageParamsType } from '../structs/commonStructs';
+import { PageParamsType, SearchParamsType } from '../structs/commonStructs';
+import { ContractForResponse } from '../lib/dtos/contractDTO';
 import contractRepository from '../repositories/contractRepository';
+import { buildSearchCondition } from '../lib/searchCondition';
 
 type CreateContractData = {
   customerId: number;
@@ -16,7 +18,7 @@ type CreateContractData = {
 const createContractService = async (data: CreateContractData) => {
   assert(data, ContractCreateStruct);
   const contract = await contractRepository.create(data);
-  return contract;
+  return contract as ContractForResponse;
 };
 
 const updateContractService = async (id: number, data: any) => {
@@ -25,9 +27,8 @@ const updateContractService = async (id: number, data: any) => {
   return updatedContract;
 };
 
-const getAllContractsService = async () => {
-  const contracts = await contractRepository.findAll();
-  return contracts;
+const getAllContractsService = async (params: SearchParamsType, companyId: number) => {
+  return await contractRepository.findMany(params, companyId);
 };
 
 const getContractByIdService = async (id: number) => {

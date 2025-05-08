@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client';
 import prisma from '../config/prismaClient';
-import { PageParamsType } from '../structs/commonStructs';
+import { PageParamsType, SearchParamsType } from '../structs/commonStructs';
 
 async function create(data: {
   customerId: number;
@@ -20,6 +20,15 @@ async function create(data: {
     },
     include: {
       meetings: true,
+      user: { select: { id: true, name: true } },
+      customer: { select: { id: true, name: true } },
+      car: {
+        select: {
+          id: true,
+          carModel: { select: { model: true } },
+        },
+      },
+      contractDocuments: true,
     },
   });
 }
@@ -44,11 +53,30 @@ async function update(id: number, contractData: any, meetings?: { time: string }
   });
 }
 
-async function findAll() {
-  return await prisma.contract.findMany({
+async function findMany({ searchBy, keyword }: SearchParamsType, companyId: number) {
+  let where: Prisma.ContractWhereInput = {
+    companyId,
+  };
+
+  if (searchBy && keyword) {
+    switch (searchBy) {
+      case 'userName':
+        where.user = { name: { contains: keyword, mode: 'insensitive' } };
+        break;
+      case 'customerName':
+        where.customer = { name: { contains: keyword, mode: 'insensitive' } };
+    }
+  }
+
+  const contracts = await prisma.contract.findMany({
+    where,
     include: {
       customer: true,
-      car: true,
+      car: {
+        include: {
+          carModel: true,
+        },
+      },
       user: true,
       meetings: true,
     },
@@ -56,6 +84,8 @@ async function findAll() {
       createdAt: 'desc',
     },
   });
+
+  return contracts;
 }
 
 async function findById(id: number) {
@@ -63,7 +93,11 @@ async function findById(id: number) {
     where: { id },
     include: {
       customer: true,
-      car: true,
+      car: {
+        include: {
+          carModel: true,
+        },
+      },
       user: true,
       meetings: true,
       contractDocuments: true,
@@ -117,6 +151,11 @@ async function findCarDropdown(companyId: number) {
     select: {
       id: true,
       carNumber: true,
+      carModel: {
+        select: {
+          model: true,
+        },
+      },
     },
   });
 }
@@ -251,7 +290,7 @@ async function getContractSummary(companyId: number, tx: Prisma.TransactionClien
 export default {
   create,
   update,
-  findAll,
+  findMany,
   findById,
   deleteById,
   updateStatus,
