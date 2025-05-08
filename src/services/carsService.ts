@@ -20,7 +20,7 @@ export async function createCar(data: CreateCarBodyType, companyId: number) {
     throw new BadRequestError('잘못된 요청입니다');
   }
 
-  const carType = await carsTypeRepository.getCarTypeById(carModel.id);
+  const carType = await carsTypeRepository.getCarTypeById(carModel.typeId);
   if (!carType) {
     throw new BadRequestError('잘못된 요청입니다');
   }
@@ -56,7 +56,7 @@ export async function updateCar(id: number, data: UpdateCarBodyType): Promise<Ca
     throw new BadRequestError('잘못된 요청입니다');
   }
 
-  const carType = await carsTypeRepository.getCarTypeById(carModel.id);
+  const carType = await carsTypeRepository.getCarTypeById(carModel.typeId);
   if (!carType) {
     throw new BadRequestError('잘못된 요청입니다');
   }
@@ -93,7 +93,7 @@ export async function getCar(id: number): Promise<CarInfo> {
     throw new BadRequestError('잘못된 요청입니다');
   }
 
-  const carType = await carsTypeRepository.getCarTypeById(carModel.id);
+  const carType = await carsTypeRepository.getCarTypeById(carModel.typeId);
   if (!carType) {
     throw new BadRequestError('잘못된 요청입니다');
   }
