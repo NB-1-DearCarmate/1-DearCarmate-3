@@ -50,56 +50,26 @@ export class ResponseContractDTO {
 }
 
 export class ResponseContractListDTO {
-  carInspection: { totalItemCount: number; data: ContractForResponse[] };
-  priceNegotiation: { totalItemCount: number; data: ContractForResponse[] };
-  contractDraft: { totalItemCount: number; data: ContractForResponse[] };
-  contractSuccessful: { totalItemCount: number; data: ContractForResponse[] };
-  contractFailed: { totalItemCount: number; data: ContractForResponse[] };
+  carInspection = { totalItemCount: 0, data: [] as ContractForResponse[] };
+  priceNegotiation = { totalItemCount: 0, data: [] as ContractForResponse[] };
+  contractDraft = { totalItemCount: 0, data: [] as ContractForResponse[] };
+  contractSuccessful = { totalItemCount: 0, data: [] as ContractForResponse[] };
+  contractFailed = { totalItemCount: 0, data: [] as ContractForResponse[] };
+
+  private statusMap = {
+    [CONTRACT_STATUS.VEHICLE_CHECKING]: 'carInspection',
+    [CONTRACT_STATUS.PRICE_CHECKING]: 'priceNegotiation',
+    [CONTRACT_STATUS.CONTRACT_PREPARING]: 'contractDraft',
+    [CONTRACT_STATUS.CONTRACT_SUCCESS]: 'contractSuccessful',
+    [CONTRACT_STATUS.CONTRACT_FAILED]: 'contractFailed',
+  } as const;
 
   constructor(contracts: ContractForResponse[]) {
-    this.carInspection = {
-      totalItemCount: 0,
-      data: [],
-    };
-    this.priceNegotiation = {
-      totalItemCount: 0,
-      data: [],
-    };
-    this.contractDraft = {
-      totalItemCount: 0,
-      data: [],
-    };
-    this.contractSuccessful = {
-      totalItemCount: 0,
-      data: [],
-    };
-    this.contractFailed = {
-      totalItemCount: 0,
-      data: [],
-    };
-
     contracts.forEach((contract) => {
-      switch (contract.status) {
-        case CONTRACT_STATUS.VEHICLE_CHECKING:
-          this.carInspection.data.push(contract);
-          this.carInspection.totalItemCount++;
-          break;
-        case CONTRACT_STATUS.PRICE_CHECKING:
-          this.priceNegotiation.data.push(contract);
-          this.priceNegotiation.totalItemCount++;
-          break;
-        case CONTRACT_STATUS.CONTRACT_PREPARING:
-          this.contractDraft.data.push(contract);
-          this.contractDraft.totalItemCount++;
-          break;
-        case CONTRACT_STATUS.CONTRACT_SUCCESS:
-          this.contractSuccessful.data.push(contract);
-          this.contractSuccessful.totalItemCount++;
-          break;
-        case CONTRACT_STATUS.CONTRACT_FAILED:
-          this.contractFailed.data.push(contract);
-          this.contractFailed.totalItemCount++;
-          break;
+      const key = this.statusMap[contract.status];
+      if (key) {
+        this[key].data.push(contract);
+        this[key].totalItemCount++;
       }
     });
   }
