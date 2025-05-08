@@ -1,0 +1,20 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const withAsync_1 = require("../lib/withAsync");
+const carsController_1 = require("../controllers/carsController");
+const passport_1 = __importDefault(require("passport"));
+const constants_1 = require("../config/constants");
+const csvController_1 = require("../controllers/csvController");
+const carsRouter = express_1.default.Router();
+carsRouter.post('/', passport_1.default.authenticate(constants_1.ACCESS_TOKEN_STRATEGY, { session: false }), (0, withAsync_1.withAsync)(carsController_1.createCar));
+carsRouter.get('/', passport_1.default.authenticate(constants_1.ACCESS_TOKEN_STRATEGY, { session: false }), (0, withAsync_1.withAsync)(carsController_1.getCarList));
+carsRouter.get('/models', passport_1.default.authenticate(constants_1.ACCESS_TOKEN_STRATEGY, { session: false }), (0, withAsync_1.withAsync)(carsController_1.getCarModelList));
+carsRouter.post('/upload', passport_1.default.authenticate(constants_1.ACCESS_TOKEN_STRATEGY, { session: false }), csvController_1.uploadCsv.single('file'), (0, withAsync_1.withAsync)(carsController_1.carUpload));
+carsRouter.patch('/:carId', passport_1.default.authenticate(constants_1.ACCESS_TOKEN_STRATEGY, { session: false }), (0, withAsync_1.withAsync)(carsController_1.updateCar));
+carsRouter.delete('/:carId', passport_1.default.authenticate(constants_1.ACCESS_TOKEN_STRATEGY, { session: false }), (0, withAsync_1.withAsync)(carsController_1.deleteCar));
+carsRouter.get('/:carId', passport_1.default.authenticate(constants_1.ACCESS_TOKEN_STRATEGY, { session: false }), (0, withAsync_1.withAsync)(carsController_1.getCar));
+exports.default = carsRouter;
