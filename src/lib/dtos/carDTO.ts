@@ -16,6 +16,10 @@ export class CarResponseDTO {
   accidentCount: number;
   explanation: string;
   accidentDetails: string;
+  status: string;
+  manufacturer: string;
+  model: string;
+  type: string;
 
   constructor(car: Car) {
     this.id = car.id;
@@ -26,6 +30,10 @@ export class CarResponseDTO {
     this.accidentCount = car.accidentCount;
     this.explanation = car.explanation || '';
     this.accidentDetails = car.accidentDetails || '';
+    this.status = car.status;
+    this.manufacturer = car.manufacturer;
+    this.model = car.model;
+    this.type = car.type;
   }
 }
 

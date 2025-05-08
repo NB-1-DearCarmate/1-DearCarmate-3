@@ -12,6 +12,9 @@ interface Car {
   explanation?: string;
   accidentDetails?: string;
   status: CAR_STATUS;
+  manufacturer: string;
+  model: string;
+  type: string;
 }
 
 export default Car;
