@@ -1,22 +1,10 @@
-import { assert } from 'superstruct';
-import { ContractCreateStruct } from '../structs/contractStructs';
-import { CONTRACT_STATUS, Prisma } from '@prisma/client';
+import { ContractCreateType } from '../structs/contractStructs';
+import { CONTRACT_STATUS } from '@prisma/client';
 import { PageParamsType, SearchParamsType } from '../structs/commonStructs';
 import { ContractForResponse } from '../lib/dtos/contractDTO';
 import contractRepository from '../repositories/contractRepository';
-import { buildSearchCondition } from '../lib/searchCondition';
 
-type CreateContractData = {
-  customerId: number;
-  carId: number;
-  userId: number;
-  companyId: number;
-  contractPrice: number;
-  meetings: { time: string }[];
-};
-
-const createContractService = async (data: CreateContractData) => {
-  assert(data, ContractCreateStruct);
+const createContractService = async (data: ContractCreateType) => {
   const contract = await contractRepository.create(data);
   return contract as ContractForResponse;
 };

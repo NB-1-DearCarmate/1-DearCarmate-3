@@ -98,11 +98,8 @@ import { SearchParamsStruct } from '../structs/commonStructs';
  *         description: 서버 오류가 발생했습니다.
  */
 const createContract = async (req: Request, res: Response) => {
-  const [error] = validate(req.body, ContractCreateStruct);
-  if (error) {
-    throw new CommonError('계약 생성 요청 형식이 올바르지 않습니다.', 400);
-  }
-  const contract = await contractService.createContractService(req.body);
+  const data = create(req.body, ContractCreateStruct);
+  const contract = await contractService.createContractService(data);
   res.status(201).send(new ResponseContractDTO(contract));
 };
 
