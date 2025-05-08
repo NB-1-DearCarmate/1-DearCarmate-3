@@ -28,7 +28,7 @@ export const CreateUserBodyStruct = matchPasswords(
     phoneNumber: phoneNumberRegExp,
     password: pwRegExp,
     passwordConfirmation: string(),
-    company: nonempty(string()),
+    companyName: nonempty(string()),
     companyCode: nonempty(string()),
   }),
 );
