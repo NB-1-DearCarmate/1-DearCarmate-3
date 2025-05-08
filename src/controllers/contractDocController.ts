@@ -2,7 +2,7 @@ import { create } from 'superstruct';
 import { Request, Response } from 'express';
 import { RequestHandler } from 'express';
 import { OmittedUser } from '../types/OmittedUser';
-import { getContractListWithDoc, getContractDraft } from '../services/contractService';
+import contractService from '../services/contractService';
 import { PageParamsStruct } from '../structs/commonStructs';
 import { ResponseContractChoiceDTO, ResponseContractDocListDTO } from '../lib/dtos/contractDocDTO';
 import { DOCUMENT_PATH } from '../config/constants';
@@ -17,16 +17,16 @@ import EmptyUploadError from '../lib/errors/EmptyUploadError';
 export const getDocumentList: RequestHandler = async (req, res) => {
   const reqUser = req.user as OmittedUser;
   const data = create(req.query, PageParamsStruct);
-  const { contracts, page, pageSize, totalItemCount } = await getContractListWithDoc(
+  const { contracts, totalItemCount } = await contractService.getContractListWithDoc(
     reqUser.companyId,
     data,
   );
-  res.send(new ResponseContractDocListDTO(contracts, page, pageSize, totalItemCount));
+  res.send(new ResponseContractDocListDTO(contracts, data.page, data.pageSize, totalItemCount));
 };
 
 export const getContractChoice: RequestHandler = async (req, res) => {
   const reqUser = req.user as OmittedUser;
-  const contracts = await getContractDraft(reqUser.companyId);
+  const contracts = await contractService.getContractDraft(reqUser.companyId);
   res.send(new ResponseContractChoiceDTO(contracts).data);
 };
 
@@ -41,6 +41,9 @@ export const uploadDocument = async (req: Request, res: Response): Promise<void>
   console.log(file.path);
   const filePath = path.join(path.resolve(), DOCUMENT_PATH, file.filename);
   console.log(filePath);
+
+  const { contractId } = req.body;
+
   const document = await contractDocService.createDocument(file.filename, filePath, fileSize);
   res.status(201).send(new ResponseDocumentIdDTO(document.id));
 };

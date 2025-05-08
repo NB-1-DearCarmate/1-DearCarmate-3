@@ -13,6 +13,7 @@ import { defaultNotFoundHandler, globalErrorHandler } from './controllers/errorC
 import imageRouter from './routers/imageRouter';
 import dotenv from 'dotenv';
 import customerRouter from './routers/customerRouter';
+import contractRouter from './routers/contractRouter';
 import contractDocRouter from './routers/comtractDocRouter';
 import carsRouter from './routers/carsRouter';
 import dashBoardRouter from './routers/dashBoardRouter';
@@ -33,6 +34,7 @@ app.use('/companies', companyRouter);
 app.use('/contractDocuments', contractDocRouter);
 app.use('/cars', carsRouter);
 app.use('/dashboard', dashBoardRouter);
+app.use('/contracts', contractRouter);
 
 app.use('/images', imageRouter);
 
