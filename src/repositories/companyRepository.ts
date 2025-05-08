@@ -46,10 +46,6 @@ async function getCount(params: Prisma.CompanyCountArgs) {
   });
 }
 
-function getEntityName() {
-  return prisma.company.getEntityName();
-}
-
 async function deleteById(companyId: number) {
   return await prisma.company.delete({
     where: {
@@ -64,6 +60,5 @@ export default {
   findByName,
   getList,
   getCount,
-  getEntityName,
   deleteById,
 };

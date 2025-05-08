@@ -1,8 +1,9 @@
 import { ResponseCompanyDTO } from '../lib/dtos/companyDTO';
 import companyRepository from '../repositories/companyRepository';
-import { Prisma } from '@prisma/client';
 import { PageParamsType } from '../structs/commonStructs';
 import { CreateCompanyBodyType, PatchCompanyBodyType } from '../structs/companyStructs';
+import NotFoundError from '../lib/errors/NotFoundError';
+import { buildSearchCondition } from '../lib/searchCondition';
 
 async function createCompany(company: CreateCompanyBodyType) {
   const createdCompany = await companyRepository.create(company);
@@ -15,49 +16,29 @@ async function updateCompany(companyId: number, body: PatchCompanyBodyType) {
 }
 
 async function getByName(companyName: string) {
-  return await companyRepository.findByName(companyName);
-}
-
-function getEntityName() {
-  return companyRepository.getEntityName();
-}
-
-async function getCompanies({ page, pageSize, searchBy, keyword }: PageParamsType) {
-  let prismaParams: {
-    skip: number;
-    take: number;
-    where?: Prisma.CompanyWhereInput;
-  } = {
-    skip: (page - 1) * pageSize,
-    take: pageSize,
-  };
-  let prismaWhereCondition: Prisma.CompanyWhereInput = {};
-  if (searchBy && keyword) {
-    switch (searchBy) {
-      case 'companyName':
-        prismaWhereCondition = {
-          companyName: {
-            contains: keyword,
-          },
-        };
-        break;
-    }
+  const company = await companyRepository.findByName(companyName);
+  if (!company) {
+    throw new NotFoundError('Company', companyName);
   }
-  prismaParams = {
-    ...prismaParams,
-    where: prismaWhereCondition,
+  return company;
+}
+
+async function getCompanies(params: PageParamsType) {
+  const searchCondition = buildSearchCondition(params, ['companyName']);
+  const where = searchCondition.whereCondition;
+  const prismaParams = {
+    ...searchCondition.pageCondition,
+    where,
   };
 
   const companies = await companyRepository.getList(prismaParams);
   const totalItemCount = await companyRepository.getCount({
-    where: prismaWhereCondition,
+    where,
   });
 
   return {
-    currentPage: page,
-    totalPages: Math.ceil(totalItemCount / pageSize),
     totalItemCount,
-    data: companies.map((company) => new ResponseCompanyDTO(company)),
+    companies,
   };
 }
 
@@ -69,7 +50,6 @@ export default {
   createCompany,
   updateCompany,
   getByName,
-  getEntityName,
   getCompanies,
   deleteCompany,
 };

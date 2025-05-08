@@ -30,19 +30,19 @@ model User {
 }
 
 model Customer {
-  id            Int      @id @default(autoincrement())
+  id            Int       @id @default(autoincrement())
   companyId     Int
-  name          String   @db.VarChar(50)
-  email         String   @unique @db.VarChar(320)
-  gender        String   @db.VarChar(50)
-  phoneNumber   String   @unique @db.VarChar(20)
-  ageGroup      Int?     @db.Integer
-  region        String?  @db.VarChar(50)
-  contractCount Int      @default(0) @db.Integer
+  name          String    @db.VarChar(50)
+  email         String    @unique @db.VarChar(320)
+  gender        String    @db.VarChar(50)
+  phoneNumber   String    @unique @db.VarChar(20)
+  ageGroup      AGE_GROUP
+  region        REGION
+  contractCount Int       @default(0) @db.Integer
   memo          String?
-  createdAt     DateTime @default(now())
+  createdAt     DateTime  @default(now())
 
-  company   Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  company   Company?   @relation(fields: [companyId], references: [id], onDelete: Cascade)
   contracts Contract[]
 }
 
@@ -53,12 +53,11 @@ model Car {
   carNumber         String     @unique @db.VarChar(50)
   manufacturingYear Int        @db.Integer
   mileage           Int        @db.Integer
-  price             Decimal    @db.Decimal(20, 2)
+  price             Int        @db.Integer
   status            CAR_STATUS @default(AVAILABLE)
   accidentCount     Int        @default(0) @db.Integer
   explanation       String?
   accidentDetails   String?
-  Datetime          DateTime   @default(now())
 
   company   Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
   carModel  CarModel   @relation(fields: [modelId], references: [id], onDelete: Restrict)
@@ -81,7 +80,7 @@ model Contract {
   user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   contractDocuments ContractDocument[]
   meetings          Meeting[]
-  Company           Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  company           Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
 model ContractDocument {
@@ -89,9 +88,9 @@ model ContractDocument {
   fileName   String @db.VarChar(50)
   filePath   String @db.VarChar(255)
   fileSize   Int?   @db.Integer
-  contractId Int
+  contractId Int?
 
-  contract Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  contract Contract? @relation(fields: [contractId], references: [id], onDelete: Cascade)
 }
 
 model Manufacturer {
@@ -154,4 +153,35 @@ enum USER_ROLE {
   ADMIN
   OWNER
   EMPLOYEE
+}
+
+enum AGE_GROUP {
+  AGE_10
+  AGE_20
+  AGE_30
+  AGE_40
+  AGE_50
+  AGE_60
+  AGE_70
+  AGE_80
+}
+
+enum REGION {
+  SEOUL
+  GYEONGGI
+  INCHEON
+  GANGWON
+  CHOUNGBUK
+  CHOUNGNAM
+  SEJONG
+  DAJEON
+  GYEONGBUK
+  GYEONGNAM
+  GWANGJU
+  JEONBUK
+  JEONNAM
+  DAEGU
+  ULSAN
+  BUSAN
+  JEJU
 }

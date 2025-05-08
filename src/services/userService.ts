@@ -5,27 +5,25 @@ import userRepository from '../repositories/userRepository';
 import NotFoundError from '../lib/errors/NotFoundError';
 import UnauthError from '../lib/errors/UnauthError';
 import { Prisma, User } from '@prisma/client';
-import { OmittedUser } from '../../types/OmittedUser';
 import { CreateUserDTO } from '../lib/dtos/userDTO';
-import CommonError from '../lib/errors/CommonError';
-import { UpdateUserBodyType } from '../structs/userStructs';
+import { CreateUserBodyType, UpdateUserBodyType } from '../structs/userStructs';
 import { PageParamsType } from '../structs/commonStructs';
+import { OmittedUser } from '../types/OmittedUser';
+import { buildSearchCondition } from '../lib/searchCondition';
 
 async function hashingPassword(password: string) {
   return await bcrypt.hash(password, 10);
 }
 
-async function createUser(user: CreateUserDTO) {
-  const hashedPassword = await hashingPassword(user.password);
-  const { password, ...rest } = user;
-  const createdUser = await userRepository.create({
-    ...rest,
-    encryptedPassword: hashedPassword,
-  });
+async function createUser(data: CreateUserBodyType, companyId: number) {
+  const hashedPassword = await hashingPassword(data.password);
+  const createdUser = await userRepository.create(
+    new CreateUserDTO(data, companyId, hashedPassword),
+  );
   return filterSensitiveUserData(createdUser);
 }
 
-async function getUser(email: string, password: string) {
+async function authenticateUser(email: string, password: string) {
   const user = await userRepository.findByEmail(email);
   if (!user) {
     throw new UnauthError();
@@ -38,78 +36,36 @@ async function getUserById(id: number) {
   const user = await userRepository.findById(id);
 
   if (!user) {
-    throw new NotFoundError(userRepository.getEntityName(), id);
+    throw new NotFoundError('user', id);
   }
 
   return filterSensitiveUserData(user);
 }
 
-async function getUsers({ page, pageSize, searchBy, keyword }: PageParamsType) {
-  let prismaParams: {
-    skip: number;
-    take: number;
-    include: {
-      company: {
-        select: { companyName: true };
-      };
-    };
-    where?: Prisma.UserWhereInput;
-  } = {
-    skip: (page - 1) * pageSize,
-    take: pageSize,
+async function getCompanyUsers(params: PageParamsType) {
+  const searchCondition = buildSearchCondition(params, ['companyName', 'email', 'name']);
+  const where = searchCondition.whereCondition;
+  const prismaParams = {
+    ...searchCondition.pageCondition,
     include: {
       company: {
         select: { companyName: true },
       },
     },
-  };
-  let prismaWhereCondition: Prisma.UserWhereInput = {};
-
-  if (searchBy && keyword) {
-    switch (searchBy) {
-      case 'companyName':
-        prismaWhereCondition = {
-          company: {
-            companyName: {
-              contains: keyword,
-            },
-          },
-        };
-        break;
-      case 'email':
-        prismaWhereCondition = {
-          email: {
-            contains: keyword,
-          },
-        };
-        break;
-      case 'name':
-        prismaWhereCondition = {
-          name: {
-            contains: keyword,
-          },
-        };
-        break;
-    }
-  }
-  prismaParams = {
-    ...prismaParams,
-    where: prismaWhereCondition,
+    where,
   };
 
   const users = await userRepository.findMany(prismaParams);
-  const totalItemCount = await userRepository.getCount({ where: prismaWhereCondition });
-  const omitedUsers = users.map((user) => {
-    const { encryptedPassword, ...rest } = user;
-    const omitedUser: OmittedUser = rest;
-    return omitedUser;
-  });
-  return {
-    currentPage: page,
-    totalPages: Math.ceil(totalItemCount / pageSize),
-    totalItemCount: totalItemCount,
-    data: omitedUsers,
-  };
+  const totalItemCount = await userRepository.getCount({ where });
+  return { users, totalItemCount };
+}
+
+async function getCompanyIdById(userId: number) {
+  const user = await userRepository.findCompanyIdbyUserId(userId);
+  if (!user) {
+    throw new NotFoundError('user', userId);
+  }
+  return user.companyId;
 }
 
 async function updateUser(id: number, data: UpdateUserBodyType) {
@@ -146,7 +102,7 @@ async function refreshToken(userId: number) {
 async function verifyPassword(inputPassword: string, savedPassword: string) {
   const isValid = await bcrypt.compare(inputPassword, savedPassword);
   if (!isValid) {
-    throw new CommonError('Wrong Password', 400);
+    throw new UnauthError();
   }
 }
 
@@ -167,11 +123,12 @@ function createToken(authedUser: OmittedUser, type?: String) {
 
 export default {
   createUser,
-  getUser,
+  getUser: authenticateUser,
   getUserById,
+  getCompanyIdById,
   updateUser,
   deleteUser,
-  getUsers,
+  getCompanyUsers,
   createToken,
   refreshToken,
 };
