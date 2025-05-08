@@ -9,7 +9,7 @@ import { PagePaginationParams } from '../types/pagination';
 import { CreateCarBodyType, UpdateCarBodyType } from '../structs/carsStructs';
 import { CreateCarDTO, UpdateCarDTO } from '../lib/dtos/carDTO';
 
-type CreateCarData = Omit<Car, 'id' | 'modelId' | 'status'> & {
+type CreateCarData = Omit<Car, 'id' | 'modelId' | 'status' | 'manufacturer' | 'model' | 'type'> & {
   manufacturer: string;
   model: string;
 };

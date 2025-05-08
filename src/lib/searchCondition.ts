@@ -18,6 +18,7 @@ export function buildSearchCondition(
     whereCondition = {
       [params.searchBy]: {
         contains: params.keyword,
+        mode: 'insensitive',
       },
     };
   }

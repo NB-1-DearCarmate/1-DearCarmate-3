@@ -1,12 +1,28 @@
-import { Contract, Customer, Car, User, Meeting, ContractDocument } from '@prisma/client';
+import { CONTRACT_STATUS } from '@prisma/client';
+import { Decimal } from '@prisma/client/runtime/library';
 
-type FullContract = Contract & {
-  customer: Customer;
-  car: Car;
-  user: User;
-  meetings: Meeting[];
-  contractDocuments: ContractDocument[];
-  updatedAt: Date;
+export type ContractForResponse = {
+  id: number;
+  contractPrice: Decimal;
+  status: CONTRACT_STATUS;
+  resolutionDate: Date | null;
+
+  user: { id: number; name: string };
+  customer: { id: number; name: string };
+  car: {
+    id: number;
+    carModel: {
+      model: string;
+    };
+  };
+  meetings: { time: Date }[];
+  contractDocuments?: {
+    id: number;
+    fileName: string;
+    filePath: string;
+    fileSize: number | null;
+    contractId: number | null;
+  }[];
 };
 
 export class ResponseContractDTO {
@@ -14,28 +30,74 @@ export class ResponseContractDTO {
   contractPrice: number;
   status: string;
   resolutionDate: Date | null;
-  createdAt: Date;
-  updatedAt: Date;
 
-  // 관계 DTO
-  customer: Customer;
-  car: Car;
-  user: User;
-  meetings: Meeting[];
-  contractDocuments: ContractDocument[];
+  user: { id: number; name: string };
+  customer: { id: number; name: string };
+  car: { id: number; model: string };
+  meetings: { date: string }[];
 
-  constructor(contract: FullContract) {
+  constructor(contract: ContractForResponse) {
     this.id = contract.id;
     this.contractPrice = contract.contractPrice.toNumber();
     this.status = contract.status;
     this.resolutionDate = contract.resolutionDate;
-    this.createdAt = contract.createdAt;
-    this.updatedAt = contract.updatedAt;
 
-    this.customer = contract.customer;
-    this.car = contract.car;
-    this.user = contract.user;
-    this.meetings = contract.meetings;
-    this.contractDocuments = contract.contractDocuments;
+    this.user = { id: contract.user.id, name: contract.user.name };
+    this.customer = { id: contract.customer.id, name: contract.customer.name };
+    this.car = { id: contract.car.id, model: contract.car.carModel.model };
+    this.meetings = contract.meetings.map((m) => ({ date: m.time.toISOString() }));
+  }
+}
+
+export class ResponseContractListDTO {
+  carInspection = { totalItemCount: 0, data: [] as ContractForResponse[] };
+  priceNegotiation = { totalItemCount: 0, data: [] as ContractForResponse[] };
+  contractDraft = { totalItemCount: 0, data: [] as ContractForResponse[] };
+  contractSuccessful = { totalItemCount: 0, data: [] as ContractForResponse[] };
+  contractFailed = { totalItemCount: 0, data: [] as ContractForResponse[] };
+
+  private statusMap = {
+    [CONTRACT_STATUS.VEHICLE_CHECKING]: 'carInspection',
+    [CONTRACT_STATUS.PRICE_CHECKING]: 'priceNegotiation',
+    [CONTRACT_STATUS.CONTRACT_PREPARING]: 'contractDraft',
+    [CONTRACT_STATUS.CONTRACT_SUCCESS]: 'contractSuccessful',
+    [CONTRACT_STATUS.CONTRACT_FAILED]: 'contractFailed',
+  } as const;
+
+  constructor(contracts: ContractForResponse[]) {
+    contracts.forEach((contract) => {
+      const key = this.statusMap[contract.status];
+      if (key) {
+        this[key].data.push(contract);
+        this[key].totalItemCount++;
+      }
+    });
+  }
+}
+
+export class ResponseCustomerDropdownDTO {
+  constructor(customers: { id: number; name: string }[]) {
+    return customers.map(({ id, name }) => ({
+      id,
+      data: name,
+    }));
+  }
+}
+
+export class ResponseUserDropdownDTO {
+  constructor(users: { id: number; name: string }[]) {
+    return users.map(({ id, name }) => ({
+      id,
+      data: name,
+    }));
+  }
+}
+
+export class ResponseCarDropdownDTO {
+  constructor(cars: { id: number; carModel: { model: string }; carNumber: string }[]) {
+    return cars.map((car) => ({
+      id: car.id,
+      data: `${car.carModel.model}(${car.carNumber})`,
+    }));
   }
 }
