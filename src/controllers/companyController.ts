@@ -11,8 +11,7 @@ import {
   CreateCompanyBodyStruct,
   PatchCompanyBodyStruct,
 } from '../structs/companyStructs';
-import { ResponseCompanyListDTO } from '../lib/dtos/companyDTO';
-import { ResponseUserListDTO } from '../lib/dtos/userDTO';
+import { ResponseCompanyListDTO, ResponseCompanyUserListDTO } from '../lib/dtos/companyDTO';
 
 /**
  * @openapi
@@ -146,7 +145,7 @@ export const getCompanyList: RequestHandler = async (req, res) => {
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ResponseUserListDTO'
+ *               $ref: '#/components/schemas/ResponseCompanyUserListDTO'
  *       400:
  *         description: 잘못된 요청입니다. 유효하지 않은 페이지 번호 또는 페이지 크기일 수 있습니다.
  *       401:
@@ -159,9 +158,16 @@ export const getCompanyUsers: RequestHandler = async (req, res) => {
   if (reqUser.role !== USER_ROLE.ADMIN) {
     throw new UnauthError();
   }
-  const data = create(req.query, PageParamsStruct);
-  const result = await userService.getUsers(data);
-  res.send(new ResponseUserListDTO(data.page, data.pageSize, result));
+  const pageParams = create(req.query, PageParamsStruct);
+  const result = await userService.getCompanyUsers(pageParams);
+  res.send(
+    new ResponseCompanyUserListDTO(
+      pageParams.page,
+      pageParams.pageSize,
+      result.users,
+      result.totalItemCount,
+    ),
+  );
 };
 
 /**
