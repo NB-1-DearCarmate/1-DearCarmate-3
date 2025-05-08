@@ -185,12 +185,21 @@ export const getCompanyUsers: RequestHandler = async (req, res) => {
  *         schema:
  *           type: integer
  *         description: 수정할 회사 ID
- *       - in: query
- *         name: companyName
- *         schema:
- *           type: string
- *         description: 수정할 회사 이름
- *         example: "햇살카 수정"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               companyName:
+ *                 type: string
+ *                 description: 수정할 회사 이름
+ *                 example: 햇살카 수정
+ *               companyCode:
+ *                 type: string
+ *                 description: 수정할 회사 코드
+ *                 example: HS-001
  *     responses:
  *       200:
  *         description: 회사 정보가 성공적으로 수정되었습니다.
@@ -205,13 +214,14 @@ export const getCompanyUsers: RequestHandler = async (req, res) => {
  *       500:
  *         description: 서버 오류가 발생했습니다.
  */
+
 export const patchCompany: RequestHandler = async (req, res) => {
   const reqUser = req.user as OmittedUser;
   if (reqUser.role !== USER_ROLE.ADMIN) {
     throw new UnauthError();
   }
   const { companyId } = create(req.params, CompanyIdParamStruct);
-  const data = create(req.query, PatchCompanyBodyStruct);
+  const data = create(req.body, PatchCompanyBodyStruct);
   const company = await companyService.updateCompany(companyId, data);
   res.send(company);
 };

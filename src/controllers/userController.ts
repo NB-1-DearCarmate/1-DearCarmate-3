@@ -115,7 +115,7 @@ export const getInfo: RequestHandler = async (req, res) => {
 /**
  * @openapi
  * /users/me:
- *   put:
+ *   patch:
  *     summary: 로그인한 사용자 정보 수정
  *     tags:
  *       - User
