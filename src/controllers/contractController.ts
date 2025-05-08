@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import contractService from '../services/contractService';
+import { ResponseContractDTO } from '../lib/dtos/contractDTO';
 import { validate } from 'superstruct';
 import { ContractCreateStruct } from '../structs/contractStructs';
 import CommonError from '../lib/errors/CommonError';
@@ -13,7 +14,7 @@ const createContract = async (req: Request, res: Response) => {
   }
 
   const contract = await contractService.createContractService(req.body);
-  res.status(201).json(contract);
+  res.status(201).json(new ResponseContractDTO(contract));
 };
 
 const updateContract = async (req: Request, res: Response) => {
@@ -48,7 +49,7 @@ const getContractById = async (req: Request, res: Response) => {
   if (!contract) {
     throw new CommonError('계약을 찾을 수 없습니다.', 404);
   }
-  res.status(200).json(contract);
+  res.status(200).json(new ResponseContractDTO(contract));
 };
 
 const deleteContract = async (req: Request, res: Response) => {

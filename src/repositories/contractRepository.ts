@@ -20,6 +20,15 @@ async function create(data: {
     },
     include: {
       meetings: true,
+      user: { select: { id: true, name: true } },
+      customer: { select: { id: true, name: true } },
+      car: {
+        select: {
+          id: true,
+          carModel: { select: { model: true } },
+        },
+      },
+      contractDocuments: true,
     },
   });
 }
@@ -63,7 +72,11 @@ async function findById(id: number) {
     where: { id },
     include: {
       customer: true,
-      car: true,
+      car: {
+        include: {
+          carModel: true,
+        },
+      },
       user: true,
       meetings: true,
       contractDocuments: true,

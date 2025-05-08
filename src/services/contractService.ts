@@ -2,6 +2,7 @@ import { assert } from 'superstruct';
 import { ContractCreateStruct } from '../structs/contractStructs';
 import { CONTRACT_STATUS, Prisma } from '@prisma/client';
 import { PageParamsType } from '../structs/commonStructs';
+import { FullContract } from '../lib/dtos/contractDTO';
 import contractRepository from '../repositories/contractRepository';
 
 type CreateContractData = {
@@ -32,7 +33,7 @@ const getAllContractsService = async () => {
 
 const getContractByIdService = async (id: number) => {
   const contract = await contractRepository.findById(id);
-  return contract;
+  return contract as FullContract;
 };
 
 const deleteContractService = async (id: number) => {
