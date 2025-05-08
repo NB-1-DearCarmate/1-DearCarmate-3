@@ -98,3 +98,21 @@ export async function getCar(id: number) {
     where: { id },
   });
 }
+
+export async function createCars(dataList: Omit<Car, 'id' | 'status'>[]) {
+  const createdCars = await prismaClient.$transaction(async (prisma) => {
+    const cars = await Promise.all(
+      dataList.map((data) =>
+        prisma.car.create({
+          data: {
+            ...data,
+            status: CAR_STATUS.AVAILABLE,
+          },
+        }),
+      ),
+    );
+    return cars;
+  });
+
+  return createdCars;
+}

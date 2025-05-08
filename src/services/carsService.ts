@@ -9,6 +9,11 @@ import { PagePaginationParams } from '../types/pagination';
 import { CreateCarBodyType, UpdateCarBodyType } from '../structs/carsStructs';
 import { CreateCarDTO, UpdateCarDTO } from '../lib/dtos/carDTO';
 
+type CreateCarData = Omit<Car, 'id' | 'modelId' | 'status'> & {
+  manufacturer: string;
+  model: string;
+};
+
 export async function createCar(data: CreateCarBodyType, companyId: number) {
   const manufacturer = await manufacturerRepository.getManufacturerByName(data.manufacturer);
   if (!manufacturer) {
@@ -110,4 +115,41 @@ export async function getCar(id: number): Promise<CarInfo> {
 
 export async function getCarModelList() {
   return await manufacturerRepository.getManufacturerList();
+}
+
+export async function carUpload(data: CreateCarData[]) {
+  const mappedCars = await Promise.all(
+    data.map(async (item) => {
+      const manufacturer = await manufacturerRepository.getManufacturerByName(item.manufacturer);
+      if (!manufacturer) {
+        throw new BadRequestError('잘못된 요청입니다');
+      }
+
+      const carModel = await carsModelRepository.getCarModelByModel(item.model, manufacturer.id);
+      if (!carModel) {
+        throw new BadRequestError('잘못된 요청입니다');
+      }
+
+      const carType = await carsTypeRepository.getCarTypeById(carModel.typeId);
+      if (!carType) {
+        throw new BadRequestError('잘못된 요청입니다');
+      }
+
+      return {
+        carNumber: item.carNumber,
+        manufacturingYear: item.manufacturingYear,
+        mileage: item.mileage,
+        price: item.price,
+        accidentCount: item.accidentCount,
+        explanation: item.explanation || '',
+        accidentDetails: item.accidentDetails || '',
+        companyId: item.companyId,
+        modelId: carModel.id,
+      };
+    }),
+  );
+
+  const carUpload = await carsRepository.createCars(mappedCars);
+
+  return carUpload;
 }

@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { create } from 'superstruct';
 import {
+  BulkCreateCarBodyStruct,
   CreateCarBodyStruct,
   GetCarListParamsStruct,
   UpdateCarBodyStruct,
@@ -9,6 +10,8 @@ import * as carsService from '../services/carsService';
 import { CarResponseDTO, ResponseCarListDTO, ResponseCarModelListDTO } from '../lib/dtos/carDTO';
 import { CarIdParamsStruct } from '../structs/commonStructs';
 import { OmittedUser } from '../types/OmittedUser';
+import BadRequestError from '../lib/errors/BadRequestError';
+import csv from 'csvtojson';
 
 /**
  * @openapi
@@ -300,4 +303,37 @@ export async function getCar(req: Request, res: Response) {
 export async function getCarModelList(req: Request, res: Response) {
   const result = await carsService.getCarModelList();
   res.send(new ResponseCarModelListDTO(result));
+}
+
+export async function carUpload(req: Request, res: Response) {
+  const reqUser = req.user as OmittedUser;
+  if (!req.file) {
+    throw new BadRequestError('CSV 파일이 업로드되지 않았습니다.');
+  }
+
+  const filePath = req.file.path;
+
+  const jsonArray = await csv().fromFile(filePath);
+
+  const parsedArray = jsonArray.map((item) => ({
+    carNumber: item.carNumber,
+    manufacturer: item.manufacturer,
+    model: item.model,
+    manufacturingYear: parseInt(item.manufacturingYear, 10),
+    mileage: parseInt(item.mileage, 10),
+    price: parseInt(item.price, 10),
+    accidentCount: parseInt(item.accidentCount, 10),
+    explanation: item.explanation,
+    accidentDetails: item.accidentDetails,
+  }));
+
+  const validatedData = create(parsedArray, BulkCreateCarBodyStruct);
+
+  const dataWithCompanyId = validatedData.map((item) => ({
+    ...item,
+    companyId: reqUser.companyId,
+  }));
+  const createdCars = await carsService.carUpload(dataWithCompanyId);
+
+  res.status(200).send({ message: '성공적으로 등록되었습니다' });
 }

@@ -9,6 +9,7 @@
     "@types/bcrypt": "^5.0.2",
     "@types/cookie-parser": "^1.4.8",
     "@types/cors": "^2.8.17",
+    "@types/csvtojson": "^2.0.3",
     "@types/dotenv": "^6.1.1",
     "@types/is-uuid": "^1.0.2",
     "@types/multer": "^1.4.12",
