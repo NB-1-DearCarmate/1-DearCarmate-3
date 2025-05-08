@@ -145,7 +145,7 @@ export const getCompanyList: RequestHandler = async (req, res) => {
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ResponseUserListDTO'
+ *               $ref: '#/components/schemas/ResponseCompanyUserListDTO'
  *       400:
  *         description: 잘못된 요청입니다. 유효하지 않은 페이지 번호 또는 페이지 크기일 수 있습니다.
  *       401:
@@ -159,7 +159,7 @@ export const getCompanyUsers: RequestHandler = async (req, res) => {
     throw new UnauthError();
   }
   const pageParams = create(req.query, PageParamsStruct);
-  const users = await userService.getUsers(pageParams);
+  const users = await userService.getCompanyUsers(pageParams);
   res.send(users);
 };
 

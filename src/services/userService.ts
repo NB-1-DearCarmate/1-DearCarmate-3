@@ -130,7 +130,7 @@ export default {
   getCompanyIdById,
   updateUser,
   deleteUser,
-  getUsers: getCompanyUsers,
+  getCompanyUsers,
   createToken,
   refreshToken,
 };
