@@ -15,15 +15,10 @@ import { uploadHandler } from '../lib/fileUploader';
 const customerRouter = express.Router();
 
 customerRouter.post(
-  '/',
-  passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
-  withAsync(postCustomer),
-);
-customerRouter.post(
   '/upload',
   passport.authenticate(ACCESS_TOKEN_STRATEGY, { session: false }),
   uploadHandler({
-    allowedExt: ['csv'],
+    allowedTypes: ['text/csv', 'application/vnd.ms-excel'],
     memoryFlag: true,
   }).single('file'),
   withAsync(postCustomers),

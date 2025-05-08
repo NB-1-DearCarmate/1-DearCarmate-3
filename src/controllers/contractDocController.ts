@@ -1,19 +1,14 @@
 import { create } from 'superstruct';
 import { Request, Response } from 'express';
-import userService from '../services/userService';
 import { RequestHandler } from 'express';
 import { OmittedUser } from '../types/OmittedUser';
-import {
-  getContractListWithDcmt,
-  getContractDraft,
-  getEntityName,
-} from '../services/contractService';
+import contractService from '../services/contractService';
 import { PageParamsStruct } from '../structs/commonStructs';
-import { ResponseContractChoiceDTO, ResponseContractDcmtDTO } from '../lib/dtos/contractDTO';
+import { ResponseContractChoiceDTO, ResponseContractDocListDTO } from '../lib/dtos/contractDocDTO';
 import { DOCUMENT_PATH } from '../config/constants';
-import contractDcmtService from '../services/contractDcmtService';
-import { CreateDocumentDTO, ResponseDocumentIdDTO } from '../lib/dtos/contractDcmtDTO';
-import { DownloadDocumentStruct } from '../structs/contractDcmtStructs';
+import contractDocService from '../services/contractDocService';
+import { ResponseDocumentIdDTO } from '../lib/dtos/contractDocDTO';
+import { DownloadDocumentStruct } from '../structs/contractDocStructs';
 import NotFoundError from '../lib/errors/NotFoundError';
 import UnauthError from '../lib/errors/UnauthError';
 import path from 'path';
@@ -28,7 +23,7 @@ import EmptyUploadError from '../lib/errors/EmptyUploadError';
  *     tags:
  *       - Contract Documents
  *     security:
- *       - accessToken: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: page
@@ -47,7 +42,7 @@ import EmptyUploadError from '../lib/errors/EmptyUploadError';
  *         required: false
  *         schema:
  *           type: string
- *         description: 검색 기준 (예: userName, carNumber)
+ *         description: 검색 기준
  *       - in: query
  *         name: keyword
  *         required: false
@@ -60,19 +55,33 @@ import EmptyUploadError from '../lib/errors/EmptyUploadError';
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ResponseContractDcmtDTO'
+ *               $ref: '#/components/schemas/ResponseContractDocListDTO'
+ *             example:
+ *               contracts:
+ *                 - id: 1
+ *                   contractPrice: 9500000
+ *                   status: "ONGOING"
+ *                   createdAt: "2024-02-01T10:00:00Z"
+ *                   car:
+ *                     id: 5
+ *                     carNumber: "12가3456"
+ *                   customer:
+ *                     id: 7
+ *                     name: "홍길동"
+ *               page: 1
+ *               pageSize: 10
+ *               totalCount: 42
  *       401:
  *         description: 권한이 없는 사용자입니다.
  */
 export const getDocumentList: RequestHandler = async (req, res) => {
   const reqUser = req.user as OmittedUser;
   const data = create(req.query, PageParamsStruct);
-  const userCompanyId = await userService.getCompanyIdById(reqUser.id);
-  const { contracts, page, pageSize, totalItemCount } = await getContractListWithDcmt(
-    userCompanyId,
+  const { contracts, totalItemCount } = await contractService.getContractListWithDoc(
+    reqUser.companyId,
     data,
   );
-  res.send(new ResponseContractDcmtDTO(contracts, page, pageSize, totalItemCount));
+  res.send(new ResponseContractDocListDTO(contracts, data.page, data.pageSize, totalItemCount));
 };
 
 /**
@@ -80,11 +89,11 @@ export const getDocumentList: RequestHandler = async (req, res) => {
  * /contractDocuments/draft:
  *   get:
  *     summary: 계약 선택 목록 조회
- *     description: 계약 초안 목록을 조회합니다.
+ *     description: 계약 초안 상태인 계약 목록을 조회합니다.
  *     tags:
  *       - Contract Documents
  *     security:
- *       - accessToken: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: 계약 선택 목록 조회 성공
@@ -94,13 +103,21 @@ export const getDocumentList: RequestHandler = async (req, res) => {
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/ResponseContractChoiceDTO'
+ *             example:
+ *               - id: 3
+ *                 contractPrice: 8000000
+ *                 customer:
+ *                   id: 12
+ *                   name: "이순신"
+ *                 car:
+ *                   id: 9
+ *                   carNumber: "34나7890"
  *       401:
  *         description: 권한이 없는 사용자입니다.
  */
 export const getContractChoice: RequestHandler = async (req, res) => {
   const reqUser = req.user as OmittedUser;
-  const userCompanyId = await userService.getCompanyIdById(reqUser.id);
-  const contracts = await getContractDraft(userCompanyId);
+  const contracts = await contractService.getContractDraft(reqUser.companyId);
   res.send(new ResponseContractChoiceDTO(contracts).data);
 };
 
@@ -109,11 +126,11 @@ export const getContractChoice: RequestHandler = async (req, res) => {
  * /contractDocuments/upload:
  *   post:
  *     summary: 계약 문서 업로드
- *     description: 계약 문서를 업로드합니다.
+ *     description: 계약 문서를 업로드합니다. 파일 형식은 `multipart/form-data`로 전송해야 합니다.
  *     tags:
  *       - Contract Documents
  *     security:
- *       - accessToken: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -124,14 +141,16 @@ export const getContractChoice: RequestHandler = async (req, res) => {
  *               file:
  *                 type: string
  *                 format: binary
- *                 description: 업로드할 파일
+ *                 description: 업로드할 문서 파일
  *     responses:
- *       200:
+ *       201:
  *         description: 문서 업로드 성공
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ResponseDocumentIdDTO'
+ *             example:
+ *               id: 42
  *       400:
  *         description: 업로드된 파일이 없거나 잘못된 요청입니다.
  *       401:
@@ -148,9 +167,10 @@ export const uploadDocument = async (req: Request, res: Response): Promise<void>
   console.log(file.path);
   const filePath = path.join(path.resolve(), DOCUMENT_PATH, file.filename);
   console.log(filePath);
-  const document = await contractDcmtService.createDocument(
-    new CreateDocumentDTO(file.filename, filePath, fileSize),
-  );
+
+  const { contractId } = req.body;
+
+  const document = await contractDocService.createDocument(file.filename, filePath, fileSize);
   res.status(201).send(new ResponseDocumentIdDTO(document.id));
 };
 
@@ -163,7 +183,7 @@ export const uploadDocument = async (req: Request, res: Response): Promise<void>
  *     tags:
  *       - Contract Documents
  *     security:
- *       - accessToken: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: contractDocumentId
@@ -186,14 +206,13 @@ export const uploadDocument = async (req: Request, res: Response): Promise<void>
  */
 export const downloadDocument = async (req: Request, res: Response): Promise<void> => {
   const reqUser = req.user as OmittedUser;
-  const userCompanyId = await userService.getCompanyIdById(reqUser.id);
   const { contractDocumentId } = create(req.params, DownloadDocumentStruct);
 
-  const contractDocument = await contractDcmtService.getDocumentWithCompany(contractDocumentId);
+  const contractDocument = await contractDocService.getDocumentWithCompany(contractDocumentId);
   if (!contractDocument.contract) {
-    throw new NotFoundError(getEntityName(), 'contract');
+    throw new NotFoundError('Contract', 'contract');
   }
-  if (contractDocument.contract.companyId !== userCompanyId) {
+  if (contractDocument.contract.companyId !== reqUser.companyId) {
     throw new UnauthError();
   }
 

@@ -63,7 +63,7 @@ const reverseRegionMap: Record<REGION, string> = {
   [REGION.JEJU]: '제주',
 };
 
-export class RequestCustomerDTO {
+export class CreateCustomerDTO {
   name: string;
   gender: string;
   phoneNumber: string;
@@ -107,7 +107,7 @@ export class ResponseCustomerDTO {
   }
 }
 
-export class RequestUpdateCustomerDTO {
+export class UpdateCustomerDTO {
   name?: string;
   gender?: string;
   phoneNumber?: string;
@@ -124,5 +124,26 @@ export class RequestUpdateCustomerDTO {
     if (customer.region !== undefined) this.region = regionMap[customer.region];
     if (customer.email !== undefined) this.email = customer.email;
     if (customer.memo !== undefined) this.memo = customer.memo;
+  }
+}
+
+export class ResponseCustomerListDTO {
+  currentPage: number;
+  totalPages: number;
+  totalItemCount: number;
+  data: ResponseCustomerDTO[];
+
+  constructor(
+    page: number,
+    pageSize: number,
+    result: {
+      totalItemCount: number;
+      customers: (Customer & { _count?: { contracts: number } })[];
+    },
+  ) {
+    this.currentPage = page;
+    this.totalPages = Math.ceil(result.totalItemCount / pageSize);
+    this.totalItemCount = result.totalItemCount;
+    this.data = result.customers.map((customer) => new ResponseCustomerDTO(customer));
   }
 }

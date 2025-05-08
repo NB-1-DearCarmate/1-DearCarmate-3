@@ -54,10 +54,6 @@ async function deleteById(id: number) {
   });
 }
 
-function getEntityName() {
-  return prisma.user.getEntityName();
-}
-
 export default {
   create,
   createMany,
@@ -66,5 +62,4 @@ export default {
   getCount,
   update,
   deleteById,
-  getEntityName,
 };

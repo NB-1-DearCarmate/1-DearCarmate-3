@@ -17,20 +17,11 @@ export async function getManufacturerById(id: number) {
 }
 
 export async function getManufacturerList() {
-  const manufacturers = await prismaClient.manufacturer.findMany({
+  return await prismaClient.manufacturer.findMany({
     include: {
       carModels: {
         select: { model: true },
       },
     },
   });
-
-  const result = manufacturers
-    .filter((manufacturer) => manufacturer.carModels.length > 0)
-    .map((manufacturer) => ({
-      manufacturer: manufacturer.name,
-      model: manufacturer.carModels.map((carModel) => carModel.model),
-    }));
-
-  return { data: result };
 }

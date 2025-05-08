@@ -9,12 +9,12 @@ import {
   PatchCustomerBodyStruct,
 } from '../structs/customerStructs';
 import { create } from 'superstruct';
-import userService from '../services/userService';
 import { PageParamsStruct } from '../structs/commonStructs';
 import {
-  RequestCustomerDTO,
-  RequestUpdateCustomerDTO,
+  CreateCustomerDTO,
+  UpdateCustomerDTO,
   ResponseCustomerDTO,
+  ResponseCustomerListDTO,
 } from '../lib/dtos/customerDTO';
 import { parse } from 'csv-parse/sync';
 import { StructError } from 'superstruct';
@@ -25,11 +25,11 @@ import BadRequestError from '../lib/errors/BadRequestError';
  * /customers/{customerId}:
  *   get:
  *     summary: 고객 상세 조회
- *     description: 고객 ID를 통해 특정 고객 정보를 조회합니다.
+ *     description: 고객 ID를 통해 특정 고객 정보를 조회합니다. 직원 권한이 필요하며, 같은 회사 소속 고객만 조회할 수 있습니다.
  *     tags:
  *       - Customer
  *     security:
- *       - accessToken: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: customerId
@@ -45,17 +45,18 @@ import BadRequestError from '../lib/errors/BadRequestError';
  *             schema:
  *               $ref: '#/components/schemas/ResponseCustomerDTO'
  *       401:
- *         description: 직원 권한이 없는 사용자입니다.
+ *         description: 인증 실패 또는 권한이 없는 사용자입니다.
+ *       404:
+ *         description: 고객을 찾을 수 없습니다.
  */
 export const getCustomer: RequestHandler = async (req, res) => {
   const reqUser = req.user as OmittedUser;
   if (reqUser.role !== USER_ROLE.EMPLOYEE) {
     throw new UnauthError();
   }
-  const userCompanyId = await userService.getCompanyIdById(reqUser.id);
   const { customerId } = create(req.params, CustomerIdParamStruct);
   const customer = await customerService.getCustomer(customerId);
-  if (userCompanyId !== customer.companyId) {
+  if (reqUser.companyId !== customer.companyId) {
     throw new UnauthError();
   }
   res.send(new ResponseCustomerDTO(customer));
@@ -66,11 +67,11 @@ export const getCustomer: RequestHandler = async (req, res) => {
  * /customers:
  *   get:
  *     summary: 고객 목록 조회
- *     description: 페이지 정보를 기반으로 고객 목록을 조회합니다.
+ *     description: 페이지 정보를 기반으로 고객 목록을 조회합니다. 직원 또는 대표 권한이 필요합니다.
  *     tags:
  *       - Customer
  *     security:
- *       - accessToken: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: page
@@ -87,6 +88,12 @@ export const getCustomer: RequestHandler = async (req, res) => {
  *     responses:
  *       200:
  *         description: 고객 목록 조회 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ResponseCustomerListDTO'
+ *       401:
+ *         description: 인증 실패 또는 권한이 없는 사용자입니다.
  */
 export const getCustomerList: RequestHandler = async (req, res) => {
   const reqUser = req.user as OmittedUser;
@@ -95,9 +102,8 @@ export const getCustomerList: RequestHandler = async (req, res) => {
   }
 
   const page = create(req.query, PageParamsStruct);
-  const userCompanyId = await userService.getCompanyIdById(reqUser.id);
-  const customers = await customerService.getCustomers(userCompanyId, page);
-  res.send(customers);
+  const result = await customerService.getCustomers(reqUser.companyId, page);
+  res.send(new ResponseCustomerListDTO(page.page, page.pageSize, result));
 };
 
 /**
@@ -109,22 +115,38 @@ export const getCustomerList: RequestHandler = async (req, res) => {
  *     tags:
  *       - Customer
  *     security:
- *       - accessToken: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       description: 등록할 고객의 정보를 포함합니다.
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/CreateCustomerBodyType'
- *           example:
- *             name: "홍길동"
- *             gender: "남성"
- *             phoneNumber: "010-1234-5678"
- *             ageGroup: "30대"
- *             region: "서울"
- *             email: "hong@example.com"
- *             memo: "VIP 고객"
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: 고객 이름
+ *               gender:
+ *                 type: string
+ *                 description: 고객 성별
+ *               phoneNumber:
+ *                 type: string
+ *                 description: 고객 전화번호
+ *               ageGroup:
+ *                 type: string
+ *                 enum: ['teen', 'twenties', 'thirties', 'forties', 'fifties', 'sixties', 'seventies', 'eightyPlus']
+ *                 description: 고객 연령대
+ *               region:
+ *                 type: string
+ *                 enum: ['Seoul', 'Busan', 'Incheon', 'Daegu', 'Daejeon', 'Gwangju', 'Ulsan', 'Gyeonggi']
+ *                 description: 고객 거주 지역
+ *               email:
+ *                 type: string
+ *                 description: 고객 이메일
+ *               memo:
+ *                 type: string
+ *                 description: 고객에 대한 메모 (선택 사항)
  *     responses:
  *       201:
  *         description: 고객이 성공적으로 등록되었습니다.
@@ -149,15 +171,14 @@ export const getCustomerList: RequestHandler = async (req, res) => {
  *       500:
  *         description: 서버 오류가 발생했습니다.
  */
+
 export const postCustomer: RequestHandler = async (req, res) => {
   const reqUser = req.user as OmittedUser;
   if (reqUser.role !== USER_ROLE.EMPLOYEE) {
     throw new UnauthError();
   }
   const rawData = create(req.body, CreateCustomerBodyStruct);
-  const userCompanyId = await userService.getCompanyIdById(reqUser.id);
-  const transformedData = new RequestCustomerDTO(rawData);
-  const customer = await customerService.createCustomer(userCompanyId, transformedData);
+  const customer = await customerService.createCustomer(reqUser.companyId, rawData);
   const reverseTransformedData = new ResponseCustomerDTO(customer);
   res.status(201).send(reverseTransformedData);
 };
@@ -171,7 +192,7 @@ export const postCustomer: RequestHandler = async (req, res) => {
  *     tags:
  *       - Customer
  *     security:
- *       - accessToken: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: customerId
@@ -184,7 +205,31 @@ export const postCustomer: RequestHandler = async (req, res) => {
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/PatchCustomerBodyType'
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: 고객 이름
+ *               gender:
+ *                 type: string
+ *                 description: 고객 성별
+ *               phoneNumber:
+ *                 type: string
+ *                 description: 고객 전화번호 형식 010-1234-5678
+ *               ageGroup:
+ *                 type: string
+ *                 enum: ['teen', 'twenties', 'thirties', 'forties', 'fifties', 'sixties', 'seventies', 'eightyPlus']
+ *                 description: 고객 연령대
+ *               region:
+ *                 type: string
+ *                 enum: ['Seoul', 'Busan', 'Incheon', 'Daegu', 'Daejeon', 'Gwangju', 'Ulsan', 'Gyeonggi']
+ *                 description: 고객 거주 지역
+ *               email:
+ *                 type: string
+ *                 description: 고객 이메일
+ *               memo:
+ *                 type: string
+ *                 description: 고객 메모
  *     responses:
  *       200:
  *         description: 고객 수정 성공
@@ -200,15 +245,13 @@ export const patchCustomer: RequestHandler = async (req, res) => {
   if (reqUser.role !== USER_ROLE.EMPLOYEE) {
     throw new UnauthError();
   }
-  const userCompanyId = await userService.getCompanyIdById(reqUser.id);
   const { customerId } = create(req.params, CustomerIdParamStruct);
   const customerCompanyId = await customerService.getCompanyIdById(customerId);
-  if (userCompanyId !== customerCompanyId) {
+  if (reqUser.companyId !== customerCompanyId) {
     throw new UnauthError();
   }
   const rawData = create(req.body, PatchCustomerBodyStruct);
-  const transformedData = new RequestUpdateCustomerDTO(rawData);
-  const customer = await customerService.updateCustomer(customerId, transformedData);
+  const customer = await customerService.updateCustomer(customerId, rawData);
   const reverseTransformedData = new ResponseCustomerDTO(customer);
   res.send(reverseTransformedData);
 };
@@ -222,7 +265,7 @@ export const patchCustomer: RequestHandler = async (req, res) => {
  *     tags:
  *       - Customer
  *     security:
- *       - accessToken: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: customerId
@@ -241,10 +284,9 @@ export const deleteCustomer: RequestHandler = async (req, res) => {
   if (reqUser.role !== USER_ROLE.EMPLOYEE) {
     throw new UnauthError();
   }
-  const userCompanyId = await userService.getCompanyIdById(reqUser.id);
   const { customerId } = create(req.params, CustomerIdParamStruct);
   const customerCompanyId = await customerService.getCompanyIdById(customerId);
-  if (userCompanyId !== customerCompanyId) {
+  if (reqUser.companyId !== customerCompanyId) {
     throw new UnauthError();
   }
   await customerService.deleteCustomer(customerId);
@@ -256,14 +298,14 @@ export const deleteCustomer: RequestHandler = async (req, res) => {
  * /customers/upload:
  *   post:
  *     summary: 고객 일괄 등록
- *     description: CSV 파일을 통해 여러 고객을 일괄 등록합니다.
+ *     description: CSV 파일을 통해 여러 고객을 일괄 등록합니다. 각 고객 정보는 CSV 형식으로 제공되며, 잘못된 형식의 데이터는 등록되지 않고, 오류 메시지가 반환됩니다.
  *     tags:
  *       - Customer
  *     security:
- *       - accessToken: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
- *       description: CSV 파일을 업로드합니다.
+ *       description: 고객 정보를 포함한 CSV 파일을 업로드합니다.
  *       content:
  *         multipart/form-data:
  *           schema:
@@ -274,7 +316,27 @@ export const deleteCustomer: RequestHandler = async (req, res) => {
  *                 format: binary
  *     responses:
  *       200:
- *         description: 고객 일괄 등록 성공
+ *         description: 고객 일괄 등록 성공. 등록되지 않은 잘못된 데이터와 오류 메시지가 함께 반환됩니다.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "성공적으로 등록되었습니다."
+ *                 invalidcustomerList:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       record:
+ *                         type: object
+ *                       errorMessage:
+ *                         type: string
+ *                       example:
+ *                         record: { "name": "홍길동", "phoneNumber": "010-1234-5678" }
+ *                         errorMessage: "잘못된 형식의 전화번호"
  */
 export const postCustomers: RequestHandler = async (req, res) => {
   const reqUser = req.user as OmittedUser;
@@ -298,7 +360,7 @@ export const postCustomers: RequestHandler = async (req, res) => {
   for (const record of records) {
     try {
       const validated = CreateCustomerBodyStruct.create(record);
-      customerList.push(new RequestCustomerDTO(validated));
+      customerList.push(new CreateCustomerDTO(validated));
     } catch (err) {
       if (err instanceof StructError) {
         invalidcustomerList.push({
@@ -313,8 +375,7 @@ export const postCustomers: RequestHandler = async (req, res) => {
   if (customerList.length === 0) {
     throw new BadRequestError('잘못된 요청입니다.');
   }
-  const userCompanyId = await userService.getCompanyIdById(reqUser.id);
-  await customerService.createCustomers(userCompanyId, customerList);
+  await customerService.createCustomers(reqUser.companyId, customerList);
   res.status(200).send({
     message: '성공적으로 등록되었습니다.',
     invalidcustomerList,

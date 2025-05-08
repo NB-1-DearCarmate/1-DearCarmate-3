@@ -11,6 +11,8 @@ import {
   CreateCompanyBodyStruct,
   PatchCompanyBodyStruct,
 } from '../structs/companyStructs';
+import { ResponseCompanyListDTO } from '../lib/dtos/companyDTO';
+import { ResponseUserListDTO } from '../lib/dtos/userDTO';
 
 /**
  * @openapi
@@ -99,22 +101,7 @@ export const postCompany: RequestHandler = async (req, res) => {
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: number
- *                     description: 회사의 고유 ID입니다.
- *                     example: 1
- *                   companyName:
- *                     type: string
- *                     description: 회사 이름입니다.
- *                     example: "햇살카"
- *                   companyCode:
- *                     type: string
- *                     description: 회사 고유 코드입니다.
- *                     example: "HS001"
+ *               $ref: '#/components/schemas/ResponseCompanyListDTO'
  *       400:
  *         description: 잘못된 요청입니다. 유효하지 않은 페이지 번호 또는 페이지 크기일 수 있습니다.
  *       401:
@@ -128,8 +115,8 @@ export const getCompanyList: RequestHandler = async (req, res) => {
     throw new UnauthError();
   }
   const data = create(req.query, PageParamsStruct);
-  const companies = await companyService.getCompanies(data);
-  res.send(companies);
+  const result = await companyService.getCompanies(data);
+  res.send(new ResponseCompanyListDTO(data.page, data.pageSize, result));
 };
 
 /**
@@ -159,22 +146,7 @@ export const getCompanyList: RequestHandler = async (req, res) => {
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: number
- *                     description: 사용자의 고유 ID
- *                     example: 1
- *                   name:
- *                     type: string
- *                     description: 사용자의 이름
- *                     example: "홍길동"
- *                   email:
- *                     type: string
- *                     description: 사용자의 이메일
- *                     example: "hong@example.com"
+ *               $ref: '#/components/schemas/ResponseUserListDTO'
  *       400:
  *         description: 잘못된 요청입니다. 유효하지 않은 페이지 번호 또는 페이지 크기일 수 있습니다.
  *       401:
@@ -182,15 +154,14 @@ export const getCompanyList: RequestHandler = async (req, res) => {
  *       500:
  *         description: 서버 오류가 발생했습니다.
  */
-
 export const getCompanyUsers: RequestHandler = async (req, res) => {
   const reqUser = req.user as OmittedUser;
   if (reqUser.role !== USER_ROLE.ADMIN) {
     throw new UnauthError();
   }
   const data = create(req.query, PageParamsStruct);
-  const users = await userService.getUsers(data);
-  res.send(users);
+  const result = await userService.getUsers(data);
+  res.send(new ResponseUserListDTO(data.page, data.pageSize, result));
 };
 
 /**
@@ -220,20 +191,7 @@ export const getCompanyUsers: RequestHandler = async (req, res) => {
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: number
- *                   description: 수정된 회사의 고유 ID
- *                   example: 1
- *                 companyName:
- *                   type: string
- *                   description: 수정된 회사의 이름
- *                   example: "햇살카 수정"
- *                 companyCode:
- *                   type: string
- *                   description: 회사 고유 코드
- *                   example: "HS001"
+ *               $ref: '#/components/schemas/ResponseCompanyDTO'
  *       400:
  *         description: 잘못된 요청입니다. 필수 필드가 누락되었거나 잘못된 형식일 수 있습니다.
  *       401:
