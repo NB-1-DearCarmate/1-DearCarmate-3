@@ -6,7 +6,16 @@ import { uploadHandler } from '../lib/fileUploader';
 import { uploadImage } from '../controllers/imageController';
 const router = Router();
 
-const extArray = ['jpg', 'png', 'webp', 'gif', 'avif', 'bmp', 'ico'];
+const typeArray = [
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+  'image/avif',
+  'image/bmp',
+  'image/svg+xml',
+  'image/vnd.microsoft.icon',
+];
 
 router.post(
   '/upload',
@@ -14,7 +23,7 @@ router.post(
   uploadHandler({
     uploadFolder: IMAGE_PATH,
     fileSizeLimit: 5 * 1024 * 1024,
-    allowedExt: extArray,
+    allowedTypes: typeArray,
   }).single('image'),
   withAsync(uploadImage),
 );

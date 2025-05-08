@@ -11,23 +11,30 @@ import {
 import { uploadHandler } from '../lib/fileUploader';
 const contractDocRouter = express.Router();
 
-const extArray = [
-  'jpg',
-  'png',
-  'webp',
-  'gif',
-  'avif',
-  'bmp',
-  'ico',
-  'txt',
-  'pdf',
-  'docx',
-  'xlsx',
-  'csv',
-  'zip',
-  'rar',
-  '7z',
-  'hwp',
+const typeArray = [
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+  'image/avif',
+  'image/bmp',
+  'image/vnd.microsoft.icon',
+  'text/plain',
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  'text/csv',
+  'application/zip',
+  'application/vnd.rar',
+  'application/x-7z-compressed',
+  'application/x-hwp',
+  'application/vnd.ms-excel',
+  'application/vnd.ms-powerpoint',
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  'application/rtf',
+  'text/html',
+  'text/markdown',
 ];
 
 contractDocRouter.get(
@@ -42,7 +49,7 @@ contractDocRouter.post(
   uploadHandler({
     uploadFolder: DOCUMENT_PATH,
     fileSizeLimit: 50 * 1024 * 1024,
-    allowedExt: extArray,
+    allowedTypes: typeArray,
   }).single('contractDocument'),
   withAsync(uploadDocument),
 );

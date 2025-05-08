@@ -5,7 +5,7 @@ interface UploadHandlerOptions {
   uploadFolder?: string;
   fileSizeLimit?: number;
   memoryFlag?: boolean;
-  allowedExt?: string[];
+  allowedTypes?: string[];
 }
 
 const dirname = path.resolve();
@@ -15,7 +15,7 @@ export function uploadHandler(options: UploadHandlerOptions) {
     uploadFolder = 'public/temp',
     fileSizeLimit = 100 * 1024 * 1024,
     memoryFlag = false,
-    allowedExt = [],
+    allowedTypes = [],
   } = options;
 
   const storage = multer.diskStorage({
@@ -37,18 +37,23 @@ export function uploadHandler(options: UploadHandlerOptions) {
     file: Express.Multer.File,
     cb: multer.FileFilterCallback,
   ) => {
-    if (allowedExt.length === 0) {
+    if (allowedTypes.length === 0) {
       cb(null, true);
       return;
     }
-    const allowedTypes = new RegExp(`^(${allowedExt.join('|')})$`, 'i');
-    const extname = path.extname(file.originalname).toLowerCase();
-    const mimeType = allowedTypes.test(file.mimetype);
+    // const allowedTypes = new RegExp(`^(${allowedExt.join('|')})$`, 'i');
+    // const extname = path.extname(file.originalname).toLowerCase();
+    // const mimeType = allowedTypes.test(file.mimetype);
 
-    if (mimeType && allowedTypes.test(extname)) {
+    if (allowedTypes.includes(file.mimetype)) {
       cb(null, true);
       return;
     }
+
+    // if (mimeType && allowedTypes.test(extname)) {
+    //   cb(null, true);
+    //   return;
+    // }
     cb(null, false);
   };
 

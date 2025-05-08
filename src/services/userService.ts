@@ -6,7 +6,6 @@ import NotFoundError from '../lib/errors/NotFoundError';
 import UnauthError from '../lib/errors/UnauthError';
 import { Prisma, User } from '@prisma/client';
 import { CreateUserDTO } from '../lib/dtos/userDTO';
-import CommonError from '../lib/errors/CommonError';
 import { CreateUserBodyType, UpdateUserBodyType } from '../structs/userStructs';
 import { PageParamsType } from '../structs/commonStructs';
 import { OmittedUser } from '../types/OmittedUser';
@@ -43,7 +42,7 @@ async function getUserById(id: number) {
   return filterSensitiveUserData(user);
 }
 
-async function getUsers(params: PageParamsType) {
+async function getCompanyUsers(params: PageParamsType) {
   const searchCondition = buildSearchCondition(params, ['companyName', 'email', 'name']);
   const where = searchCondition.whereCondition;
   const prismaParams = {
@@ -58,8 +57,7 @@ async function getUsers(params: PageParamsType) {
 
   const users = await userRepository.findMany(prismaParams);
   const totalItemCount = await userRepository.getCount({ where });
-  const omitedUsers = users.map(filterSensitiveUserData);
-  return { totalItemCount, omitedUsers };
+  return { users, totalItemCount };
 }
 
 async function getCompanyIdById(userId: number) {
@@ -130,7 +128,7 @@ export default {
   getCompanyIdById,
   updateUser,
   deleteUser,
-  getUsers,
+  getCompanyUsers,
   createToken,
   refreshToken,
 };

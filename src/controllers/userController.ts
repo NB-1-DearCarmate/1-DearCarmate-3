@@ -19,10 +19,12 @@ import UnauthError from '../lib/errors/UnauthError';
  * /users:
  *   post:
  *     summary: 새로운 사용자 생성
+ *     description: 새로운 사용자를 생성하며, 회사 이름과 코드가 일치하는지 확인합니다.
  *     tags:
  *       - User
  *     requestBody:
  *       required: true
+ *       description: 생성할 사용자의 정보를 포함합니다.
  *       content:
  *         application/json:
  *           schema:
@@ -66,10 +68,20 @@ import UnauthError from '../lib/errors/UnauthError';
  *                 error:
  *                   type: string
  *                   example: "Company not found or company code is wrong"
+ *       400:
+ *         description: 잘못된 요청
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Missing required fields"
  */
 export const createUser: RequestHandler = async (req, res) => {
   const data = create(req.body, CreateUserBodyStruct);
-  const company = await companyService.getByName(data.company);
+  const company = await companyService.getByName(data.companyName);
   if (company.companyCode !== data.companyCode) {
     throw new CommonError('Company code is wrong', 404);
   }
@@ -82,8 +94,11 @@ export const createUser: RequestHandler = async (req, res) => {
  * /users/me:
  *   get:
  *     summary: 로그인한 사용자 정보 조회
+ *     description: 현재 로그인한 사용자의 정보를 반환합니다.
  *     tags:
  *       - User
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: 사용자 정보 반환
@@ -100,7 +115,7 @@ export const getInfo: RequestHandler = async (req, res) => {
 /**
  * @openapi
  * /users/me:
- *   put:
+ *   patch:
  *     summary: 로그인한 사용자 정보 수정
  *     tags:
  *       - User
@@ -139,11 +154,14 @@ export const editInfo: RequestHandler = async (req, res) => {
 
 /**
  * @openapi
- * /users/me/withdraw:
+ * /users/me:
  *   delete:
  *     summary: 사용자 탈퇴
+ *     description: 현재 로그인한 사용자를 탈퇴 처리합니다.
  *     tags:
  *       - User
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       204:
  *         description: 사용자 탈퇴 성공
@@ -159,6 +177,7 @@ export const withDraw: RequestHandler = async (req, res) => {
  * /users/{userId}:
  *   delete:
  *     summary: 관리자에 의한 사용자 삭제
+ *     description: 관리자 권한을 가진 사용자가 특정 사용자를 삭제합니다.
  *     tags:
  *       - User
  *     parameters:
@@ -168,11 +187,13 @@ export const withDraw: RequestHandler = async (req, res) => {
  *         description: 삭제할 사용자 ID
  *         schema:
  *           type: integer
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       204:
  *         description: 사용자 삭제 성공
  *       401:
- *         description: 권한 없음
+ *         description: 권한이 없습니다. 관리자만 접근 가능합니다.
  */
 export const deleteUser: RequestHandler = async (req, res) => {
   const reqUser = req.user as OmittedUser;

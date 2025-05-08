@@ -71,45 +71,11 @@ import { SearchParamsStruct } from '../structs/commonStructs';
  *               - time: "2025-05-10T14:00:00.000Z"
  *     responses:
  *       201:
- *         description: 계약이 성공적으로 생성되었습니다.
+ *         description: 계약과 관련된 회의가 성공적으로 생성되었습니다.
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: number
- *                 contractPrice:
- *                   type: number
- *                 status:
- *                   type: string
- *                 resolutionDate:
- *                   type: string
- *                   format: date-time
- *                   nullable: true
- *                 user:
- *                   type: object
- *                   properties:
- *                     id: { type: number }
- *                     name: { type: string }
- *                 customer:
- *                   type: object
- *                   properties:
- *                     id: { type: number }
- *                     name: { type: string }
- *                 car:
- *                   type: object
- *                   properties:
- *                     id: { type: number }
- *                     model: { type: string }
- *                 meetings:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       date:
- *                         type: string
- *                         format: date-time
+ *               $ref: '#/components/schemas/ResponseContractDTO'
  *             example:
  *               id: 1
  *               contractPrice: 15000000
@@ -280,7 +246,6 @@ const updateContract = async (req: Request, res: Response) => {
 
   const existingContract = await contractService.getContractByIdService(contractId);
   const existingDcmtId = new Set(existingContract?.contractDocuments.map((dcmt) => dcmt.id));
-
   const updated = await contractService.updateContractService(contractId, req.body);
 
   const { customer, createdAt, companyId, id, ...tempResponse } = updated;

@@ -43,6 +43,11 @@ async function findByEmail(email: string) {
 async function findMany(params: Prisma.UserFindManyArgs) {
   return await prisma.user.findMany({
     ...params,
+    include: {
+      company: {
+        select: { companyName: true },
+      },
+    },
   });
 }
 

@@ -2,10 +2,40 @@ import { CreateCarBodyType, UpdateCarBodyType } from '../../structs/carsStructs'
 import Car from '../../types/Car';
 import CarInfo from '../../types/CarInfo';
 
-export const carResponseDTO = (car: Car) => {
-  const { companyId, modelId, ...carWithoutCompanyId } = car;
-  return carWithoutCompanyId;
-};
+// export const carResponseDTO = (car: Car) => {
+//   const { companyId, modelId, ...carWithoutCompanyId } = car;
+//   return carWithoutCompanyId;
+// };
+
+export class CarResponseDTO {
+  id: number;
+  carNumber: string;
+  manufacturingYear: number;
+  mileage: number;
+  price: number;
+  accidentCount: number;
+  explanation: string;
+  accidentDetails: string;
+  status: string;
+  manufacturer: string;
+  model: string;
+  type: string;
+
+  constructor(car: Car) {
+    this.id = car.id;
+    this.carNumber = car.carNumber;
+    this.manufacturingYear = car.manufacturingYear;
+    this.mileage = car.mileage;
+    this.price = car.price;
+    this.accidentCount = car.accidentCount;
+    this.explanation = car.explanation || '';
+    this.accidentDetails = car.accidentDetails || '';
+    this.status = car.status;
+    this.manufacturer = car.manufacturer;
+    this.model = car.model;
+    this.type = car.type;
+  }
+}
 
 export class CreateCarDTO {
   carNumber: string;
