@@ -138,7 +138,7 @@ export const getContractChoice: RequestHandler = async (req, res) => {
  *           schema:
  *             type: object
  *             properties:
- *               file:
+ *               contractDocument:
  *                 type: string
  *                 format: binary
  *                 description: 업로드할 문서 파일
@@ -209,10 +209,7 @@ export const downloadDocument = async (req: Request, res: Response): Promise<voi
   const { contractDocumentId } = create(req.params, DownloadDocumentStruct);
 
   const contractDocument = await contractDocService.getDocumentWithCompany(contractDocumentId);
-  if (!contractDocument.contract) {
-    throw new NotFoundError('Contract', 'contract');
-  }
-  if (contractDocument.contract.companyId !== reqUser.companyId) {
+  if (contractDocument.contract && contractDocument.contract.companyId !== reqUser.companyId) {
     throw new UnauthError();
   }
 
