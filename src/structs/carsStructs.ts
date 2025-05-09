@@ -29,9 +29,9 @@ export type CreateCarBodyType = Infer<typeof CreateCarBodyStruct>;
 export const GetCarListParamsStruct = assign(
   PageParamsStruct,
   object({
-    status: optional(enums(['possession', 'contractProceeding', 'contractCompleted'])),
-    searchBy: optional(enums(['companyName', 'name', 'email'])),
-    keyword: optional(nonempty(string())),
+    status: optional(enums(['possession', 'contractProceeding', 'contractCompleted', 'total'])),
+    searchBy: optional(enums(['carNumber', 'model'])),
+    keyword: optional(string()),
   }),
 );
 
