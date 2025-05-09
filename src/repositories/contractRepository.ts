@@ -1,21 +1,30 @@
-import { Prisma } from '@prisma/client';
+import { CONTRACT_STATUS, Prisma } from '@prisma/client';
 import prisma from '../config/prismaClient';
 import { PageParamsType, SearchParamsType } from '../structs/commonStructs';
+import { ContractCreateType, ContractUpdateType } from '../structs/contractStructs';
 
-async function create(data: {
-  customerId: number;
-  carId: number;
-  userId: number;
-  companyId: number;
-  contractPrice: number;
-  meetings: { time: string }[];
-}) {
+async function create(
+  data: {
+    customerId: number;
+    carId: number;
+    userId: number;
+    contractPrice: number;
+    meetings: { date: string }[];
+  },
+  companyId: number,
+) {
+  const convertedData = {
+    ...data,
+    companyId,
+    meetings: data.meetings.map(({ date }) => ({ time: date })),
+  };
+
   return await prisma.contract.create({
     data: {
-      ...data,
+      ...convertedData,
       status: 'CONTRACT_PREPARING',
       meetings: {
-        create: data.meetings,
+        create: convertedData.meetings,
       },
     },
     include: {
@@ -33,15 +42,42 @@ async function create(data: {
   });
 }
 
-async function update(id: number, contractData: any, meetings?: { time: string }[]) {
+async function update(id: number, contractData: ContractUpdateType) {
+  const { meetings: dateMeetings, status: stringStatus, contractDocuments, ...rest } = contractData;
+  const meetings = dateMeetings?.map(({ date }) => ({ time: date }));
+  let status: CONTRACT_STATUS | undefined = undefined;
+  switch (stringStatus) {
+    case 'CONTRACT_PREPARING':
+      status = CONTRACT_STATUS.CONTRACT_PREPARING;
+      break;
+    case 'CONTRACT_SUCCESS':
+      status = CONTRACT_STATUS.CONTRACT_SUCCESS;
+      break;
+    case 'CONTRACT_FAILED':
+      status = CONTRACT_STATUS.CONTRACT_FAILED;
+      break;
+    case 'PRICE_CHECKING':
+      status = CONTRACT_STATUS.PRICE_CHECKING;
+      break;
+    case 'VEHICLE_CHECKING':
+      status = CONTRACT_STATUS.VEHICLE_CHECKING;
+      break;
+  }
+
   return await prisma.contract.update({
     where: { id },
     data: {
-      ...contractData,
+      ...rest,
+      status,
       ...(meetings && {
         meetings: {
           deleteMany: {},
           create: meetings,
+        },
+      }),
+      ...(contractDocuments && {
+        contractDocuments: {
+          set: contractDocuments.map((doc) => ({ id: doc.id })),
         },
       }),
     },
@@ -49,6 +85,12 @@ async function update(id: number, contractData: any, meetings?: { time: string }
       meetings: true,
       contractDocuments: true, // 이메일 전송용 포함
       customer: true, // 이메일 주소 접근용 포함
+      user: true,
+      car: {
+        include: {
+          carModel: true,
+        },
+      },
     },
   });
 }

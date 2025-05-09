@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import contractService from '../services/contractService';
 import {
-  ContractForResponse,
   ResponseCarDropdownDTO,
   ResponseContractDTO,
   ResponseContractListDTO,
@@ -9,13 +8,14 @@ import {
   ResponseUserDropdownDTO,
 } from '../lib/dtos/contractDTO';
 import { create, validate } from 'superstruct';
-import { ContractCreateStruct } from '../structs/contractStructs';
+import { ContractCreateStruct, ContractUpdateStruct } from '../structs/contractStructs';
 import CommonError from '../lib/errors/CommonError';
 import { sendEmail } from '../lib/emailHandler';
 import { OmittedUser } from '../types/OmittedUser';
 import { USER_ROLE } from '@prisma/client';
 import UnauthError from '../lib/errors/UnauthError';
 import { SearchParamsStruct } from '../structs/commonStructs';
+import NotFoundError from '../lib/errors/NotFoundError';
 
 /**
  * @openapi
@@ -41,8 +41,6 @@ import { SearchParamsStruct } from '../structs/commonStructs';
  *                 type: number
  *               userId:
  *                 type: number
- *               companyId:
- *                 type: number
  *               contractPrice:
  *                 type: number
  *               status:
@@ -56,19 +54,17 @@ import { SearchParamsStruct } from '../structs/commonStructs';
  *                 items:
  *                   type: object
  *                   properties:
- *                     time:
+ *                     date:
  *                       type: string
  *                       format: date-time
  *           example:
- *             customerId: 2
- *             carId: 3
- *             userId: 1
- *             companyId: 1
+ *             customerId: 20
+ *             carId: 30
+ *             userId: 11
  *             contractPrice: 15000000
  *             status: "VEHICLE_CHECKING"
- *             resolutionDate: null
  *             meetings:
- *               - time: "2025-05-10T14:00:00.000Z"
+ *               - date: "2025-05-10T14:00:00.000Z"
  *     responses:
  *       201:
  *         description: 계약과 관련된 회의가 성공적으로 생성되었습니다.
@@ -98,15 +94,16 @@ import { SearchParamsStruct } from '../structs/commonStructs';
  *         description: 서버 오류가 발생했습니다.
  */
 const createContract = async (req: Request, res: Response) => {
+  const reqUser = req.user as OmittedUser;
   const data = create(req.body, ContractCreateStruct);
-  const contract = await contractService.createContractService(data);
+  const contract = await contractService.createContractService(data, reqUser.companyId);
   res.status(201).send(new ResponseContractDTO(contract));
 };
 
 /**
  * @openapi
  * /contracts/{contractId}:
- *   put:
+ *   patch:
  *     summary: 계약 수정
  *     description: 기존 계약 정보를 수정합니다. 새로운 계약 문서가 추가된 경우 고객에게 이메일이 전송됩니다.
  *     tags:
@@ -134,13 +131,16 @@ const createContract = async (req: Request, res: Response) => {
  *                 type: number
  *               userId:
  *                 type: number
- *               companyId:
- *                 type: number
  *               contractPrice:
  *                 type: number
  *               status:
  *                 type: string
- *                 enum: [VEHICLE_CHECKING, PRICE_CHECKING, CONTRACT_PREPARING, CONTRACT_SUCCESS, CONTRACT_FAILED]
+ *                 enum:
+ *                   - VEHICLE_CHECKING
+ *                   - PRICE_CHECKING
+ *                   - CONTRACT_PREPARING
+ *                   - CONTRACT_SUCCESS
+ *                   - CONTRACT_FAILED
  *               resolutionDate:
  *                 type: string
  *                 format: date-time
@@ -149,7 +149,7 @@ const createContract = async (req: Request, res: Response) => {
  *                 items:
  *                   type: object
  *                   properties:
- *                     time:
+ *                     date:
  *                       type: string
  *                       format: date-time
  *               contractDocuments:
@@ -159,78 +159,27 @@ const createContract = async (req: Request, res: Response) => {
  *                   properties:
  *                     id:
  *                       type: number
- *                     name:
- *                       type: string
- *                     url:
+ *                     fileName:
  *                       type: string
  *           example:
- *             customerId: 2
- *             carId: 3
- *             userId: 1
- *             companyId: 1
+ *             customerId: 20
+ *             carId: 30
+ *             userId: 10
  *             contractPrice: 16000000
  *             status: "CONTRACT_PREPARING"
  *             resolutionDate: "2025-05-12T12:00:00.000Z"
  *             meetings:
- *               - time: "2025-05-10T14:00:00.000Z"
+ *               - date: "2025-05-10T14:00:00.000Z"
  *             contractDocuments:
  *               - id: 1
- *                 name: "계약서"
- *                 url: "https://example.com/contract1.pdf"
+ *               - fileName: "계약서_2025_05_10.pdf"
  *     responses:
  *       200:
  *         description: 계약이 성공적으로 수정되었습니다.
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 contractPrice:
- *                   type: number
- *                 status:
- *                   type: string
- *                 resolutionDate:
- *                   type: string
- *                   format: date-time
- *                   nullable: true
- *                 userId:
- *                   type: number
- *                 customerId:
- *                   type: number
- *                 carId:
- *                   type: number
- *                 companyId:
- *                   type: number
- *                 meetings:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       time:
- *                         type: string
- *                         format: date-time
- *                 contractDocuments:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id: { type: number }
- *                       name: { type: string }
- *                       url: { type: string }
- *             example:
- *               contractPrice: 16000000
- *               status: "CONTRACT_PREPARING"
- *               resolutionDate: "2025-05-12T12:00:00.000Z"
- *               userId: 1
- *               customerId: 2
- *               carId: 3
- *               companyId: 1
- *               meetings:
- *                 - time: "2025-05-10T14:00:00.000Z"
- *               contractDocuments:
- *                 - id: 1
- *                   name: "계약서"
- *                   url: "https://example.com/contract1.pdf"
+ *               $ref: '#/components/schemas/ResponseContractDTO'
  *       400:
  *         description: 잘못된 요청입니다. 필수 필드가 누락되었거나 형식이 잘못되었을 수 있습니다.
  *       404:
@@ -240,21 +189,20 @@ const createContract = async (req: Request, res: Response) => {
  */
 const updateContract = async (req: Request, res: Response) => {
   const contractId = parseInt(req.params.contractId);
+  const data = create(req.body, ContractUpdateStruct);
 
   const existingContract = await contractService.getContractByIdService(contractId);
   const existingDcmtId = new Set(existingContract?.contractDocuments.map((dcmt) => dcmt.id));
-  const updated = await contractService.updateContractService(contractId, req.body);
+  const updated = await contractService.updateContractService(contractId, data);
 
   const { customer, createdAt, companyId, id, ...tempResponse } = updated;
   const isNewDocumentAdded = updated.contractDocuments.some(
     (dcmt: { id: number }) => !existingDcmtId.has(dcmt.id),
   );
-
   if (isNewDocumentAdded) {
     sendEmail(customer.email);
   }
-
-  res.send(tempResponse);
+  res.send(new ResponseContractDTO(updated));
 };
 
 /**
@@ -274,7 +222,7 @@ const updateContract = async (req: Request, res: Response) => {
  *         description: 검색 기준을 선택합니다
  *         schema:
  *           type: string
- *           enum: [customerName, carModel]
+ *           enum: [customerName, userName]
  *       - in: query
  *         name: keyword
  *         required: false
@@ -342,6 +290,9 @@ const deleteContract = async (req: Request, res: Response) => {
   const reqUser = req.user as OmittedUser;
   const id = parseInt(req.params.contractId);
   const existingContract = await contractService.getContractByIdService(id);
+  if (!existingContract) {
+    throw new NotFoundError('Contract', id);
+  }
   if (reqUser.companyId !== existingContract?.companyId) {
     throw new CommonError('담당자만 삭제가 가능합니다.', 403);
   }

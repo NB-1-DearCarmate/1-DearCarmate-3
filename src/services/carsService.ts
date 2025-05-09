@@ -17,17 +17,17 @@ type CreateCarData = Omit<Car, 'id' | 'modelId' | 'status' | 'manufacturer' | 'm
 export async function createCar(data: CreateCarBodyType, companyId: number) {
   const manufacturer = await manufacturerRepository.getManufacturerByName(data.manufacturer);
   if (!manufacturer) {
-    throw new BadRequestError('잘못된 요청입니다');
+    throw new BadRequestError('제조사가 없습니다');
   }
 
   const carModel = await carsModelRepository.getCarModelByModel(data.model, manufacturer.id);
   if (!carModel) {
-    throw new BadRequestError('잘못된 요청입니다');
+    throw new BadRequestError('차종이 없습니다');
   }
 
   const carType = await carsTypeRepository.getCarTypeById(carModel.typeId);
   if (!carType) {
-    throw new BadRequestError('잘못된 요청입니다');
+    throw new BadRequestError('타입이 없습니다');
   }
 
   const car = await carsRepository.createCar(new CreateCarDTO(data, companyId, carModel.id));
