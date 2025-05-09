@@ -19,7 +19,7 @@ async function create(
     contractPrice,
     userId,
     companyId,
-    meetings: data.meetings.map(({ date }) => ({ time: date })),
+    meetings: data.meetings.map(({ date }) => ({ time: new Date(date) })),
   };
 
   return await prisma.contract.create({
@@ -47,7 +47,7 @@ async function create(
 
 async function update(id: number, contractData: ContractUpdateType) {
   const { meetings: dateMeetings, status: stringStatus, contractDocuments, ...rest } = contractData;
-  const meetings = dateMeetings?.map(({ date }) => ({ time: date }));
+  const meetings = dateMeetings?.map(({ date }) => ({ time: new Date(date) }));
   let status: CONTRACT_STATUS | undefined = undefined;
   switch (stringStatus) {
     case 'CONTRACT_PREPARING':
