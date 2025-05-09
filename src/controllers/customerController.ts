@@ -51,7 +51,7 @@ import BadRequestError from '../lib/errors/BadRequestError';
  */
 export const getCustomer: RequestHandler = async (req, res) => {
   const reqUser = req.user as OmittedUser;
-  if (reqUser.role !== USER_ROLE.EMPLOYEE) {
+  if (reqUser.role !== USER_ROLE.EMPLOYEE && reqUser.role !== USER_ROLE.OWNER) {
     throw new UnauthError();
   }
   const { customerId } = create(req.params, CustomerIdParamStruct);
@@ -174,7 +174,7 @@ export const getCustomerList: RequestHandler = async (req, res) => {
 
 export const postCustomer: RequestHandler = async (req, res) => {
   const reqUser = req.user as OmittedUser;
-  if (reqUser.role !== USER_ROLE.EMPLOYEE) {
+  if (reqUser.role !== USER_ROLE.EMPLOYEE && reqUser.role !== USER_ROLE.OWNER) {
     throw new UnauthError();
   }
   const rawData = create(req.body, CreateCustomerBodyStruct);
@@ -242,7 +242,7 @@ export const postCustomer: RequestHandler = async (req, res) => {
  */
 export const patchCustomer: RequestHandler = async (req, res) => {
   const reqUser = req.user as OmittedUser;
-  if (reqUser.role !== USER_ROLE.EMPLOYEE) {
+  if (reqUser.role !== USER_ROLE.EMPLOYEE && reqUser.role !== USER_ROLE.OWNER) {
     throw new UnauthError();
   }
   const { customerId } = create(req.params, CustomerIdParamStruct);
@@ -281,7 +281,7 @@ export const patchCustomer: RequestHandler = async (req, res) => {
  */
 export const deleteCustomer: RequestHandler = async (req, res) => {
   const reqUser = req.user as OmittedUser;
-  if (reqUser.role !== USER_ROLE.EMPLOYEE) {
+  if (reqUser.role !== USER_ROLE.EMPLOYEE && reqUser.role !== USER_ROLE.OWNER) {
     throw new UnauthError();
   }
   const { customerId } = create(req.params, CustomerIdParamStruct);
@@ -340,7 +340,7 @@ export const deleteCustomer: RequestHandler = async (req, res) => {
  */
 export const postCustomers: RequestHandler = async (req, res) => {
   const reqUser = req.user as OmittedUser;
-  if (reqUser.role !== USER_ROLE.EMPLOYEE) {
+  if (reqUser.role !== USER_ROLE.EMPLOYEE && reqUser.role !== USER_ROLE.OWNER) {
     throw new UnauthError();
   }
   if (!req.file) {
