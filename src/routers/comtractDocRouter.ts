@@ -50,7 +50,7 @@ contractDocRouter.post(
     uploadFolder: DOCUMENT_PATH,
     fileSizeLimit: 50 * 1024 * 1024,
     allowedTypes: typeArray,
-  }).single('contractDocument'),
+  }).single('file'),
   withAsync(uploadDocument),
 );
 
