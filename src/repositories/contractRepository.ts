@@ -7,14 +7,17 @@ async function create(
   data: {
     customerId: number;
     carId: number;
-    userId: number;
-    contractPrice: number;
+    contractPrice?: number;
     meetings: { date: string }[];
   },
+  userId: number,
   companyId: number,
 ) {
+  const contractPrice = data.contractPrice ?? 0;
   const convertedData = {
     ...data,
+    contractPrice,
+    userId,
     companyId,
     meetings: data.meetings.map(({ date }) => ({ time: date })),
   };
@@ -22,7 +25,7 @@ async function create(
   return await prisma.contract.create({
     data: {
       ...convertedData,
-      status: 'CONTRACT_PREPARING',
+      status: CONTRACT_STATUS.VEHICLE_CHECKING,
       meetings: {
         create: convertedData.meetings,
       },
