@@ -76,19 +76,19 @@ export class ResponseContractListDTO {
 }
 
 export class ResponseCustomerDropdownDTO {
-  constructor(customers: { id: number; name: string }[]) {
-    return customers.map(({ id, name }) => ({
+  constructor(customers: { id: number; name: string; email: string }[]) {
+    return customers.map(({ id, name, email }) => ({
       id,
-      data: name,
+      data: `${name}(${email})`,
     }));
   }
 }
 
 export class ResponseUserDropdownDTO {
-  constructor(users: { id: number; name: string }[]) {
-    return users.map(({ id, name }) => ({
+  constructor(users: { id: number; name: string; email: string }[]) {
+    return users.map(({ id, name, email }) => ({
       id,
-      data: name,
+      data: `${name}(${email})`,
     }));
   }
 }
