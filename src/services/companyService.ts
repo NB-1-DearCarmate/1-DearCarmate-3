@@ -24,7 +24,7 @@ async function getByName(companyName: string) {
 }
 
 async function getCompanies(params: PageParamsType) {
-  const searchCondition = buildSearchCondition(params, ['companyName']);
+  const searchCondition = buildSearchCondition(params, ['companyName', 'companyCode']);
   const where = searchCondition.whereCondition;
   const prismaParams = {
     ...searchCondition.pageCondition,

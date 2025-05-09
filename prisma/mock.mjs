@@ -557,6 +557,12 @@ export const CARMODEL = [
     manufacturerId: 60, // 벤츠
     typeId: 53, // 세단
   },
+  {
+    id: 74,
+    model: '스파크',
+    manufacturerId: 73, // 쉐보레
+    typeId: 53, // 세단
+  },
 ];
 
 export const MEETING = [
@@ -616,6 +622,10 @@ export const MANUFACTURER = [
   {
     id: 69,
     name: 'Toyota',
+  },
+  {
+    id: 73,
+    name: '쉐보레',
   },
 ];
 

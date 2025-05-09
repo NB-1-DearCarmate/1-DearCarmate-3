@@ -293,7 +293,7 @@ const deleteContract = async (req: Request, res: Response) => {
   if (!existingContract) {
     throw new NotFoundError('Contract', id);
   }
-  if (reqUser.companyId !== existingContract?.companyId) {
+  if (reqUser.id !== existingContract?.userId) {
     throw new CommonError('담당자만 삭제가 가능합니다.', 403);
   }
   await contractService.deleteContractService(id);

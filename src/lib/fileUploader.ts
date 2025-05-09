@@ -41,19 +41,12 @@ export function uploadHandler(options: UploadHandlerOptions) {
       cb(null, true);
       return;
     }
-    // const allowedTypes = new RegExp(`^(${allowedExt.join('|')})$`, 'i');
-    // const extname = path.extname(file.originalname).toLowerCase();
-    // const mimeType = allowedTypes.test(file.mimetype);
 
     if (allowedTypes.includes(file.mimetype)) {
       cb(null, true);
       return;
     }
 
-    // if (mimeType && allowedTypes.test(extname)) {
-    //   cb(null, true);
-    //   return;
-    // }
     cb(null, false);
   };
 
