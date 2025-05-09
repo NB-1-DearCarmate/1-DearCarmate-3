@@ -24,7 +24,7 @@ router.post(
     uploadFolder: IMAGE_PATH,
     fileSizeLimit: 5 * 1024 * 1024,
     allowedTypes: typeArray,
-  }).single('image'),
+  }).single('file'),
   withAsync(uploadImage),
 );
 
