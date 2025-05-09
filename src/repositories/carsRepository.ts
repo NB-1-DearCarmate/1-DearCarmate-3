@@ -31,7 +31,7 @@ export async function getCarList({
         ? CAR_STATUS.PENDING
         : status === 'contractCompleted'
           ? CAR_STATUS.SOLD
-          : status;
+          : undefined;
 
   const where = {
     ...searchCondition.whereCondition,
