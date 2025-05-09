@@ -36,7 +36,7 @@ export type CreateUserBodyType = Infer<typeof CreateUserBodyStruct>;
 
 export const UpdateUserBodyStruct = matchPasswords(
   object({
-    currentPassword: pwRegExp,
+    currentPassword: string(),
     employeeNumber: nonempty(string()),
     phoneNumber: phoneNumberRegExp,
     imageUrl: optional(string()),
