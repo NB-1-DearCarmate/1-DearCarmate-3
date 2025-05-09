@@ -131,6 +131,7 @@ async function findCustomerDropdown(companyId: number) {
     select: {
       id: true,
       name: true,
+      email: true,
     },
   });
 }
@@ -141,6 +142,7 @@ async function findUserDropdown(companyId: number) {
     select: {
       id: true,
       name: true,
+      email: true,
     },
   });
 }

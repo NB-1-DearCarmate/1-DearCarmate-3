@@ -356,7 +356,7 @@ const deleteContract = async (req: Request, res: Response) => {
  *     summary: 고객 드롭다운 목록 조회
  *     description: 사용자의 회사에 속한 고객 목록을 조회하여 드롭다운 형식으로 반환합니다.
  *     tags:
- *       - Customer
+ *       - Contract
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -391,7 +391,7 @@ const getCustomerDropdown = async (req: Request, res: Response) => {
  *     summary: 사용자 드롭다운 목록 조회
  *     description: 사용자의 회사에 속한 사용자 목록을 조회하여 드롭다운 형식으로 반환합니다.
  *     tags:
- *       - User
+ *       - Contract
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -426,7 +426,7 @@ const getUserDropdown = async (req: Request, res: Response) => {
  *     summary: 차량 드롭다운 목록 조회
  *     description: 사용자의 회사에 속한 차량 목록을 조회하여 드롭다운 형식으로 반환합니다.
  *     tags:
- *       - Car
+ *       - Contract
  *     security:
  *       - bearerAuth: []
  *     responses:
