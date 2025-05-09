@@ -1,4 +1,4 @@
-import { object, number, string, optional, array, Infer, partial } from 'superstruct';
+import { object, number, string, optional, array, Infer, partial, unknown } from 'superstruct';
 
 export const ContractCreateStruct = object({
   customerId: number(),
@@ -9,6 +9,7 @@ export const ContractCreateStruct = object({
   meetings: array(
     object({
       date: string(),
+      alarms: optional(unknown()),
     }),
   ),
   contractDocuments: optional(array(object({ id: number(), fileName: string() }))),
