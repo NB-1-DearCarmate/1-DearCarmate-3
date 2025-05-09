@@ -1,17 +1,16 @@
-import { ContractCreateType } from '../structs/contractStructs';
+import { ContractCreateType, ContractUpdateType } from '../structs/contractStructs';
 import { CONTRACT_STATUS } from '@prisma/client';
 import { PageParamsType, SearchParamsType } from '../structs/commonStructs';
 import { ContractForResponse } from '../lib/dtos/contractDTO';
 import contractRepository from '../repositories/contractRepository';
 
-const createContractService = async (data: ContractCreateType) => {
-  const contract = await contractRepository.create(data);
+const createContractService = async (data: ContractCreateType, companyId: number) => {
+  const contract = await contractRepository.create(data, companyId);
   return contract as ContractForResponse;
 };
 
-const updateContractService = async (id: number, data: any) => {
-  const { meetings, ...contractData } = data;
-  const updatedContract = await contractRepository.update(id, contractData, meetings);
+const updateContractService = async (id: number, data: ContractUpdateType) => {
+  const updatedContract = await contractRepository.update(id, data);
   return updatedContract;
 };
 

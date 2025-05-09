@@ -49,12 +49,33 @@ export class ResponseContractDTO {
   }
 }
 
+class ContractListItemDTO {
+  id: number;
+  car: { id: number; model: string };
+  customer: { id: number; name: string };
+  user: { id: number; name: string };
+  meetings: { date: string }[];
+  contractPrice: number;
+  resolutionDate: Date | null;
+  status: string;
+  constructor(contract: ContractForResponse) {
+    this.id = contract.id;
+    this.car = { id: contract.car.id, model: contract.car.carModel.model };
+    this.customer = { id: contract.customer.id, name: contract.customer.name };
+    this.user = { id: contract.user.id, name: contract.user.name };
+    this.meetings = contract.meetings.map((m) => ({ date: m.time.toISOString() }));
+    this.contractPrice = contract.contractPrice.toNumber();
+    this.resolutionDate = contract.resolutionDate;
+    this.status = contract.status;
+  }
+}
+
 export class ResponseContractListDTO {
-  carInspection = { totalItemCount: 0, data: [] as ContractForResponse[] };
-  priceNegotiation = { totalItemCount: 0, data: [] as ContractForResponse[] };
-  contractDraft = { totalItemCount: 0, data: [] as ContractForResponse[] };
-  contractSuccessful = { totalItemCount: 0, data: [] as ContractForResponse[] };
-  contractFailed = { totalItemCount: 0, data: [] as ContractForResponse[] };
+  carInspection = { totalItemCount: 0, data: [] as ContractListItemDTO[] };
+  priceNegotiation = { totalItemCount: 0, data: [] as ContractListItemDTO[] };
+  contractDraft = { totalItemCount: 0, data: [] as ContractListItemDTO[] };
+  contractSuccessful = { totalItemCount: 0, data: [] as ContractListItemDTO[] };
+  contractFailed = { totalItemCount: 0, data: [] as ContractListItemDTO[] };
 
   private statusMap = {
     [CONTRACT_STATUS.VEHICLE_CHECKING]: 'carInspection',
@@ -68,7 +89,7 @@ export class ResponseContractListDTO {
     contracts.forEach((contract) => {
       const key = this.statusMap[contract.status];
       if (key) {
-        this[key].data.push(contract);
+        this[key].data.push(new ContractListItemDTO(contract));
         this[key].totalItemCount++;
       }
     });
