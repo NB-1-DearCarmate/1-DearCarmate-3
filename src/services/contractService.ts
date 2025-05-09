@@ -4,8 +4,12 @@ import { PageParamsType, SearchParamsType } from '../structs/commonStructs';
 import { ContractForResponse } from '../lib/dtos/contractDTO';
 import contractRepository from '../repositories/contractRepository';
 
-const createContractService = async (data: ContractCreateType, companyId: number) => {
-  const contract = await contractRepository.create(data, companyId);
+const createContractService = async (
+  data: ContractCreateType,
+  userId: number,
+  companyId: number,
+) => {
+  const contract = await contractRepository.create(data, userId, companyId);
   return contract as ContractForResponse;
 };
 

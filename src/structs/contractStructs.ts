@@ -3,8 +3,7 @@ import { object, number, string, optional, array, Infer, partial } from 'superst
 export const ContractCreateStruct = object({
   customerId: number(),
   carId: number(),
-  userId: number(),
-  contractPrice: number(),
+  contractPrice: optional(number()),
   status: optional(string()),
   resolutionDate: optional(string()),
   meetings: array(

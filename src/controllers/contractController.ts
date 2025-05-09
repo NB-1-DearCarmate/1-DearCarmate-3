@@ -96,7 +96,7 @@ import NotFoundError from '../lib/errors/NotFoundError';
 const createContract = async (req: Request, res: Response) => {
   const reqUser = req.user as OmittedUser;
   const data = create(req.body, ContractCreateStruct);
-  const contract = await contractService.createContractService(data, reqUser.companyId);
+  const contract = await contractService.createContractService(data, reqUser.id, reqUser.companyId);
   res.status(201).send(new ResponseContractDTO(contract));
 };
 
