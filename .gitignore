@@ -4,8 +4,12 @@ node_modules/
 .env*
 !.env.example
 dist/
+http/
 
 # Uploaded files
-public/*
-!public/.gitkeep
-
+/public/documents/*
+/public/images/*
+/public/temp/*
+!public/documents/.gitkeep
+!public/images/.gitkeep
+!public/temp/.gitkeep
