@@ -4,7 +4,7 @@ exports.SearchParamsStruct = exports.PageParamsStruct = exports.CarIdParamsStruc
 const superstruct_1 = require("superstruct");
 exports.emailRegExp = (0, superstruct_1.pattern)((0, superstruct_1.string)(), 
 // /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i,
-/^[\w.-]+@([\w.-]+\.)+[\w]{2,4}$/g);
+/^[\w.-]+@([\w.-]+\.)+[\w]{2,4}$/i);
 exports.phoneNumberRegExp = (0, superstruct_1.pattern)((0, superstruct_1.string)(), /^\d{2,3}-\d{3,4}-\d{4}$/);
 exports.integerString = (0, superstruct_1.coerce)((0, superstruct_1.integer)(), (0, superstruct_1.string)(), (value) => parseInt(value));
 exports.CarIdParamsStruct = (0, superstruct_1.object)({

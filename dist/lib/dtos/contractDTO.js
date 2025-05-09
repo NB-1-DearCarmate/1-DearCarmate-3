@@ -15,6 +15,18 @@ class ResponseContractDTO {
     }
 }
 exports.ResponseContractDTO = ResponseContractDTO;
+class ContractListItemDTO {
+    constructor(contract) {
+        this.id = contract.id;
+        this.car = { id: contract.car.id, model: contract.car.carModel.model };
+        this.customer = { id: contract.customer.id, name: contract.customer.name };
+        this.user = { id: contract.user.id, name: contract.user.name };
+        this.meetings = contract.meetings.map((m) => ({ date: m.time.toISOString() }));
+        this.contractPrice = contract.contractPrice.toNumber();
+        this.resolutionDate = contract.resolutionDate;
+        this.status = contract.status;
+    }
+}
 class ResponseContractListDTO {
     constructor(contracts) {
         this.carInspection = { totalItemCount: 0, data: [] };
@@ -32,7 +44,7 @@ class ResponseContractListDTO {
         contracts.forEach((contract) => {
             const key = this.statusMap[contract.status];
             if (key) {
-                this[key].data.push(contract);
+                this[key].data.push(new ContractListItemDTO(contract));
                 this[key].totalItemCount++;
             }
         });
@@ -41,18 +53,18 @@ class ResponseContractListDTO {
 exports.ResponseContractListDTO = ResponseContractListDTO;
 class ResponseCustomerDropdownDTO {
     constructor(customers) {
-        return customers.map(({ id, name }) => ({
+        return customers.map(({ id, name, email }) => ({
             id,
-            data: name,
+            data: `${name}(${email})`,
         }));
     }
 }
 exports.ResponseCustomerDropdownDTO = ResponseCustomerDropdownDTO;
 class ResponseUserDropdownDTO {
     constructor(users) {
-        return users.map(({ id, name }) => ({
+        return users.map(({ id, name, email }) => ({
             id,
-            data: name,
+            data: `${name}(${email})`,
         }));
     }
 }

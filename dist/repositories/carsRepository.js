@@ -37,7 +37,7 @@ function getCarList(_a) {
                 ? client_1.CAR_STATUS.PENDING
                 : status === 'contractCompleted'
                     ? client_1.CAR_STATUS.SOLD
-                    : status;
+                    : undefined;
         const where = Object.assign(Object.assign({}, searchCondition.whereCondition), (dbStatus ? { status: dbStatus } : {}));
         const totalItemCount = yield prismaClient_1.prismaClient.car.count({
             where,

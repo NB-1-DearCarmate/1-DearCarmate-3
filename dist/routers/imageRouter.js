@@ -24,5 +24,5 @@ router.post('/upload', passport_1.default.authenticate(constants_1.ACCESS_TOKEN_
     uploadFolder: constants_1.IMAGE_PATH,
     fileSizeLimit: 5 * 1024 * 1024,
     allowedTypes: typeArray,
-}).single('image'), (0, withAsync_1.withAsync)(imageController_1.uploadImage));
+}).single('file'), (0, withAsync_1.withAsync)(imageController_1.uploadImage));
 exports.default = router;

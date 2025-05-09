@@ -63,15 +63,15 @@ function createCar(data, companyId) {
         var _a, _b;
         const manufacturer = yield manufacturerRepository.getManufacturerByName(data.manufacturer);
         if (!manufacturer) {
-            throw new BadRequestError_1.default('잘못된 요청입니다');
+            throw new BadRequestError_1.default('제조사가 없습니다');
         }
         const carModel = yield carsModelRepository.getCarModelByModel(data.model, manufacturer.id);
         if (!carModel) {
-            throw new BadRequestError_1.default('잘못된 요청입니다');
+            throw new BadRequestError_1.default('차종이 없습니다');
         }
         const carType = yield carsTypeRepository.getCarTypeById(carModel.typeId);
         if (!carType) {
-            throw new BadRequestError_1.default('잘못된 요청입니다');
+            throw new BadRequestError_1.default('타입이 없습니다');
         }
         const car = yield carsRepository.createCar(new carDTO_1.CreateCarDTO(data, companyId, carModel.id));
         return Object.assign(Object.assign({}, car), { manufacturer: manufacturer.name, model: carModel.model, type: carType.type, explanation: (_a = car.explanation) !== null && _a !== void 0 ? _a : undefined, accidentDetails: (_b = car.accidentDetails) !== null && _b !== void 0 ? _b : undefined });

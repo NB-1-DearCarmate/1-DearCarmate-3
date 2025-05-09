@@ -15,9 +15,9 @@ exports.CreateCarBodyStruct = (0, superstruct_1.object)({
     accidentDetails: (0, superstruct_1.string)(),
 });
 exports.GetCarListParamsStruct = (0, superstruct_1.assign)(commonStructs_1.PageParamsStruct, (0, superstruct_1.object)({
-    status: (0, superstruct_1.optional)((0, superstruct_1.enums)(['possession', 'contractProceeding', 'contractCompleted'])),
-    searchBy: (0, superstruct_1.optional)((0, superstruct_1.enums)(['companyName', 'name', 'email'])),
-    keyword: (0, superstruct_1.optional)((0, superstruct_1.nonempty)((0, superstruct_1.string)())),
+    status: (0, superstruct_1.optional)((0, superstruct_1.enums)(['possession', 'contractProceeding', 'contractCompleted', 'total'])),
+    searchBy: (0, superstruct_1.optional)((0, superstruct_1.enums)(['carNumber', 'model'])),
+    keyword: (0, superstruct_1.optional)((0, superstruct_1.string)()),
 }));
 exports.UpdateCarBodyStruct = (0, superstruct_1.partial)(exports.CreateCarBodyStruct);
 exports.BulkCreateCarBodyStruct = (0, superstruct_1.array)(exports.CreateCarBodyStruct);

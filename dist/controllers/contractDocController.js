@@ -21,7 +21,6 @@ const constants_1 = require("../config/constants");
 const contractDocService_1 = __importDefault(require("../services/contractDocService"));
 const contractDocDTO_2 = require("../lib/dtos/contractDocDTO");
 const contractDocStructs_1 = require("../structs/contractDocStructs");
-const NotFoundError_1 = __importDefault(require("../lib/errors/NotFoundError"));
 const UnauthError_1 = __importDefault(require("../lib/errors/UnauthError"));
 const path_1 = __importDefault(require("path"));
 const EmptyUploadError_1 = __importDefault(require("../lib/errors/EmptyUploadError"));
@@ -146,7 +145,7 @@ exports.getContractChoice = getContractChoice;
  *           schema:
  *             type: object
  *             properties:
- *               file:
+ *               contractDocument:
  *                 type: string
  *                 format: binary
  *                 description: 업로드할 문서 파일
@@ -214,10 +213,7 @@ const downloadDocument = (req, res) => __awaiter(void 0, void 0, void 0, functio
     const reqUser = req.user;
     const { contractDocumentId } = (0, superstruct_1.create)(req.params, contractDocStructs_1.DownloadDocumentStruct);
     const contractDocument = yield contractDocService_1.default.getDocumentWithCompany(contractDocumentId);
-    if (!contractDocument.contract) {
-        throw new NotFoundError_1.default('Contract', 'contract');
-    }
-    if (contractDocument.contract.companyId !== reqUser.companyId) {
+    if (contractDocument.contract && contractDocument.contract.companyId !== reqUser.companyId) {
         throw new UnauthError_1.default();
     }
     res.download(contractDocument.filePath, contractDocument.fileName, (err) => {

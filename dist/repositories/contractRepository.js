@@ -8,16 +8,29 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const client_1 = require("@prisma/client");
 const prismaClient_1 = __importDefault(require("../config/prismaClient"));
-function create(data) {
+function create(data, companyId) {
     return __awaiter(this, void 0, void 0, function* () {
+        const convertedData = Object.assign(Object.assign({}, data), { companyId, meetings: data.meetings.map(({ date }) => ({ time: date })) });
         return yield prismaClient_1.default.contract.create({
-            data: Object.assign(Object.assign({}, data), { status: 'CONTRACT_PREPARING', meetings: {
-                    create: data.meetings,
+            data: Object.assign(Object.assign({}, convertedData), { status: 'CONTRACT_PREPARING', meetings: {
+                    create: convertedData.meetings,
                 } }),
             include: {
                 meetings: true,
@@ -34,20 +47,50 @@ function create(data) {
         });
     });
 }
-function update(id, contractData, meetings) {
+function update(id, contractData) {
     return __awaiter(this, void 0, void 0, function* () {
+        const { meetings: dateMeetings, status: stringStatus, contractDocuments } = contractData, rest = __rest(contractData, ["meetings", "status", "contractDocuments"]);
+        const meetings = dateMeetings === null || dateMeetings === void 0 ? void 0 : dateMeetings.map(({ date }) => ({ time: date }));
+        let status = undefined;
+        switch (stringStatus) {
+            case 'CONTRACT_PREPARING':
+                status = client_1.CONTRACT_STATUS.CONTRACT_PREPARING;
+                break;
+            case 'CONTRACT_SUCCESS':
+                status = client_1.CONTRACT_STATUS.CONTRACT_SUCCESS;
+                break;
+            case 'CONTRACT_FAILED':
+                status = client_1.CONTRACT_STATUS.CONTRACT_FAILED;
+                break;
+            case 'PRICE_CHECKING':
+                status = client_1.CONTRACT_STATUS.PRICE_CHECKING;
+                break;
+            case 'VEHICLE_CHECKING':
+                status = client_1.CONTRACT_STATUS.VEHICLE_CHECKING;
+                break;
+        }
         return yield prismaClient_1.default.contract.update({
             where: { id },
-            data: Object.assign(Object.assign({}, contractData), (meetings && {
+            data: Object.assign(Object.assign(Object.assign(Object.assign({}, rest), { status }), (meetings && {
                 meetings: {
                     deleteMany: {},
                     create: meetings,
+                },
+            })), (contractDocuments && {
+                contractDocuments: {
+                    set: contractDocuments.map((doc) => ({ id: doc.id })),
                 },
             })),
             include: {
                 meetings: true,
                 contractDocuments: true, // 이메일 전송용 포함
                 customer: true, // 이메일 주소 접근용 포함
+                user: true,
+                car: {
+                    include: {
+                        carModel: true,
+                    },
+                },
             },
         });
     });
@@ -128,6 +171,7 @@ function findCustomerDropdown(companyId) {
             select: {
                 id: true,
                 name: true,
+                email: true,
             },
         });
     });
@@ -139,6 +183,7 @@ function findUserDropdown(companyId) {
             select: {
                 id: true,
                 name: true,
+                email: true,
             },
         });
     });

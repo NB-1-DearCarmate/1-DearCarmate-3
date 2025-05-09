@@ -18,7 +18,7 @@ exports.CreateUserBodyStruct = matchPasswords((0, superstruct_1.object)({
     companyCode: (0, superstruct_1.nonempty)((0, superstruct_1.string)()),
 }));
 exports.UpdateUserBodyStruct = matchPasswords((0, superstruct_1.object)({
-    currentPassword: pwRegExp,
+    currentPassword: (0, superstruct_1.string)(),
     employeeNumber: (0, superstruct_1.nonempty)((0, superstruct_1.string)()),
     phoneNumber: commonStructs_1.phoneNumberRegExp,
     imageUrl: (0, superstruct_1.optional)((0, superstruct_1.string)()),

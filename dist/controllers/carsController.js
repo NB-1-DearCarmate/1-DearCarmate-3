@@ -84,7 +84,7 @@ const csvtojson_1 = __importDefault(require("csvtojson"));
  *                 example: "Hyundai"
  *               model:
  *                 type: string
- *                 example: "Sonata"
+ *                 example: "Sonata 2023"
  *               manufacturingYear:
  *                 type: integer
  *                 example: 2020
@@ -144,7 +144,7 @@ function createCar(req, res) {
  *           default: 1
  *         description: 페이지 번호
  *       - in: query
- *         name: limit
+ *         name: pageSize
  *         required: false
  *         schema:
  *           type: number
@@ -206,7 +206,7 @@ function getCarList(req, res) {
 /**
  * @openapi
  * /cars/{carId}:
- *   put:
+ *   patch:
  *     summary: 차량 정보 수정
  *     description: 차량 정보를 수정합니다.
  *     tags:
@@ -356,6 +356,45 @@ function getCarModelList(req, res) {
         res.send(new carDTO_1.ResponseCarModelListDTO(result));
     });
 }
+/**
+ * @openapi
+ * /cars/upload:
+ *   post:
+ *     summary: 차량 정보 일괄 업로드
+ *     description: CSV 파일을 통해 차량 정보를 일괄적으로 업로드합니다.
+ *     tags:
+ *       - Car
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               file:
+ *                 type: string
+ *                 format: binary
+ *                 description: 업로드할 CSV 파일
+ *     responses:
+ *       200:
+ *         description: 차량 정보 일괄 업로드 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 성공적으로 등록되었습니다
+ *       400:
+ *         description: 잘못된 요청. CSV 파일이 누락되었거나 유효하지 않은 경우
+ *       401:
+ *         description: 인증 실패. 유효하지 않은 액세스 토큰
+ *       500:
+ *         description: 서버 오류. 차량 정보 업로드 처리 중 오류 발생
+ */
 function carUpload(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const reqUser = req.user;

@@ -51,13 +51,16 @@ const UnauthError_1 = __importDefault(require("../lib/errors/UnauthError"));
  *                 example: 010-1234-5678
  *               password:
  *                 type: string
- *                 example: securepassword
- *               company:
+ *                 example: password9
+ *               passwordConfirmation:
  *                 type: string
- *                 example: "Acme Corp"
+ *                 example: password9
+ *               companyName:
+ *                 type: string
+ *                 example: "햇살카"
  *               companyCode:
  *                 type: string
- *                 example: "ACME123"
+ *                 example: "sunshine"
  *     responses:
  *       201:
  *         description: 사용자 생성 성공
