@@ -129,8 +129,6 @@ const createContract = async (req: Request, res: Response) => {
  *                 type: number
  *               carId:
  *                 type: number
- *               userId:
- *                 type: number
  *               contractPrice:
  *                 type: number
  *               status:
@@ -164,7 +162,6 @@ const createContract = async (req: Request, res: Response) => {
  *           example:
  *             customerId: 20
  *             carId: 30
- *             userId: 10
  *             contractPrice: 16000000
  *             status: "CONTRACT_PREPARING"
  *             resolutionDate: "2025-05-12T12:00:00.000Z"
@@ -172,7 +169,7 @@ const createContract = async (req: Request, res: Response) => {
  *               - date: "2025-05-10T14:00:00.000Z"
  *             contractDocuments:
  *               - id: 1
- *               - fileName: "계약서_2025_05_10.pdf"
+ *                 fileName: "계약서_2025_05_10.pdf"
  *     responses:
  *       200:
  *         description: 계약이 성공적으로 수정되었습니다.
