@@ -17,7 +17,6 @@ exports.getCar = getCar;
 exports.createCars = createCars;
 const client_1 = require("@prisma/client");
 const prismaClient_1 = require("../lib/prismaClient");
-const searchCondition_1 = require("../lib/searchCondition");
 function createCar(data) {
     return __awaiter(this, void 0, void 0, function* () {
         return yield prismaClient_1.prismaClient.car.create({
@@ -27,10 +26,26 @@ function createCar(data) {
 }
 function getCarList(_a) {
     return __awaiter(this, arguments, void 0, function* ({ page, pageSize, status, searchBy, keyword, }) {
-        const searchCondition = (0, searchCondition_1.buildSearchCondition)({ page, pageSize, searchBy, keyword }, [
-            'carNumber',
-            'model',
-        ]);
+        const pageCondition = {
+            skip: (page - 1) * pageSize,
+            take: pageSize,
+        };
+        let where = {};
+        if (searchBy && keyword) {
+            switch (searchBy) {
+                case 'carNumber':
+                    where.carNumber = { contains: keyword, mode: 'insensitive' };
+                    break;
+                case 'model':
+                    where.carModel = {
+                        model: {
+                            contains: keyword,
+                            mode: 'insensitive',
+                        },
+                    };
+                    break;
+            }
+        }
         const dbStatus = status === 'possession'
             ? client_1.CAR_STATUS.AVAILABLE
             : status === 'contractProceeding'
@@ -38,11 +53,11 @@ function getCarList(_a) {
                 : status === 'contractCompleted'
                     ? client_1.CAR_STATUS.SOLD
                     : undefined;
-        const where = Object.assign(Object.assign({}, searchCondition.whereCondition), (dbStatus ? { status: dbStatus } : {}));
+        where = Object.assign(Object.assign({}, where), (dbStatus ? { status: dbStatus } : {}));
         const totalItemCount = yield prismaClient_1.prismaClient.car.count({
             where,
         });
-        const cars = yield prismaClient_1.prismaClient.car.findMany(Object.assign(Object.assign({}, searchCondition.pageCondition), { where, include: {
+        const cars = yield prismaClient_1.prismaClient.car.findMany(Object.assign(Object.assign({}, pageCondition), { where, include: {
                 carModel: {
                     include: {
                         carType: true,

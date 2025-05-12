@@ -33,7 +33,7 @@ const EmptyUploadError_1 = __importDefault(require("../lib/errors/EmptyUploadErr
  *           schema:
  *             type: object
  *             properties:
- *               image:
+ *               file:
  *                 type: string
  *                 format: binary
  *                 description: 업로드할 이미지 파일

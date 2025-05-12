@@ -40,7 +40,7 @@ contractDocRouter.post('/upload', passport_1.default.authenticate(constants_1.AC
     uploadFolder: constants_1.DOCUMENT_PATH,
     fileSizeLimit: 50 * 1024 * 1024,
     allowedTypes: typeArray,
-}).single('contractDocument'), (0, withAsync_1.withAsync)(contractDocController_1.uploadDocument));
+}).single('file'), (0, withAsync_1.withAsync)(contractDocController_1.uploadDocument));
 contractDocRouter.get('/:contractDocumentId/download', passport_1.default.authenticate(constants_1.ACCESS_TOKEN_STRATEGY, { session: false }), (0, withAsync_1.withAsync)(contractDocController_1.downloadDocument));
 contractDocRouter.get('/', passport_1.default.authenticate(constants_1.ACCESS_TOKEN_STRATEGY, { session: false }), (0, withAsync_1.withAsync)(contractDocController_1.getDocumentList));
 exports.default = contractDocRouter;

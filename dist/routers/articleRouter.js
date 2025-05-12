@@ -1,0 +1,23 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const withAsync_1 = require("../lib/withAsync");
+const articleController_1 = require("../controllers/articleController");
+const passport_1 = __importDefault(require("../middlewares/passport/passport"));
+const articleAuth_1 = __importDefault(require("../middlewares/articleAuth"));
+const passportPartial_1 = require("../middlewares/passport/passportPartial");
+const constants_1 = require("../config/constants");
+const articlesRouter = express_1.default.Router();
+articlesRouter.post('/:id/comments', passport_1.default.authenticate(constants_1.ACCESS_TOKEN_STRATEGY, { session: false }), (0, withAsync_1.withAsync)(articleController_1.createComment));
+articlesRouter.get('/:id/comments', (0, withAsync_1.withAsync)(articleController_1.getCommentList));
+articlesRouter.get('/:id/like', passport_1.default.authenticate(constants_1.ACCESS_TOKEN_STRATEGY, { session: false }), (0, withAsync_1.withAsync)(articleController_1.likeArticle));
+articlesRouter.get('/:id/dislike', passport_1.default.authenticate(constants_1.ACCESS_TOKEN_STRATEGY, { session: false }), (0, withAsync_1.withAsync)(articleController_1.dislikeArticle));
+articlesRouter.get('/:id', (0, passportPartial_1.authenticatePartial)(constants_1.ACCESS_TOKEN_STRATEGY), (0, withAsync_1.withAsync)(articleController_1.getArticle));
+articlesRouter.patch('/:id', passport_1.default.authenticate(constants_1.ACCESS_TOKEN_STRATEGY, { session: false }), articleAuth_1.default.verifyAricleOwner, (0, withAsync_1.withAsync)(articleController_1.updateArticle));
+articlesRouter.delete('/:id', passport_1.default.authenticate(constants_1.ACCESS_TOKEN_STRATEGY, { session: false }), articleAuth_1.default.verifyAricleOwner, (0, withAsync_1.withAsync)(articleController_1.deleteArticle));
+articlesRouter.post('/', passport_1.default.authenticate(constants_1.ACCESS_TOKEN_STRATEGY, { session: false }), (0, withAsync_1.withAsync)(articleController_1.createArticle));
+articlesRouter.get('/', (0, withAsync_1.withAsync)(articleController_1.getArticleList));
+exports.default = articlesRouter;

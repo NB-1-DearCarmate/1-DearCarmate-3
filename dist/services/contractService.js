@@ -14,8 +14,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getContractListWithDoc = getContractListWithDoc;
 const contractRepository_1 = __importDefault(require("../repositories/contractRepository"));
-const createContractService = (data, companyId) => __awaiter(void 0, void 0, void 0, function* () {
-    const contract = yield contractRepository_1.default.create(data, companyId);
+const createContractService = (data, userId, companyId) => __awaiter(void 0, void 0, void 0, function* () {
+    const contract = yield contractRepository_1.default.create(data, userId, companyId);
     return contract;
 });
 const updateContractService = (id, data) => __awaiter(void 0, void 0, void 0, function* () {

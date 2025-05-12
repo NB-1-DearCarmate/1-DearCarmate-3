@@ -38,7 +38,7 @@ app.use('/dashboard', dashBoardRouter_1.default);
 app.use('/contracts', contractRouter_1.default);
 app.use('/images', imageRouter_1.default);
 app.use('/public/images', express_1.default.static(path_1.default.join(__dirname, '../public/images')));
-app.use('/', swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swagger_1.default));
+app.use('/swagger', swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swagger_1.default));
 app.use(errorController_1.defaultNotFoundHandler);
 app.use(errorController_1.globalErrorHandler);
 app.listen(constants_1.PORT, () => {

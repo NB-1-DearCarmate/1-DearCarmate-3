@@ -30,7 +30,6 @@ const userRepository_1 = __importDefault(require("../repositories/userRepository
 const NotFoundError_1 = __importDefault(require("../lib/errors/NotFoundError"));
 const UnauthError_1 = __importDefault(require("../lib/errors/UnauthError"));
 const userDTO_1 = require("../lib/dtos/userDTO");
-const searchCondition_1 = require("../lib/searchCondition");
 function hashingPassword(password) {
     return __awaiter(this, void 0, void 0, function* () {
         return yield bcrypt_1.default.hash(password, 10);
@@ -62,11 +61,32 @@ function getUserById(id) {
         return filterSensitiveUserData(user);
     });
 }
-function getCompanyUsers(params) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const searchCondition = (0, searchCondition_1.buildSearchCondition)(params, ['companyName', 'email', 'name']);
-        const where = searchCondition.whereCondition;
-        const prismaParams = Object.assign(Object.assign({}, searchCondition.pageCondition), { include: {
+function getCompanyUsers(_a) {
+    return __awaiter(this, arguments, void 0, function* ({ page, pageSize, searchBy, keyword }) {
+        const pageCondition = {
+            skip: (page - 1) * pageSize,
+            take: pageSize,
+        };
+        let where = {};
+        if (searchBy && keyword) {
+            switch (searchBy) {
+                case 'email':
+                    where.email = { contains: keyword, mode: 'insensitive' };
+                    break;
+                case 'name':
+                    where.name = { contains: keyword, mode: 'insensitive' };
+                    break;
+                case 'companyName':
+                    where.company = {
+                        companyName: {
+                            contains: keyword,
+                            mode: 'insensitive',
+                        },
+                    };
+                    break;
+            }
+        }
+        const prismaParams = Object.assign(Object.assign({}, pageCondition), { include: {
                 company: {
                     select: { companyName: true },
                 },

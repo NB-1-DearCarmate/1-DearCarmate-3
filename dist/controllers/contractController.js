@@ -112,7 +112,7 @@ const NotFoundError_1 = __importDefault(require("../lib/errors/NotFoundError"));
 const createContract = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const reqUser = req.user;
     const data = (0, superstruct_1.create)(req.body, contractStructs_1.ContractCreateStruct);
-    const contract = yield contractService_1.default.createContractService(data, reqUser.companyId);
+    const contract = yield contractService_1.default.createContractService(data, reqUser.id, reqUser.companyId);
     res.status(201).send(new contractDTO_1.ResponseContractDTO(contract));
 });
 /**
@@ -143,8 +143,6 @@ const createContract = (req, res) => __awaiter(void 0, void 0, void 0, function*
  *               customerId:
  *                 type: number
  *               carId:
- *                 type: number
- *               userId:
  *                 type: number
  *               contractPrice:
  *                 type: number
@@ -179,7 +177,6 @@ const createContract = (req, res) => __awaiter(void 0, void 0, void 0, function*
  *           example:
  *             customerId: 20
  *             carId: 30
- *             userId: 10
  *             contractPrice: 16000000
  *             status: "CONTRACT_PREPARING"
  *             resolutionDate: "2025-05-12T12:00:00.000Z"
@@ -187,7 +184,7 @@ const createContract = (req, res) => __awaiter(void 0, void 0, void 0, function*
  *               - date: "2025-05-10T14:00:00.000Z"
  *             contractDocuments:
  *               - id: 1
- *               - fileName: "계약서_2025_05_10.pdf"
+ *                 fileName: "계약서_2025_05_10.pdf"
  *     responses:
  *       200:
  *         description: 계약이 성공적으로 수정되었습니다.
@@ -302,7 +299,7 @@ const deleteContract = (req, res) => __awaiter(void 0, void 0, void 0, function*
     if (!existingContract) {
         throw new NotFoundError_1.default('Contract', id);
     }
-    if (reqUser.companyId !== (existingContract === null || existingContract === void 0 ? void 0 : existingContract.companyId)) {
+    if (reqUser.id !== (existingContract === null || existingContract === void 0 ? void 0 : existingContract.userId)) {
         throw new CommonError_1.default('담당자만 삭제가 가능합니다.', 403);
     }
     yield contractService_1.default.deleteContractService(id);

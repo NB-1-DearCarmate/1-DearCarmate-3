@@ -39,7 +39,7 @@ function getByName(companyName) {
 }
 function getCompanies(params) {
     return __awaiter(this, void 0, void 0, function* () {
-        const searchCondition = (0, searchCondition_1.buildSearchCondition)(params, ['companyName']);
+        const searchCondition = (0, searchCondition_1.buildSearchCondition)(params, ['companyName', 'companyCode']);
         const where = searchCondition.whereCondition;
         const prismaParams = Object.assign(Object.assign({}, searchCondition.pageCondition), { where });
         const companies = yield companyRepository_1.default.getList(prismaParams);

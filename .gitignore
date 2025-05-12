@@ -1,0 +1,14 @@
+# Local files
+.vscode/
+node_modules/
+.env*
+!.env.example
+http/
+
+# Uploaded files
+/public/documents/*
+/public/images/*
+/public/temp/*
+!public/documents/.gitkeep
+!public/images/.gitkeep
+!public/temp/.gitkeep

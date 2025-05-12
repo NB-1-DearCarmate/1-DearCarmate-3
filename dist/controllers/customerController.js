@@ -54,7 +54,7 @@ const BadRequestError_1 = __importDefault(require("../lib/errors/BadRequestError
  */
 const getCustomer = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const reqUser = req.user;
-    if (reqUser.role !== client_1.USER_ROLE.EMPLOYEE) {
+    if (reqUser.role !== client_1.USER_ROLE.EMPLOYEE && reqUser.role !== client_1.USER_ROLE.OWNER) {
         throw new UnauthError_1.default();
     }
     const { customerId } = (0, superstruct_1.create)(req.params, customerStructs_1.CustomerIdParamStruct);
@@ -175,7 +175,7 @@ exports.getCustomerList = getCustomerList;
  */
 const postCustomer = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const reqUser = req.user;
-    if (reqUser.role !== client_1.USER_ROLE.EMPLOYEE) {
+    if (reqUser.role !== client_1.USER_ROLE.EMPLOYEE && reqUser.role !== client_1.USER_ROLE.OWNER) {
         throw new UnauthError_1.default();
     }
     const rawData = (0, superstruct_1.create)(req.body, customerStructs_1.CreateCustomerBodyStruct);
@@ -243,7 +243,7 @@ exports.postCustomer = postCustomer;
  */
 const patchCustomer = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const reqUser = req.user;
-    if (reqUser.role !== client_1.USER_ROLE.EMPLOYEE) {
+    if (reqUser.role !== client_1.USER_ROLE.EMPLOYEE && reqUser.role !== client_1.USER_ROLE.OWNER) {
         throw new UnauthError_1.default();
     }
     const { customerId } = (0, superstruct_1.create)(req.params, customerStructs_1.CustomerIdParamStruct);
@@ -282,7 +282,7 @@ exports.patchCustomer = patchCustomer;
  */
 const deleteCustomer = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const reqUser = req.user;
-    if (reqUser.role !== client_1.USER_ROLE.EMPLOYEE) {
+    if (reqUser.role !== client_1.USER_ROLE.EMPLOYEE && reqUser.role !== client_1.USER_ROLE.OWNER) {
         throw new UnauthError_1.default();
     }
     const { customerId } = (0, superstruct_1.create)(req.params, customerStructs_1.CustomerIdParamStruct);
@@ -341,7 +341,7 @@ exports.deleteCustomer = deleteCustomer;
  */
 const postCustomers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const reqUser = req.user;
-    if (reqUser.role !== client_1.USER_ROLE.EMPLOYEE) {
+    if (reqUser.role !== client_1.USER_ROLE.EMPLOYEE && reqUser.role !== client_1.USER_ROLE.OWNER) {
         throw new UnauthError_1.default();
     }
     if (!req.file) {

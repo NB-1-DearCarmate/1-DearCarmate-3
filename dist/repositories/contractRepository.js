@@ -25,11 +25,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const client_1 = require("@prisma/client");
 const prismaClient_1 = __importDefault(require("../config/prismaClient"));
-function create(data, companyId) {
+function create(data, userId, companyId) {
     return __awaiter(this, void 0, void 0, function* () {
-        const convertedData = Object.assign(Object.assign({}, data), { companyId, meetings: data.meetings.map(({ date }) => ({ time: date })) });
+        var _a;
+        const contractPrice = (_a = data.contractPrice) !== null && _a !== void 0 ? _a : 0;
+        const convertedData = Object.assign(Object.assign({}, data), { contractPrice,
+            userId,
+            companyId, meetings: data.meetings.map(({ date }) => ({ time: new Date(date) })) });
         return yield prismaClient_1.default.contract.create({
-            data: Object.assign(Object.assign({}, convertedData), { status: 'CONTRACT_PREPARING', meetings: {
+            data: Object.assign(Object.assign({}, convertedData), { status: client_1.CONTRACT_STATUS.VEHICLE_CHECKING, meetings: {
                     create: convertedData.meetings,
                 } }),
             include: {
@@ -50,7 +54,7 @@ function create(data, companyId) {
 function update(id, contractData) {
     return __awaiter(this, void 0, void 0, function* () {
         const { meetings: dateMeetings, status: stringStatus, contractDocuments } = contractData, rest = __rest(contractData, ["meetings", "status", "contractDocuments"]);
-        const meetings = dateMeetings === null || dateMeetings === void 0 ? void 0 : dateMeetings.map(({ date }) => ({ time: date }));
+        const meetings = dateMeetings === null || dateMeetings === void 0 ? void 0 : dateMeetings.map(({ date }) => ({ time: new Date(date) }));
         let status = undefined;
         switch (stringStatus) {
             case 'CONTRACT_PREPARING':

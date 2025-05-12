@@ -59,6 +59,7 @@ const carDTO_1 = require("../lib/dtos/carDTO");
 const commonStructs_1 = require("../structs/commonStructs");
 const BadRequestError_1 = __importDefault(require("../lib/errors/BadRequestError"));
 const csvtojson_1 = __importDefault(require("csvtojson"));
+const fs_1 = __importDefault(require("fs"));
 /**
  * @openapi
  * /cars:
@@ -397,26 +398,31 @@ function getCarModelList(req, res) {
  */
 function carUpload(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const reqUser = req.user;
         if (!req.file) {
             throw new BadRequestError_1.default('CSV 파일이 업로드되지 않았습니다.');
         }
         const filePath = req.file.path;
-        const jsonArray = yield (0, csvtojson_1.default)().fromFile(filePath);
-        const parsedArray = jsonArray.map((item) => ({
-            carNumber: item.carNumber,
-            manufacturer: item.manufacturer,
-            model: item.model,
-            manufacturingYear: parseInt(item.manufacturingYear, 10),
-            mileage: parseInt(item.mileage, 10),
-            price: parseInt(item.price, 10),
-            accidentCount: parseInt(item.accidentCount, 10),
-            explanation: item.explanation,
-            accidentDetails: item.accidentDetails,
-        }));
-        const validatedData = (0, superstruct_1.create)(parsedArray, carsStructs_1.BulkCreateCarBodyStruct);
-        const dataWithCompanyId = validatedData.map((item) => (Object.assign(Object.assign({}, item), { companyId: reqUser.companyId })));
-        const createdCars = yield carsService.carUpload(dataWithCompanyId);
-        res.status(200).send({ message: '성공적으로 등록되었습니다' });
+        try {
+            const reqUser = req.user;
+            const jsonArray = yield (0, csvtojson_1.default)().fromFile(filePath);
+            const parsedArray = jsonArray.map((item) => ({
+                carNumber: item.carNumber,
+                manufacturer: item.manufacturer,
+                model: item.model,
+                manufacturingYear: parseInt(item.manufacturingYear, 10),
+                mileage: parseInt(item.mileage, 10),
+                price: parseInt(item.price, 10),
+                accidentCount: parseInt(item.accidentCount, 10),
+                explanation: item.explanation,
+                accidentDetails: item.accidentDetails,
+            }));
+            const validatedData = (0, superstruct_1.create)(parsedArray, carsStructs_1.BulkCreateCarBodyStruct);
+            const dataWithCompanyId = validatedData.map((item) => (Object.assign(Object.assign({}, item), { companyId: reqUser.companyId })));
+            yield carsService.carUpload(dataWithCompanyId);
+            res.status(200).send({ message: '성공적으로 등록되었습니다' });
+        }
+        finally {
+            fs_1.default.unlink(filePath, () => { });
+        }
     });
 }
