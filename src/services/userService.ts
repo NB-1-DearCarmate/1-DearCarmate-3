@@ -42,11 +42,35 @@ async function getUserById(id: number) {
   return filterSensitiveUserData(user);
 }
 
-async function getCompanyUsers(params: PageParamsType) {
-  const searchCondition = buildSearchCondition(params, ['companyName', 'email', 'name']);
-  const where = searchCondition.whereCondition;
+async function getCompanyUsers({ page, pageSize, searchBy, keyword }: PageParamsType) {
+  const pageCondition = {
+    skip: (page - 1) * pageSize,
+    take: pageSize,
+  };
+
+  let where: Prisma.UserWhereInput = {};
+
+  if (searchBy && keyword) {
+    switch (searchBy) {
+      case 'email':
+        where.email = { contains: keyword, mode: 'insensitive' };
+        break;
+      case 'name':
+        where.name = { contains: keyword, mode: 'insensitive' };
+        break;
+      case 'companyName':
+        where.company = {
+          companyName: {
+            contains: keyword,
+            mode: 'insensitive',
+          },
+        };
+        break;
+    }
+  }
+
   const prismaParams = {
-    ...searchCondition.pageCondition,
+    ...pageCondition,
     include: {
       company: {
         select: { companyName: true },
