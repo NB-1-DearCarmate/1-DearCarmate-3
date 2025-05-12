@@ -138,7 +138,7 @@ export const getContractChoice: RequestHandler = async (req, res) => {
  *           schema:
  *             type: object
  *             properties:
- *               contractDocument:
+ *               file:
  *                 type: string
  *                 format: binary
  *                 description: 업로드할 문서 파일
