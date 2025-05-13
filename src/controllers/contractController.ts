@@ -196,8 +196,11 @@ const updateContract = async (req: Request, res: Response) => {
   const isNewDocumentAdded = updated.contractDocuments.some(
     (dcmt: { id: number }) => !existingDcmtId.has(dcmt.id),
   );
+  const newDocumentPaths = updated.contractDocuments
+    .filter((dcmt: { id: number }) => !existingDcmtId.has(dcmt.id))
+    .map((dcmt: { filePath: string }) => dcmt.filePath);
   if (isNewDocumentAdded) {
-    sendEmail(customer.email);
+    sendEmail(customer.email, newDocumentPaths);
   }
   res.send(new ResponseContractDTO(updated));
 };
