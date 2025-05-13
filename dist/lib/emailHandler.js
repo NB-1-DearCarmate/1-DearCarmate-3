@@ -18,7 +18,7 @@ const constants_1 = require("../config/constants");
 const transporter = nodemailer_1.default.createTransport({
     service: 'gmail',
     auth: {
-        user: 'jbyoum3@gmail.com', // 본인 이메일
+        user: 'gusxo999@gmail.com', // 본인 이메일
         pass: constants_1.EMAIL_PW, // 앱 비밀번호
     },
 });
@@ -29,7 +29,7 @@ function sendEmail(email, pathArray) {
                 path: filePath,
             }));
             const info = yield transporter.sendMail({
-                from: '"Dear Carmate" <jbyoum3@gmail.com>',
+                from: '"Dear Carmate" <gusxo999@gmail.com>',
                 to: email,
                 subject: '계약서 등록 안내',
                 text: '계약서 등록 안내',
