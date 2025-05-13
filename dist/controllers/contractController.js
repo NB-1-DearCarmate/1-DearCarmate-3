@@ -207,8 +207,11 @@ const updateContract = (req, res) => __awaiter(void 0, void 0, void 0, function*
     const updated = yield contractService_1.default.updateContractService(contractId, data);
     const { customer, createdAt, companyId, id } = updated, tempResponse = __rest(updated, ["customer", "createdAt", "companyId", "id"]);
     const isNewDocumentAdded = updated.contractDocuments.some((dcmt) => !existingDcmtId.has(dcmt.id));
+    const newDocumentPaths = updated.contractDocuments
+        .filter((dcmt) => !existingDcmtId.has(dcmt.id))
+        .map((dcmt) => dcmt.filePath);
     if (isNewDocumentAdded) {
-        (0, emailHandler_1.sendEmail)(customer.email);
+        (0, emailHandler_1.sendEmail)(customer.email, newDocumentPaths);
     }
     res.send(new contractDTO_1.ResponseContractDTO(updated));
 });
